@@ -46,12 +46,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
 
-//CHANGELOG:
-// upgraded to commons-compress 1.10 
-// added support for compressing sub-directories 
-// built GUI for application with advanced functionality
-// added threading capability for GUI responsiveness
-// added Linux compatibility
 public class GUI extends JFrame implements Runnable {
 
     //ATTRIBUTES
@@ -190,7 +184,8 @@ public class GUI extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    /*starts compressing/decompressing if start button has been pressed*/
+    /*this method will create a new thread if none is alive yet;
+     it also toggles PauseControl to let Thread start the archive operation*/
     private void startButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _startButton) {
             _abortButton.setEnabled(true);
@@ -203,7 +198,7 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*aborts the compressing/decompressing operation*/
+    /*trys to abort the compressing/decompressing operation*/
     private void abortButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _abortButton) {
             _textOutput.append("Trying to abort operation...\n");
@@ -295,7 +290,7 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*draw new windows with predefinded title and text*/
+    /*draw new window with predefinded title and text*/
     private void drawNewWindow(String title, String text) {
         JFrame frame = new JFrame(title);
         JLabel label = new JLabel(text, SwingConstants.CENTER);
