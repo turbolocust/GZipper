@@ -1,6 +1,11 @@
 # gzipper
 
-<b>CHANGELOG (v0.6)</b><br>
+<b>CHANGELOG</b><br>
+<b><i>v0.6</b></i>
+<ul>
+<li>added icon image</li>
+</ul>
+<b><i>v0.5</b></i>
 <ul>
 <li>upgraded to commons-compress 1.10<br></li>
 <li>added support for compressing sub-directories<br></li>
