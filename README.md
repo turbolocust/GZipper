@@ -1,6 +1,7 @@
 # gzipper
 
-<u><b>CHANGELOG</b></u><br>
+<b>CHANGELOG</b><br>
+<br>
 <b>v0.6</b>
 <ul>
 <li>added icon image</li>
