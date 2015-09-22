@@ -24,11 +24,14 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -77,14 +80,14 @@ public class GUI extends JFrame implements Runnable {
     protected static boolean _isUnix; //to check whether OS is unix or not
 
     //CONSTRUCTOR
-    public GUI(String path) {
+    public GUI(String path, BufferedImage ico) {
         INITIAL_PATH = path;
         _ps = new PauseControl();
-        initComponents();
+        initComponents(ico);
     }
 
     //METHODS
-    private void initComponents() {
+    private void initComponents(BufferedImage ico) {
         /*initialize fields*/
         _fileMenu = new JMenu();
         _helpMenu = new JMenu();
@@ -109,6 +112,7 @@ public class GUI extends JFrame implements Runnable {
         setLayout(new BorderLayout());
         setTitle("GZipper");
         setPreferredSize(new Dimension(500, 250));
+        setIconImage(ico);
         setJMenuBar(_menuBar);
 
         /*define components*/
@@ -381,15 +385,20 @@ public class GUI extends JFrame implements Runnable {
                 _isUnix = true;
                 decPath = path.substring(0, path.length() - 11);
             }
+            /*get icon image for frame from root application folder;
+             do not forget to copy it to class files directory when debugging app,
+             the image can be found in the main directory of the project*/
+            FileInputStream imgStream = new FileInputStream(decPath + "icon.png");
+            BufferedImage ico = ImageIO.read(imgStream);
             /*draw application frame*/
             java.awt.EventQueue.invokeLater(() -> {
-                new GUI(decPath).setVisible(true);
+                new GUI(decPath, ico).setVisible(true);
             });
             Thread.sleep(300);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
             System.exit(1);
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException | IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         }
     }
