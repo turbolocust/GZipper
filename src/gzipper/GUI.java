@@ -286,8 +286,9 @@ public class GUI extends JFrame implements Runnable {
 
     private void aboutMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _aboutMenuItem) {
-            drawNewWindow("About", "<html><br><p align=\"center\">&nbsp;2015 (C) "
-                    + "Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com</p>"
+            drawNewWindow("About", "<html><br><p align=\"center\">"
+                    + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v0.6</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)&nbsp;<br>&nbsp;</html>");
@@ -388,7 +389,7 @@ public class GUI extends JFrame implements Runnable {
             /*get icon image for frame from root application folder;
              do not forget to copy it to class files directory when debugging app,
              the image can be found in the main directory of the project*/
-            FileInputStream imgStream = new FileInputStream(decPath + "icon.png");
+            FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
             BufferedImage ico = ImageIO.read(imgStream);
             /*draw application frame*/
             java.awt.EventQueue.invokeLater(() -> {
