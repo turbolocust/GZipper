@@ -6,7 +6,7 @@ This JAVA program is mainly for practicing. It builds on a seminary work and as 
 <br>
 <b>How it works:</b><br>
 
-Select files/folders to put them into an archive (tar.gz). The archive will be created in the same folder where the JAR-file is located. If there is already an archive with the default or same name, a second file (and so on...) be created. So the old archive will not be overriden. Extraction works the same, you select an archive and it will be extracted into an subfolder to the directory of the executable app. In the future I am planning to implement the option to select custom paths for zip/unzip destinations.<br>
+Select files/folders to put them into an archive (tar.gz). The archive will be created in the same folder where the JAR-file is located. If there is already an archive with the default or same name, a second file (and so on...) will be created. So any old archive will not be overriden. Extraction works the same, you select an archive and it will be extracted into a subfolder in the directory of the executable app. In the future, I am planning to implement the option to select custom paths for zip/unzip destinations.<br>
 <br>
 <b>CHANGELOG</b><br>
 <br>
