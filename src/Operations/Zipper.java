@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper;
+package Operations;
 
+import Graphics.GUI;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -57,13 +58,13 @@ public class Zipper implements Runnable {
     }
 
     //METHODS
-    protected void start() throws IOException {
+    public void start() throws IOException {
         _runFlag = true;
         _zipperThread = new Thread(this);
         _zipperThread.start();
     }
 
-    protected void stop() {
+    public void stop() {
         _runFlag = false;
         if (_tos != null) {
             try {
@@ -79,7 +80,7 @@ public class Zipper implements Runnable {
         }
     }
 
-    protected void interrupt() {
+    public void interrupt() {
         _runFlag = false;
         _zipperThread.interrupt();
     }
@@ -164,7 +165,7 @@ public class Zipper implements Runnable {
     }
 
     /*called by other classes to wait for thread to die*/
-    protected boolean waitForExecEnd() throws InterruptedException {
+    public boolean waitForExecEnd() throws InterruptedException {
         if (_zipperThread != null) {
             _zipperThread.join();
             return true;
@@ -172,7 +173,7 @@ public class Zipper implements Runnable {
         return false;
     }
 
-    protected long getElapsedTime() {
+    public long getElapsedTime() {
         return _elapsedTime;
     }
 

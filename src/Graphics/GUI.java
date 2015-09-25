@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper;
+package Graphics;
 
+import Operations.PauseControl;
+import Operations.Zipper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -77,7 +79,7 @@ public class GUI extends JFrame implements Runnable {
     private Thread _guiThread;
     private boolean _runFlag;
 
-    protected static boolean _isUnix; //to check whether OS is unix or not
+    public static boolean _isUnix; //to check whether OS is unix or not
 
     //CONSTRUCTOR
     public GUI(String path, BufferedImage ico) {
@@ -89,8 +91,8 @@ public class GUI extends JFrame implements Runnable {
     //METHODS
     private void initComponents(BufferedImage ico) {
         /*initialize fields*/
-        _fileMenu = new JMenu();
-        _helpMenu = new JMenu();
+        _fileMenu = new JMenu("File");
+        _helpMenu = new JMenu("Help");
         _exitMenuItem = new JMenuItem("Exit");
         _aboutMenuItem = new JMenuItem("About");
         _startButton = new JButton("Start");
@@ -123,11 +125,9 @@ public class GUI extends JFrame implements Runnable {
         _panel2.setLayout(new GridLayout());
         _panel3.setLayout(new GridLayout());
 
-        _fileMenu.setLabel("File");
         _exitMenuItem.addActionListener((ActionEvent evt) -> {
             this.exitMenuActionPerformed(evt);
         });
-        _helpMenu.setLabel("Help");
         _aboutMenuItem.addActionListener((ActionEvent evt) -> {
             this.aboutMenuActionPerformed(evt);
         });
