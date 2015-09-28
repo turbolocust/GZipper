@@ -71,7 +71,7 @@ public class Zipper implements Runnable {
                 _tos.flush();
                 _tos.close();
             } catch (IOException ex) {
-                Logger.getLogger(Zipper.class.getName()).log(Level.WARNING, "Archive entry still open", ex);
+                Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Archive entry still open", ex);
                 File file = new File(_path + _archiveName + ".tar.gz");
                 if (file.exists()) {
                     file.delete();
@@ -179,7 +179,7 @@ public class Zipper implements Runnable {
 
     @Override
     public void run() {
-        /*in current implamantation multiple jobs are not yet supported*/
+        /*in current implementation multiple jobs are not yet supported*/
         if (_zipMode != false) {
             try {
                 /*check whether archive with given name already exists;
@@ -193,7 +193,7 @@ public class Zipper implements Runnable {
                 _tos = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(_path + _archiveName + ".tar.gz")));
                 _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             } catch (IOException ex) {
-                Logger.getLogger(Zipper.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
                 System.exit(1);
             }
         }
@@ -206,7 +206,7 @@ public class Zipper implements Runnable {
                 }
                 stop();
             } catch (IOException ex) {
-                Logger.getLogger(Zipper.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
                 System.exit(1);
             }
         }

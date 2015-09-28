@@ -10,6 +10,11 @@ Select files/folders to put them into an archive (tar.gz). The archive will be c
 <br>
 <b>CHANGELOG</b><br>
 <br>
+<b>v0.6.5</b>
+<ul>
+<li>added logging capability</li>
+<li>new options menu to enable/disable logging</li>
+</ul>
 <b>v0.6</b>
 <ul>
 <li>added icon image</li>

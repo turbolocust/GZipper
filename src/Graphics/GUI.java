@@ -16,6 +16,7 @@
  */
 package Graphics;
 
+import Exceptions.ConfigErrorException;
 import Operations.PauseControl;
 import Operations.Zipper;
 import java.awt.BorderLayout;
@@ -27,15 +28,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +66,7 @@ public class GUI extends JFrame implements Runnable {
     private JMenu _fileMenu;
     private JMenu _helpMenu;
     private JMenuItem _exitMenuItem;
+    private JMenuItem _optionsMenuItem;
     private JMenuItem _aboutMenuItem;
     private JMenuBar _menuBar;
     private JLabel _label1;
@@ -66,7 +76,7 @@ public class GUI extends JFrame implements Runnable {
     private JButton _selectButton;
     private JRadioButton _archiveModeZip;
     private JRadioButton _archiveModeUnzip;
-    private ButtonGroup _buttonGroup;
+    private ButtonGroup _buttonGroup1;
     private JFileChooser _fileChooser;
     private FileNameExtensionFilter _filter;
     private JPanel _panel1; //center panel
@@ -80,27 +90,30 @@ public class GUI extends JFrame implements Runnable {
     private boolean _runFlag;
 
     public static boolean _isUnix; //to check whether OS is unix or not
+    private static BufferedImage _ico; //the icon for the frame
+    private static boolean _loggingEnabled; //true if logging is enabled in "gzipper.ini"
 
     //CONSTRUCTOR
-    public GUI(String path, BufferedImage ico) {
+    public GUI(String path) {
         INITIAL_PATH = path;
         _ps = new PauseControl();
-        initComponents(ico);
+        initComponents();
     }
 
     //METHODS
-    private void initComponents(BufferedImage ico) {
+    private void initComponents() {
         /*initialize fields*/
         _fileMenu = new JMenu("File");
         _helpMenu = new JMenu("Help");
         _exitMenuItem = new JMenuItem("Exit");
+        _optionsMenuItem = new JMenuItem("Options");
         _aboutMenuItem = new JMenuItem("About");
         _startButton = new JButton("Start");
         _abortButton = new JButton("Abort");
         _selectButton = new JButton("Select...");
         _archiveModeZip = new JRadioButton("Compress");
         _archiveModeUnzip = new JRadioButton("Decompress");
-        _buttonGroup = new ButtonGroup();
+        _buttonGroup1 = new ButtonGroup();
         _fileChooser = new JFileChooser();
         _filter = new FileNameExtensionFilter(".tar.gz", "gz");
         _menuBar = new JMenuBar();
@@ -113,8 +126,8 @@ public class GUI extends JFrame implements Runnable {
         /*set frame properties*/
         setLayout(new BorderLayout());
         setTitle("GZipper");
-        setPreferredSize(new Dimension(500, 250));
-        setIconImage(ico);
+        setPreferredSize(new Dimension(520, 250));
+        setIconImage(_ico);
         setJMenuBar(_menuBar);
 
         /*define components*/
@@ -128,12 +141,16 @@ public class GUI extends JFrame implements Runnable {
         _exitMenuItem.addActionListener((ActionEvent evt) -> {
             this.exitMenuActionPerformed(evt);
         });
+        _optionsMenuItem.addActionListener((ActionEvent evt) -> {
+            this.optionsMenuActionPerformed(evt);
+        });
         _aboutMenuItem.addActionListener((ActionEvent evt) -> {
             this.aboutMenuActionPerformed(evt);
         });
 
         _textOutput.setFont(new Font("Consolas", Font.PLAIN, 12));
-        _textOutput.setText("run: \n\n");
+        _textOutput.setText("run: \n");
+        _textOutput.append("Output path: " + INITIAL_PATH + "\n");
         _textOutput.setEditable(false);
         _textOutput.setBackground(Color.WHITE);
 
@@ -159,11 +176,13 @@ public class GUI extends JFrame implements Runnable {
             this.archiveModeUnzipButtonActionPerformed(evt);
         });
 
-        _buttonGroup.add(_archiveModeZip);
-        _buttonGroup.add(_archiveModeUnzip);
+        _buttonGroup1.add(_archiveModeZip);
+        _buttonGroup1.add(_archiveModeUnzip);
 
         _menuBar.add(_fileMenu);
         _menuBar.add(_helpMenu);
+        _fileMenu.add(_optionsMenuItem);
+        _fileMenu.addSeparator();
         _fileMenu.add(_exitMenuItem);
         _helpMenu.add(_aboutMenuItem);
 
@@ -171,9 +190,9 @@ public class GUI extends JFrame implements Runnable {
         _panel1.add(_selectButton, BorderLayout.SOUTH);
         _panel2.add(_startButton);
         _panel2.add(_abortButton);
-        _panel3.add(_label1);
-        _panel3.add(_archiveModeZip);
-        _panel3.add(_archiveModeUnzip);
+        _panel3.add(_label1, BorderLayout.NORTH);
+        _panel3.add(_archiveModeZip, BorderLayout.NORTH);
+        _panel3.add(_archiveModeUnzip, BorderLayout.NORTH);
 
         /*add scroll pane to text area*/
         JScrollPane sp = new JScrollPane(_textOutput,
@@ -226,7 +245,7 @@ public class GUI extends JFrame implements Runnable {
      or to select (save) files to compress them into an archive*/
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
-            if (_buttonGroup.getSelection() != null) {
+            if (_buttonGroup1.getSelection() != null) {
 
                 if (_archiveModeZip.isSelected()) {
                     _fileChooser.setAcceptAllFileFilterUsed(true);
@@ -276,6 +295,44 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    private void optionsMenuActionPerformed(ActionEvent evt) {
+        if (evt.getSource() == _optionsMenuItem) {
+            JFrame frame = new JFrame("Options");
+            JCheckBox checkBox = new JCheckBox("Enable logging (requires restart)");
+            checkBox.setFont(new Font("Consolas", Font.BOLD, 12));
+            if (_loggingEnabled != false) {
+                checkBox.setSelected(true);
+            }
+            checkBox.addActionListener((ActionEvent e) -> {
+                if (e.getSource() == checkBox) {
+                    /*updates config file on change of settings; 
+                     as this file only contains two lines I chose to write them manually,
+                     otherwise a List<String> would be a much handier solution*/
+                    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
+                        bw.write("[OPTIONS]");
+                        bw.newLine();
+                        if (checkBox.isSelected()) {
+                            bw.write("LoggingEnabled=true;");
+                        } else {
+                            bw.write("LoggingEnabled=false;");
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+                    }
+                }
+            });
+            frame.setPreferredSize(new Dimension(320, 90));
+            frame.setResizable(false);
+            frame.setIconImage(_ico);
+            frame.add(checkBox, BorderLayout.CENTER);
+            frame.addKeyListener(null);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setVisible(true);
+        }
+    }
+
     private void exitMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _exitMenuItem) {
             setVisible(false);
@@ -288,7 +345,7 @@ public class GUI extends JFrame implements Runnable {
         if (evt.getSource() == _aboutMenuItem) {
             drawNewWindow("About", "<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v0.6</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v0.6.5</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)&nbsp;<br>&nbsp;</html>");
@@ -316,6 +373,7 @@ public class GUI extends JFrame implements Runnable {
             }
         });
         frame.setResizable(false);
+        frame.setIconImage(_ico);
         frame.add(label, BorderLayout.CENTER);
         frame.add(button, BorderLayout.SOUTH);
         frame.addKeyListener(null);
@@ -364,46 +422,6 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /**
-     *
-     * @author Matthias Fussenegger
-     * @param args
-     * @version 0.6
-     */
-    public static void main(String[] args) {
-        /*String path and decPath used to make directory where JAR-file is located
-         to the current working directory for creating a new archive*/
-        String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-
-        try {
-            String decPath;
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                /*decode path without adding the name of the JAR-file (GZipper.jar = 11 characters)
-                 - for debugging inside an IDE please remove the minus operation (- 11) and make sure
-                 to rename archive name (currently: gzipper) when starting to compress/decompress*/
-                decPath = URLDecoder.decode(path.substring(1, path.length() - 11), "UTF-8");
-            } else {
-                _isUnix = true;
-                decPath = path.substring(0, path.length() - 11);
-            }
-            /*get icon image for frame from root application folder;
-             do not forget to copy it to class files directory when debugging app,
-             the image can be found in the main directory of the project*/
-            FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
-            BufferedImage ico = ImageIO.read(imgStream);
-            /*draw application frame*/
-            java.awt.EventQueue.invokeLater(() -> {
-                new GUI(decPath, ico).setVisible(true);
-            });
-            Thread.sleep(300);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-            System.exit(1);
-        } catch (InterruptedException | IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-        }
-    }
-
     @Override
     public void run() {
         while (_runFlag) {
@@ -424,5 +442,76 @@ public class GUI extends JFrame implements Runnable {
                 _ps.pause();
             }
         }
+    }
+
+    /**
+     *
+     * @author Matthias Fussenegger
+     * @param args
+     * @version 0.6.5
+     */
+    public static void main(String[] args) {
+        /*create file handler for logger if enabled via configuration*/
+        try {
+            _loggingEnabled = checkLoggerConfig();
+        } catch (ConfigErrorException | IOException ex) {
+            System.err.println(ex.toString());
+        }
+
+        /*String path and decPath used to make directory where JAR-file is located
+         to the current working directory for creating a new archive*/
+        String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+        try {
+            String decPath;
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                /*decode path without adding the name of the JAR-file (GZipper.jar = 11 characters)
+                 - for debugging inside an IDE please remove the minus operation (- 11) and make sure
+                 to rename archive name (currently: gzipper) when starting to compress/decompress*/
+                decPath = URLDecoder.decode(path.substring(1, path.length() - 11), "UTF-8");
+            } else {
+                _isUnix = true;
+                decPath = path.substring(0, path.length() - 11);
+            }
+            /*get icon image for frame from root application folder;
+             do not forget to copy it to class files directory when debugging app,
+             the image can be found in the main directory of the project*/
+            FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
+            _ico = ImageIO.read(imgStream);
+            /*draw application frame*/
+            java.awt.EventQueue.invokeLater(() -> {
+                new GUI(decPath).setVisible(true);
+            });
+            Thread.sleep(300);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+            System.exit(1);
+        } catch (InterruptedException | IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+        }
+    }
+
+    /*check config file if logging has been enabled;
+     if so, create new file handler for logger*/
+    public static boolean checkLoggerConfig() throws ConfigErrorException, IOException {
+        String line;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("LoggingEnabled=")) {
+                    if (line.endsWith("true;")) {
+                        /*create new logger*/
+                        Logger logger = Logger.getLogger((GUI.class.getName()));
+                        FileHandler fh = new FileHandler("logs/gzipper.log", true);
+                        logger.addHandler(fh);
+                        return true;
+                    } else if (line.endsWith("false;")) {
+                        return false;
+                    } else {
+                        throw new ConfigErrorException();
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
