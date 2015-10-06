@@ -246,7 +246,6 @@ public class GUI extends JFrame implements Runnable {
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
             if (_buttonGroup1.getSelection() != null) {
-
                 if (_archiveModeZip.isSelected()) {
                     _fileChooser.setAcceptAllFileFilterUsed(true);
                     _fileChooser.removeChoosableFileFilter(_filter);
@@ -266,19 +265,16 @@ public class GUI extends JFrame implements Runnable {
                     if (filename.contains("<") || filename.contains(">") || filename.contains("/")
                             || filename.contains("\\") || filename.contains("|") || filename.contains(":")
                             || filename.contains("*") || filename.contains("\"") || filename.contains("?")) {
-                        drawNewWindow("Warning", "<html><br><p align=\"center\">"
-                                + "&nbsp;Illegal characters found in file name!"
-                                + "<br><br>&nbsp;<u>Characters not allowed:</u> "
-                                + "\\ / | : * \" ? &lt; >&nbsp;<br>&nbsp;</p></html>");
+                        _textOutput.append("\nIllegal characters found in file name!\n"
+                                + "Characters not allowed: "
+                                + "\\ / | : * \" ? < >\n");
                     } else {
                         _textOutput.append("Selection successful; ready to start compression\n");
                         _startButton.setEnabled(true);
                     }
                 }
             } else {
-                drawNewWindow("Warning", "<html><br><p align=\"center\">"
-                        + "&nbsp;You need to select a ZIP-mode first!"
-                        + "&nbsp;</p><br></html>");
+                _textOutput.append("You need to select a ZIP-mode first!\n");
             }
         }
     }
@@ -343,44 +339,39 @@ public class GUI extends JFrame implements Runnable {
 
     private void aboutMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _aboutMenuItem) {
-            drawNewWindow("About", "<html><br><p align=\"center\">"
+            JFrame frame = new JFrame("About");
+            JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
                     + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v0.6.5</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
-                    + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)&nbsp;<br>&nbsp;</html>");
-        }
-    }
-
-    /*draw new window with predefinded title and text*/
-    private void drawNewWindow(String title, String text) {
-        JFrame frame = new JFrame(title);
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
-        JButton button = new JButton("OK");
-        button.addActionListener((ActionEvent evt) -> {
-            if (evt.getActionCommand().equals("OK")) {
-                frame.setVisible(false);
-                frame.dispose();
-            }
-        });
-        label.setFont(new Font("Consolas", Font.BOLD, 12));
-        button.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent evt) {
-                if (evt.getKeyCode() == 10) { //10 = return key
-                    button.doClick();
+                    + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)&nbsp;<br>&nbsp;</html>", SwingConstants.CENTER);
+            JButton button = new JButton("OK");
+            button.addActionListener((ActionEvent e) -> {
+                if (e.getActionCommand().equals("OK")) {
+                    frame.setVisible(false);
+                    frame.dispose();
                 }
-            }
-        });
-        frame.setResizable(false);
-        frame.setIconImage(_ico);
-        frame.add(label, BorderLayout.CENTER);
-        frame.add(button, BorderLayout.SOUTH);
-        frame.addKeyListener(null);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setVisible(true);
+            });
+            label.setFont(new Font("Consolas", Font.BOLD, 12));
+            button.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent evt) {
+                    if (evt.getKeyCode() == 10) { //10 = return key
+                        button.doClick();
+                    }
+                }
+            });
+            frame.setResizable(false);
+            frame.setIconImage(_ico);
+            frame.add(label, BorderLayout.CENTER);
+            frame.add(button, BorderLayout.SOUTH);
+            frame.addKeyListener(null);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setVisible(true);
+        }
     }
 
     private void startCompressing() throws InterruptedException {
