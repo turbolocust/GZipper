@@ -1,4 +1,4 @@
-# gzipper
+# GZipper
 
 <b>Motivation:</b><br>
 
