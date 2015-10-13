@@ -207,12 +207,8 @@ public class GUI extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    /**
-     * creates a new thread if none is alive yet; it also toggles PauseControl
-     * to let Thread start the archive operation (see run() method)
-     *
-     * @param evt
-     */
+    /*creates a new thread if none is alive yet; it also toggles PauseControl
+     to let Thread start the archive operation (see run() method)*/
     private void startButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _startButton) {
             _abortButton.setEnabled(true);
@@ -225,11 +221,7 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /**
-     * tries to abort the compressing/decompressing operation
-     *
-     * @param evt
-     */
+    /*tries to abort the compressing/decompressing operation*/
     private void abortButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _abortButton) {
             _textOutput.append("Trying to abort operation...\n");
@@ -249,12 +241,8 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /**
-     * opens a file dialog to either open an archive (tar.gz) or to select
-     * (save) files to compress them into an archive
-     *
-     * @param evt
-     */
+    /*opens a file dialog to either open an archive (tar.gz) or to select
+     * (save) files to compress them into an archive*/
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
             if (_buttonGroup1.getSelection() != null) {

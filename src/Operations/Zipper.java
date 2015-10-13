@@ -170,25 +170,14 @@ public class Zipper implements Runnable {
         _elapsedTime = System.nanoTime() - startTime;
     }
 
-    /**
-     * retrieves files from a specific directory; mandatory for compression
-     *
-     * @param path : the absolute path to the directory
-     * @return : an array of files
-     * @throws IOException
-     */
+    /*retrieves files from a specific directory; mandatory for compression*/
     private File[] getFiles(String path) throws IOException {
         File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
     }
 
-    /**
-     * called by other classes to wait for thread to die
-     *
-     * @return : true if thread is dead
-     * @throws InterruptedException
-     */
+    /*called by other classes to wait for thread to die*/
     public boolean waitForExecEnd() throws InterruptedException {
         if (_zipperThread != null) {
             _zipperThread.join();
@@ -203,7 +192,7 @@ public class Zipper implements Runnable {
 
     @Override
     public void run() {
-        /*in current implementation multiple jobs are not yet supported*/
+        /*in current implementation multiple jobs are not supported*/
         if (_zipMode != false) {
             try {
                 /*check whether archive with given name already exists;
