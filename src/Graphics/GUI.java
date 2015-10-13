@@ -207,8 +207,12 @@ public class GUI extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    /*this method will create a new thread if none is alive yet;
-     it also toggles PauseControl to let Thread start the archive operation*/
+    /**
+     * creates a new thread if none is alive yet; it also toggles PauseControl
+     * to let Thread start the archive operation (see run() method)
+     *
+     * @param evt
+     */
     private void startButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _startButton) {
             _abortButton.setEnabled(true);
@@ -221,7 +225,11 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*trys to abort the compressing/decompressing operation*/
+    /**
+     * tries to abort the compressing/decompressing operation
+     *
+     * @param evt
+     */
     private void abortButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _abortButton) {
             _textOutput.append("Trying to abort operation...\n");
@@ -241,8 +249,12 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*opens a file dialog to either open an archive 
-     or to select (save) files to compress them into an archive*/
+    /**
+     * opens a file dialog to either open an archive (tar.gz) or to select
+     * (save) files to compress them into an archive
+     *
+     * @param evt
+     */
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
             if (_buttonGroup1.getSelection() != null) {
@@ -482,8 +494,13 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*check config file if logging has been enabled;
-     if so, create new file handler for logger*/
+    /**
+     * check configuration file if logging has been enabled; if so, create new
+     * file handler for logger. Logging can also be enabled via the options menu
+     *
+     * @return @throws ConfigErrorException : Configuration file is corrupt
+     * @throws IOException
+     */
     public static boolean checkLoggerConfig() throws ConfigErrorException, IOException {
         String line;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("gzipper.ini"), Charset.forName("UTF-8")))) {

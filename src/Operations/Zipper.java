@@ -85,8 +85,14 @@ public class Zipper implements Runnable {
         _zipperThread.interrupt();
     }
 
-    /*compress files using TAR/GZIP-algorithm and create archive;
-     note that GZIPOutputStream already has a built-in buffer*/
+    /**
+     * compresses files using TAR/GZIP-algorithm and creates an archive; note
+     * that GZIPOutputStream already has a built-in buffer
+     *
+     * @param files : the files selected from jFileChooser
+     * @param base : the root path of folder
+     * @throws IOException
+     */
     private void makeGzip(File[] files, String base) throws IOException {
         long startTime = System.nanoTime();
         byte[] buffer = new byte[4096];
@@ -113,7 +119,14 @@ public class Zipper implements Runnable {
         _elapsedTime = System.nanoTime() - startTime;
     }
 
-    /*extract a TAR/GZIP-archive; note that GZIPInputStream already has a built-in buffer*/
+    /**
+     * extract a TAR/GZIP-archive; note that GZIPInputStream already has a
+     * built-in buffer
+     *
+     * @param path : the absolute path of the archive
+     * @param name : the filename of the archive
+     * @throws IOException
+     */
     private void extractGzip(String path, String name) throws IOException {
         long startTime = System.nanoTime();
         try (TarArchiveInputStream tis = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(path + name)))) {
@@ -157,14 +170,25 @@ public class Zipper implements Runnable {
         _elapsedTime = System.nanoTime() - startTime;
     }
 
-    /*retrieve files from a specific directory; mandatory for compression*/
+    /**
+     * retrieves files from a specific directory; mandatory for compression
+     *
+     * @param path : the absolute path to the directory
+     * @return : an array of files
+     * @throws IOException
+     */
     private File[] getFiles(String path) throws IOException {
         File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
     }
 
-    /*called by other classes to wait for thread to die*/
+    /**
+     * called by other classes to wait for thread to die
+     *
+     * @return : true if thread is dead
+     * @throws InterruptedException
+     */
     public boolean waitForExecEnd() throws InterruptedException {
         if (_zipperThread != null) {
             _zipperThread.join();
