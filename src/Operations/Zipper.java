@@ -49,7 +49,14 @@ public class Zipper implements Runnable {
     private Thread _zipperThread;
     private static int _nameIterator; //to avoid overwriting recent archives
 
-    //CONSTRUCTOR
+    /**
+     * Creates a new Zipper object for zip/unzip operations
+     *
+     * @param path The path of the output directory
+     * @param name The name of the target archive
+     * @param files The selected files from GUI
+     * @param zipMode True if zip, false if unzip
+     */
     public Zipper(String path, String name, File[] files, boolean zipMode) {
         _path = path;
         _archiveName = name;
@@ -57,13 +64,20 @@ public class Zipper implements Runnable {
         _selectedFiles = files;
     }
 
-    //METHODS
+    /**
+     * Starts the current thread of this class
+     *
+     * @throws IOException
+     */
     public void start() throws IOException {
         _runFlag = true;
         _zipperThread = new Thread(this);
         _zipperThread.start();
     }
 
+    /**
+     * Stops the current thread of this class and closes any open file streams
+     */
     public void stop() {
         _runFlag = false;
         if (_tos != null) {
@@ -80,17 +94,20 @@ public class Zipper implements Runnable {
         }
     }
 
+    /**
+     * Tries to interrupt the current thread
+     */
     public void interrupt() {
         _runFlag = false;
         _zipperThread.interrupt();
     }
 
     /**
-     * compresses files using TAR/GZIP-algorithm and creates an archive; note
+     * Compresses files using TAR/GZIP-algorithm and creates an archive. Note
      * that GZIPOutputStream already has a built-in buffer
      *
-     * @param files : the files selected from jFileChooser
-     * @param base : the root path of folder
+     * @param files The files selected from jFileChooser
+     * @param base The root path of the specified folder
      * @throws IOException
      */
     private void makeGzip(File[] files, String base) throws IOException {
@@ -120,11 +137,11 @@ public class Zipper implements Runnable {
     }
 
     /**
-     * extract a TAR/GZIP-archive; note that GZIPInputStream already has a
+     * Extracts a TAR/GZIP-archive. Note that GZIPInputStream already has a
      * built-in buffer
      *
-     * @param path : the absolute path of the archive
-     * @param name : the filename of the archive
+     * @param path The absolute path of the archive
+     * @param name The filename of the archive
      * @throws IOException
      */
     private void extractGzip(String path, String name) throws IOException {
@@ -170,14 +187,25 @@ public class Zipper implements Runnable {
         _elapsedTime = System.nanoTime() - startTime;
     }
 
-    /*retrieves files from a specific directory; mandatory for compression*/
+    /**
+     * Retrieves files from a specific directory; mandatory for compression
+     *
+     * @param path The path that contains files to be compressed
+     * @return And array of files from the specified path
+     * @throws IOException
+     */
     private File[] getFiles(String path) throws IOException {
         File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
     }
 
-    /*called by other classes to wait for thread to die*/
+    /**
+     * Called by other classes to wait for thread to die
+     *
+     * @return True if thread is dead
+     * @throws InterruptedException
+     */
     public boolean waitForExecEnd() throws InterruptedException {
         if (_zipperThread != null) {
             _zipperThread.join();
@@ -186,6 +214,10 @@ public class Zipper implements Runnable {
         return false;
     }
 
+    /**
+     *
+     * @return The elapsed time of the chosen operation
+     */
     public long getElapsedTime() {
         return _elapsedTime;
     }

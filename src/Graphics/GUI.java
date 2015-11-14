@@ -93,14 +93,20 @@ public class GUI extends JFrame implements Runnable {
     private static BufferedImage _ico; //the icon for the frame
     private static boolean _loggingEnabled; //true if logging is enabled in "gzipper.ini"
 
-    //CONSTRUCTOR
+    /**
+     * Initializes the GUI
+     *
+     * @param path The path of the JAR-file, which is the initial path
+     */
     public GUI(String path) {
         INITIAL_PATH = path;
         _ps = new PauseControl();
         initComponents();
     }
 
-    //METHODS
+    /**
+     * Initializes all the GUI components
+     */
     private void initComponents() {
         /*initialize fields*/
         _fileMenu = new JMenu("File");
@@ -207,8 +213,12 @@ public class GUI extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    /*creates a new thread if none is alive yet; it also toggles PauseControl
-     to let Thread start the archive operation (see run() method)*/
+    /**
+     * Creates a new thread if none is alive yet; it also toggles PauseControl
+     * to let the thread start the archive operation (see run() method)
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void startButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _startButton) {
             _abortButton.setEnabled(true);
@@ -221,7 +231,11 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*tries to abort the compressing/decompressing operation*/
+    /**
+     * Tries to abort the compressing/decompressing operation
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void abortButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _abortButton) {
             _textOutput.append("Trying to abort operation...\n");
@@ -241,8 +255,12 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-    /*opens a file dialog to either open an archive (tar.gz) or to select
-     * (save) files to compress them into an archive*/
+    /**
+     * Opens a file dialog to either open an archive or to select (save) files
+     * to compress them into an archive
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
             if (_buttonGroup1.getSelection() != null) {
@@ -279,18 +297,33 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Called if Zip-mode has been selected
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void archiveModeZipButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _archiveModeZip) {
             _selectButton.setText("Select files/folders...");
         }
     }
 
+    /**
+     * Called if Unzip-mode has been selected
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void archiveModeUnzipButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _archiveModeUnzip) {
             _selectButton.setText("Select archive...");
         }
     }
 
+    /**
+     * Called if options menu has been selected
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void optionsMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _optionsMenuItem) {
             JFrame frame = new JFrame("Options");
@@ -303,7 +336,7 @@ public class GUI extends JFrame implements Runnable {
                 if (e.getSource() == checkBox) {
                     /*updates config file on change of settings; 
                      as this file only contains two lines I chose to write them manually,
-                     otherwise a List<String> would be a much handier solution*/
+                     otherwise List<String> would be a much handier solution*/
                     try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
                         bw.write("[OPTIONS]");
                         bw.newLine();
@@ -329,6 +362,11 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Called if exit menu has been selected
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void exitMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _exitMenuItem) {
             setVisible(false);
@@ -337,6 +375,11 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Called if about menu has been selected
+     *
+     * @param evt The event that caused this method to be called
+     */
     private void aboutMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _aboutMenuItem) {
             JFrame frame = new JFrame("About");
@@ -374,6 +417,12 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Starts the compressing operation by creating a new association with a
+     * Zipper object and starting its thread
+     *
+     * @throws InterruptedException
+     */
     private void startCompressing() throws InterruptedException {
         if (_zipper == null) {
             _zipper = new Zipper(INITIAL_PATH, "gzipper", _fileChooser.getSelectedFiles(), true);
@@ -390,6 +439,12 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Starts the decompressing operation by creating a new association with a
+     * Zipper object and starting its thread
+     *
+     * @throws InterruptedException
+     */
     private void startDecompressing() throws InterruptedException {
         if (_zipper == null) {
             _abortButton.setEnabled(true);
@@ -483,10 +538,11 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * check configuration file if logging has been enabled; if so, create new
-     * file handler for logger. Logging can also be enabled via the options menu
+     * Checks the configuration file if logging has been enabled. If so, it will
+     * create a new file handler for the logger. Logging can also be enabled via
+     * the options menu
      *
-     * @return @throws ConfigErrorException : Configuration file is corrupt
+     * @return @throws ConfigErrorException If configuration file is corrupt
      * @throws IOException
      */
     public static boolean checkLoggerConfig() throws ConfigErrorException, IOException {
