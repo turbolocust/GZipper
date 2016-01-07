@@ -65,9 +65,9 @@ public class Zipper implements Runnable {
     }
 
     /**
-     * Starts the current thread of this class
+     * Creates a new thread and starts it
      *
-     * @throws IOException
+     * @throws IOException If an error occurred
      */
     public void start() throws IOException {
         _runFlag = true;
@@ -76,7 +76,7 @@ public class Zipper implements Runnable {
     }
 
     /**
-     * Stops the current thread of this class and closes any open file streams
+     * Stops the thread and tries to close any open file streams
      */
     public void stop() {
         _runFlag = false;
@@ -108,7 +108,7 @@ public class Zipper implements Runnable {
      *
      * @param files The files selected from jFileChooser
      * @param base The root path of the specified folder
-     * @throws IOException
+     * @throws IOException If an error occurred
      */
     private void makeGzip(File[] files, String base) throws IOException {
         long startTime = System.nanoTime();
@@ -129,7 +129,7 @@ public class Zipper implements Runnable {
                     }
                 } else { //child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
-                    makeGzip(children, entryName + "/"); //the slash indicates a folder, see JavaDoc
+                    makeGzip(children, entryName + "/"); //the slash indicates a folder
                 }
             }
         }
@@ -142,7 +142,7 @@ public class Zipper implements Runnable {
      *
      * @param path The absolute path of the archive
      * @param name The filename of the archive
-     * @throws IOException
+     * @throws IOException If an error occurred
      */
     private void extractGzip(String path, String name) throws IOException {
         long startTime = System.nanoTime();
@@ -158,7 +158,7 @@ public class Zipper implements Runnable {
                 /*check if entry contains a directory*/
                 if (entryName.contains("/")) {
                     File newFile;
-                    if (GUI._isUnix) {//check OS for correct file path
+                    if (GUI._isUnix) { //check OS for correct file path
                         newFile = new File(folder.getAbsolutePath() + "/" + entryName);
                     } else {
                         newFile = new File(folder.getAbsolutePath() + "\\" + entryName);
@@ -192,7 +192,7 @@ public class Zipper implements Runnable {
      *
      * @param path The path that contains files to be compressed
      * @return And array of files from the specified path
-     * @throws IOException
+     * @throws IOException If an error occurred
      */
     private File[] getFiles(String path) throws IOException {
         File dir = new File(path);
@@ -215,6 +215,7 @@ public class Zipper implements Runnable {
     }
 
     /**
+     * Returns the elapsed time of the chosen archiving operation
      *
      * @return The elapsed time of the chosen operation
      */

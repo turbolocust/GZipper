@@ -69,7 +69,7 @@ public class GUI extends JFrame implements Runnable {
     private JMenuItem _optionsMenuItem;
     private JMenuItem _aboutMenuItem;
     private JMenuBar _menuBar;
-    private JLabel _label1;
+    private JLabel _chooseModeLabel;
     private JTextArea _textOutput;
     private JButton _startButton;
     private JButton _abortButton;
@@ -78,20 +78,20 @@ public class GUI extends JFrame implements Runnable {
     private JRadioButton _archiveModeUnzip;
     private ButtonGroup _buttonGroup1;
     private JFileChooser _fileChooser;
-    private FileNameExtensionFilter _filter;
-    private JPanel _panel1; //center panel
-    private JPanel _panel2; //southern panel
-    private JPanel _panel3; //northern panel
+    private FileNameExtensionFilter _extFilter;
+    private JPanel _centerPanel;
+    private JPanel _southernPanel;
+    private JPanel _northernPanel;
 
     private final String INITIAL_PATH; //the decoded standard path of JAR-file
-    private final PauseControl _ps; //to pause GUI-Thread after operation
-    private Zipper _zipper; //associated object for archive operations
+    private final PauseControl _pauseControl; //to pause GUI-Thread after operation
+    private Zipper _zipper; //used for archive operations
     private Thread _guiThread;
     private boolean _runFlag;
 
-    public static boolean _isUnix; //to check whether OS is unix or not
-    private static BufferedImage _ico; //the icon for the frame
-    private static boolean _loggingEnabled; //true if logging is enabled in "gzipper.ini"
+    public static boolean _isUnix;
+    private static BufferedImage _frameIcon;
+    private static boolean _loggingEnabled;
 
     /**
      * Initializes the GUI
@@ -100,7 +100,7 @@ public class GUI extends JFrame implements Runnable {
      */
     public GUI(String path) {
         INITIAL_PATH = path;
-        _ps = new PauseControl();
+        _pauseControl = new PauseControl();
         initComponents();
     }
 
@@ -121,28 +121,28 @@ public class GUI extends JFrame implements Runnable {
         _archiveModeUnzip = new JRadioButton("Decompress");
         _buttonGroup1 = new ButtonGroup();
         _fileChooser = new JFileChooser();
-        _filter = new FileNameExtensionFilter(".tar.gz", "gz");
+        _extFilter = new FileNameExtensionFilter(".tar.gz", "gz");
         _menuBar = new JMenuBar();
-        _label1 = new JLabel("Choose ZIP-mode:");
+        _chooseModeLabel = new JLabel("Choose ZIP-mode:");
         _textOutput = new JTextArea();
-        _panel1 = new JPanel();
-        _panel2 = new JPanel();
-        _panel3 = new JPanel();
+        _centerPanel = new JPanel();
+        _southernPanel = new JPanel();
+        _northernPanel = new JPanel();
 
         /*set frame properties*/
         setLayout(new BorderLayout());
         setTitle("GZipper");
         setPreferredSize(new Dimension(520, 250));
-        setIconImage(_ico);
+        setIconImage(_frameIcon);
         setJMenuBar(_menuBar);
 
         /*define components*/
-        add(_panel1, BorderLayout.CENTER);
-        add(_panel2, BorderLayout.SOUTH);
-        add(_panel3, BorderLayout.NORTH);
-        _panel1.setLayout(new BorderLayout());
-        _panel2.setLayout(new GridLayout());
-        _panel3.setLayout(new GridLayout());
+        add(_centerPanel, BorderLayout.CENTER);
+        add(_southernPanel, BorderLayout.SOUTH);
+        add(_northernPanel, BorderLayout.NORTH);
+        _centerPanel.setLayout(new BorderLayout());
+        _southernPanel.setLayout(new GridLayout());
+        _northernPanel.setLayout(new GridLayout());
 
         _exitMenuItem.addActionListener((ActionEvent evt) -> {
             this.exitMenuActionPerformed(evt);
@@ -192,24 +192,24 @@ public class GUI extends JFrame implements Runnable {
         _fileMenu.add(_exitMenuItem);
         _helpMenu.add(_aboutMenuItem);
 
-        _panel1.add(_textOutput, BorderLayout.CENTER);
-        _panel1.add(_selectButton, BorderLayout.SOUTH);
-        _panel2.add(_startButton);
-        _panel2.add(_abortButton);
-        _panel3.add(_label1, BorderLayout.NORTH);
-        _panel3.add(_archiveModeZip, BorderLayout.NORTH);
-        _panel3.add(_archiveModeUnzip, BorderLayout.NORTH);
+        _centerPanel.add(_textOutput, BorderLayout.CENTER);
+        _centerPanel.add(_selectButton, BorderLayout.SOUTH);
+        _southernPanel.add(_startButton);
+        _southernPanel.add(_abortButton);
+        _northernPanel.add(_chooseModeLabel, BorderLayout.NORTH);
+        _northernPanel.add(_archiveModeZip, BorderLayout.NORTH);
+        _northernPanel.add(_archiveModeUnzip, BorderLayout.NORTH);
 
         /*add scroll pane to text area*/
         JScrollPane sp = new JScrollPane(_textOutput,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        _panel1.add(sp, BorderLayout.CENTER);
+        _centerPanel.add(sp, BorderLayout.CENTER);
 
         DefaultCaret caret = (DefaultCaret) _textOutput.getCaret();
         caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM); //for auto-scrolling
 
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); //center position on screen
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -227,7 +227,7 @@ public class GUI extends JFrame implements Runnable {
                 _guiThread = new Thread(this);
                 _guiThread.start();
             }
-            _ps.unpause();
+            _pauseControl.unpause();
         }
     }
 
@@ -240,7 +240,7 @@ public class GUI extends JFrame implements Runnable {
         if (evt.getSource() == _abortButton) {
             _textOutput.append("Trying to abort operation...\n");
             if (_zipper != null) {
-                _ps.pause();
+                _pauseControl.pause();
                 _zipper.interrupt();
                 _zipper.stop();
                 try {
@@ -266,13 +266,13 @@ public class GUI extends JFrame implements Runnable {
             if (_buttonGroup1.getSelection() != null) {
                 if (_archiveModeZip.isSelected()) {
                     _fileChooser.setAcceptAllFileFilterUsed(true);
-                    _fileChooser.removeChoosableFileFilter(_filter);
+                    _fileChooser.removeChoosableFileFilter(_extFilter);
                     _fileChooser.setMultiSelectionEnabled(true);
                     _fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     _fileChooser.showSaveDialog(this);
                 } else { //unzip
                     _fileChooser.setAcceptAllFileFilterUsed(false);
-                    _fileChooser.setFileFilter(_filter);
+                    _fileChooser.setFileFilter(_extFilter);
                     _fileChooser.setMultiSelectionEnabled(false);
                     _fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                     _fileChooser.showOpenDialog(this);
@@ -329,21 +329,24 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("Options");
             JCheckBox checkBox = new JCheckBox("Enable logging (requires restart)");
             checkBox.setFont(new Font("Consolas", Font.BOLD, 12));
-            if (_loggingEnabled != false) {
+            if (_loggingEnabled) {
                 checkBox.setSelected(true);
             }
             checkBox.addActionListener((ActionEvent e) -> {
                 if (e.getSource() == checkBox) {
                     /*updates config file on change of settings; 
                      as this file only contains two lines I chose to write them manually,
-                     otherwise List<String> would be a much handier solution*/
-                    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
+                     otherwise using List<String> would be a much handier solution*/
+                    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
                         bw.write("[OPTIONS]");
                         bw.newLine();
                         if (checkBox.isSelected()) {
                             bw.write("LoggingEnabled=true;");
+                            _loggingEnabled = true;
                         } else {
                             bw.write("LoggingEnabled=false;");
+                            _loggingEnabled = false;
                         }
                     } catch (IOException ex) {
                         Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
@@ -352,7 +355,7 @@ public class GUI extends JFrame implements Runnable {
             });
             frame.setPreferredSize(new Dimension(320, 90));
             frame.setResizable(false);
-            frame.setIconImage(_ico);
+            frame.setIconImage(_frameIcon);
             frame.add(checkBox, BorderLayout.CENTER);
             frame.addKeyListener(null);
             frame.pack();
@@ -385,7 +388,7 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("About");
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v0.6.5</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-07</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)&nbsp;<br>&nbsp;</html>", SwingConstants.CENTER);
@@ -406,7 +409,7 @@ public class GUI extends JFrame implements Runnable {
                 }
             });
             frame.setResizable(false);
-            frame.setIconImage(_ico);
+            frame.setIconImage(_frameIcon);
             frame.add(label, BorderLayout.CENTER);
             frame.add(button, BorderLayout.SOUTH);
             frame.addKeyListener(null);
@@ -432,7 +435,8 @@ public class GUI extends JFrame implements Runnable {
                 _textOutput.append(ex.toString() + "\n");
             } finally {
                 if (_zipper.waitForExecEnd() != false & _zipper != null) {
-                    double seconds = ((double) _zipper.getElapsedTime() / 1E9); //calculate elapsed time in seconds
+                    /*calculate elapsed time in seconds*/
+                    double seconds = ((double) _zipper.getElapsedTime() / 1E9);
                     _textOutput.append("Job done!\n" + "Elapsed time: " + seconds + " seconds\n");
                 }
             }
@@ -461,7 +465,8 @@ public class GUI extends JFrame implements Runnable {
                 _textOutput.append(ex.toString() + "\n");
             } finally {
                 if (_zipper.waitForExecEnd() != false & _zipper != null) {
-                    double seconds = ((double) _zipper.getElapsedTime() / 1E9); //calculate elapsed time in seconds
+                    /*calculate elapsed time in seconds*/
+                    double seconds = ((double) _zipper.getElapsedTime() / 1E9);
                     _textOutput.append("Job done!\n" + "Elapsed time: " + seconds + " seconds\n");
                 }
             }
@@ -472,7 +477,7 @@ public class GUI extends JFrame implements Runnable {
     public void run() {
         while (_runFlag) {
             try {
-                _ps.pausePoint();
+                _pauseControl.pausePoint();
                 if (_archiveModeZip.isSelected()) {
                     _textOutput.append("Selected files/folders will be compressed, please wait...\n");
                     startCompressing();
@@ -485,7 +490,7 @@ public class GUI extends JFrame implements Runnable {
             } finally {
                 _abortButton.setEnabled(false);
                 _zipper = null;
-                _ps.pause();
+                _pauseControl.pause();
             }
         }
     }
@@ -494,18 +499,17 @@ public class GUI extends JFrame implements Runnable {
      *
      * @author Matthias Fussenegger
      * @param args
-     * @version 0.6.5
+     * @version 2016-01-07
      */
     public static void main(String[] args) {
-        /*create file handler for logger if enabled via configuration*/
-        try {
+        try { //create file handler for logger if enabled via configuration
             _loggingEnabled = checkLoggerConfig();
         } catch (ConfigErrorException | IOException ex) {
             System.err.println(ex.toString());
         }
 
-        /*String path and decPath used to make directory where JAR-file is located
-         to the current working directory for creating a new archive*/
+        /*String path and decPath are used to make directory where JAR-file is 
+         located to the current working directory for creating a new archive*/
         String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
         try {
@@ -523,7 +527,7 @@ public class GUI extends JFrame implements Runnable {
              do not forget to copy it to class files directory when debugging app,
              the image can be found in the main directory of the project*/
             FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
-            _ico = ImageIO.read(imgStream);
+            _frameIcon = ImageIO.read(imgStream);
             /*draw application frame*/
             java.awt.EventQueue.invokeLater(() -> {
                 new GUI(decPath).setVisible(true);
@@ -540,7 +544,7 @@ public class GUI extends JFrame implements Runnable {
     /**
      * Checks the configuration file if logging has been enabled. If so, it will
      * create a new file handler for the logger. Logging can also be enabled via
-     * the options menu
+     * the options menu of the GUI
      *
      * @return @throws ConfigErrorException If configuration file is corrupt
      * @throws IOException
