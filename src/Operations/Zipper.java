@@ -30,6 +30,8 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 
 /**
  *
@@ -37,17 +39,60 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  */
 public class Zipper implements Runnable {
 
-    //ATTRIBUTES
+    /**
+     * The output stream for creating a TarArchive
+     */
     private TarArchiveOutputStream _tos;
+
+    /**
+     * The output stream for creating a classic ZipArchive
+     */
+    private ZipArchiveOutputStream _zos;
+
+    /**
+     * The name of the archive to be processed
+     */
     private String _archiveName;
+
+    /**
+     * The path of the archive to be processed
+     */
     private final String _path;
+
+    /**
+     * To calculate the elapsed time for archiving operation
+     */
     private long _elapsedTime;
-    private final boolean _zipMode;
+
+    /**
+     * True for creating an archive, false for extracting an archive
+     */
+    private final boolean _createArchive;
+
+    /**
+     * True for creating a ZIP-archive, false for creating a TAR.GZ-Archive
+     */
+    private final boolean _makeZip;
+
+    /**
+     * The selected files to be put in an archive by FileChooser of GUI
+     */
     private final File[] _selectedFiles;
 
+    /**
+     * The run flag to keep zipperThread alive
+     */
     private boolean _runFlag;
+
+    /**
+     * The thread of this class
+     */
     private Thread _zipperThread;
-    private static int _nameIterator; //to avoid overwriting recent archives
+
+    /**
+     * To avoid overwriting recent archives, if any exist
+     */
+    private static int _nameIndex;
 
     /**
      * Creates a new Zipper object for zip/unzip operations
@@ -56,11 +101,13 @@ public class Zipper implements Runnable {
      * @param name The name of the target archive
      * @param files The selected files from GUI
      * @param zipMode True if zip, false if unzip
+     * @param zipType True for zip-archive, false for tar-archive
      */
-    public Zipper(String path, String name, File[] files, boolean zipMode) {
+    public Zipper(String path, String name, File[] files, boolean zipMode, boolean zipType) {
         _path = path;
         _archiveName = name;
-        _zipMode = zipMode;
+        _createArchive = zipMode;
+        _makeZip = zipType;
         _selectedFiles = files;
     }
 
@@ -80,16 +127,24 @@ public class Zipper implements Runnable {
      */
     public void stop() {
         _runFlag = false;
-        if (_tos != null) {
-            try {
+        try {
+            if (_tos != null) {
                 _tos.flush();
                 _tos.close();
-            } catch (IOException ex) {
-                Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Archive entry still open", ex);
-                File file = new File(_path + _archiveName + ".tar.gz");
-                if (file.exists()) {
-                    file.delete();
-                }
+            } else if (_zos != null) {
+                _zos.flush();
+                _zos.close();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Archive entry still open", ex);
+            File file; //used to delete prevously created archive on error
+            if (!_makeZip) {
+                file = new File(_path + _archiveName + ".tar.gz");
+            } else {
+                file = new File(_path + _archiveName + ".zip");
+            }
+            if (file.exists()) {
+                file.delete();
             }
         }
     }
@@ -103,25 +158,29 @@ public class Zipper implements Runnable {
     }
 
     /**
-     * Compresses files using TAR/GZIP-algorithm and creates an archive. Note
-     * that GZIPOutputStream already has a built-in buffer
+     * Compresses files using TAR/GZIP-algorithm and creates an archive to the
+     * specified path, which is the initialPath of GUI.class
      *
      * @param files The files selected from jFileChooser
      * @param base The root path of the specified folder
-     * @throws IOException If an error occurred
+     * @throws IOException If an archiving error occurred
      */
-    private void makeGzip(File[] files, String base) throws IOException {
-        long startTime = System.nanoTime();
+    private void makeTarball(File[] files, String base) throws IOException {
         byte[] buffer = new byte[4096];
         int readBytes;
         if (files.length >= 1) {
             for (int i = 0; i < files.length & _runFlag != false; ++i) {
+                /*create next file and define entry name based on folder level*/
                 File newFile = files[i];
                 String entryName = base + newFile.getName();
+                /*start compressing the file*/
                 if (newFile.isFile()) {
-                    try (BufferedInputStream buf = new BufferedInputStream(new FileInputStream(newFile))) {
+                    try (BufferedInputStream buf = new BufferedInputStream(
+                            new FileInputStream(newFile))) {
+                        /*create next archive entry and put it on output strom*/
                         ArchiveEntry entry = _tos.createArchiveEntry(newFile, entryName);
                         _tos.putArchiveEntry(entry);
+                        /*write bytes to file*/
                         while ((readBytes = buf.read(buffer)) != -1) {
                             _tos.write(buffer, 0, readBytes);
                         }
@@ -129,25 +188,26 @@ public class Zipper implements Runnable {
                     }
                 } else { //child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
-                    makeGzip(children, entryName + "/"); //the slash indicates a folder
+                    makeTarball(children, entryName + "/"); //the slash indicates a folder
                 }
             }
         }
-        _elapsedTime = System.nanoTime() - startTime;
     }
 
     /**
-     * Extracts a TAR/GZIP-archive. Note that GZIPInputStream already has a
-     * built-in buffer
+     * Extracts a TAR/GZIP-archive to the specified path, which is the
+     * initialPath of GUI.class
      *
      * @param path The absolute path of the archive
      * @param name The filename of the archive
-     * @throws IOException If an error occurred
+     * @throws IOException If an archiving error occurred
      */
-    private void extractGzip(String path, String name) throws IOException {
-        long startTime = System.nanoTime();
-        try (TarArchiveInputStream tis = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(path + name)))) {
+    private void extractTarball(String path, String name) throws IOException {
+        try (TarArchiveInputStream tis = new TarArchiveInputStream(
+                new GZIPInputStream(new BufferedInputStream(new FileInputStream(path + name))))) {
+
             ArchiveEntry entry = tis.getNextEntry();
+
             /*create main folder of gzip archive*/
             File folder = new File(path + name.substring(0, 7));
             if (!folder.exists()) {
@@ -163,18 +223,22 @@ public class Zipper implements Runnable {
                     } else {
                         newFile = new File(folder.getAbsolutePath() + "\\" + entryName);
                     }
+                    /*mkdirs also creates parent directories*/
                     if (!newFile.getParentFile().exists()) {
                         newFile.getParentFile().mkdirs();
                     }
                 }
+
                 String newFilePath;
+
                 if (GUI._isUnix) { //check OS for correct file path
                     newFilePath = folder.getAbsolutePath() + "/" + entryName;
                 } else {
                     newFilePath = folder.getAbsolutePath() + "\\" + entryName;
                 }
-                /*create new OutputStream and write bytes to new file*/
-                try (BufferedOutputStream buf = new BufferedOutputStream(new FileOutputStream(newFilePath))) {
+                /*create new OutputStream and write bytes to file*/
+                try (BufferedOutputStream buf = new BufferedOutputStream(
+                        new FileOutputStream(newFilePath))) {
                     byte[] buffer = new byte[4096];
                     int readBytes;
                     while ((readBytes = tis.read(buffer)) != -1) {
@@ -184,7 +248,99 @@ public class Zipper implements Runnable {
                 entry = tis.getNextEntry();
             }
         }
-        _elapsedTime = System.nanoTime() - startTime;
+    }
+
+    /**
+     * Compresses files using ZIP-algorithm with default settings and creates an
+     * archive to the specified path, which is the initialPath of GUI.class
+     *
+     * @param files The files selected from jFileChooser
+     * @param base The root path of the specified folder
+     * @throws IOException If an archiving error occurred
+     */
+    private void makeZip(File[] files, String base) throws IOException {
+        byte[] buffer = new byte[4096];
+        int readBytes;
+        if (files.length >= 1) {
+            for (int i = 0; i < files.length & _runFlag != false; ++i) {
+                /*create next file and define entry name based on folder level*/
+                File newFile = files[i];
+                String entryName = base + newFile.getName();
+                /*start compressing the file*/
+                if (newFile.isFile()) {
+                    try (BufferedInputStream buf = new BufferedInputStream(
+                            new FileInputStream(newFile))) {
+                        /*create next archive entry and put it on output strom*/
+                        ArchiveEntry entry = _zos.createArchiveEntry(newFile, entryName);
+                        _zos.putArchiveEntry(entry);
+                        /*write bytes to file*/
+                        while ((readBytes = buf.read(buffer)) != -1) {
+                            _zos.write(buffer, 0, readBytes);
+                        }
+                        _zos.closeArchiveEntry();
+                    }
+                } else { //child is a directory
+                    File[] children = getFiles(newFile.getAbsolutePath());
+                    makeZip(children, entryName + "/"); //the slash indicates a folder
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracts a ZIP-archive to the specified path, which is the initialPath of
+     * GUI.class
+     *
+     * @param path The absolute path of the archive
+     * @param name The filename of the archive
+     * @throws IOException If an archiving error occurred
+     */
+    private void extractZip(String path, String name) throws IOException {
+        try (ZipArchiveInputStream zis = new ZipArchiveInputStream(
+                new BufferedInputStream(new FileInputStream(path + name)))) {
+
+            ArchiveEntry entry = zis.getNextEntry();
+
+            /*create main folder of gzip archive*/
+            File folder = new File(path + name.substring(0, 7));
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            while (entry != null & _runFlag != false) {
+                String entryName = entry.getName();
+                /*check if entry contains a directory*/
+                if (entryName.contains("/")) {
+                    File newFile;
+                    if (GUI._isUnix) { //check OS for correct file path
+                        newFile = new File(folder.getAbsolutePath() + "/" + entryName);
+                    } else {
+                        newFile = new File(folder.getAbsolutePath() + "\\" + entryName);
+                    }
+                    /*mkdirs also creates parent directories*/
+                    if (!newFile.getParentFile().exists()) {
+                        newFile.getParentFile().mkdirs();
+                    }
+                }
+
+                String newFilePath;
+
+                if (GUI._isUnix) { //check OS for correct file path
+                    newFilePath = folder.getAbsolutePath() + "/" + entryName;
+                } else {
+                    newFilePath = folder.getAbsolutePath() + "\\" + entryName;
+                }
+                /*create new OutputStream and write bytes to file*/
+                try (BufferedOutputStream buf = new BufferedOutputStream(
+                        new FileOutputStream(newFilePath))) {
+                    byte[] buffer = new byte[4096];
+                    int readBytes;
+                    while ((readBytes = zis.read(buffer)) != -1) {
+                        buf.write(buffer, 0, readBytes);
+                    }
+                }
+                entry = zis.getNextEntry();
+            }
+        }
     }
 
     /**
@@ -226,18 +382,35 @@ public class Zipper implements Runnable {
     @Override
     public void run() {
         /*in current implementation multiple jobs are not supported*/
-        if (_zipMode != false) {
+        if (_createArchive != false) {
             try {
                 /*check whether archive with given name already exists;
-                 if so, add iterator to file name an re-check*/
-                File file = new File(_path + _archiveName + ".tar.gz");
-                while (file.exists()) {
-                    ++_nameIterator;
-                    _archiveName = _archiveName.substring(0, 7) + _nameIterator;
+                 if so, add index to file name an re-check*/
+                File file; //will be the output file of archive
+                if (!_makeZip) {
                     file = new File(_path + _archiveName + ".tar.gz");
+                } else {
+                    file = new File(_path + _archiveName + ".zip");
                 }
-                _tos = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(_path + _archiveName + ".tar.gz")));
-                _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+                while (file.exists()) {
+                    ++_nameIndex;
+                    _archiveName = _archiveName.substring(0, 7) + _nameIndex;
+                    if (!_makeZip) {
+                        file = new File(_path + _archiveName + ".tar.gz");
+                    } else {
+                        file = new File(_path + _archiveName + ".zip");
+                    }
+                }
+                if (!_makeZip) {
+                    _tos = new TarArchiveOutputStream(new GZIPOutputStream(
+                            new BufferedOutputStream(new FileOutputStream(
+                                    _path + _archiveName + ".tar.gz"))));
+                    _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+                } else { //create output stream for classic zip-archive
+                    _zos = new ZipArchiveOutputStream(new BufferedOutputStream(
+                            new FileOutputStream(
+                                    _path + _archiveName + ".zip")));
+                }
             } catch (IOException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
                 System.exit(1);
@@ -245,15 +418,26 @@ public class Zipper implements Runnable {
         }
         while (_runFlag) {
             try {
-                if (_zipMode != false & _selectedFiles != null) {
-                    makeGzip(_selectedFiles, "");
-                } else { //unzip
-                    extractGzip(_path, _archiveName);
+
+                long startTime = System.nanoTime();
+
+                if (_createArchive != false & _selectedFiles != null) {
+                    if (!_makeZip) {
+                        makeTarball(_selectedFiles, "");
+                    } else {
+                        makeZip(_selectedFiles, "");
+                    }
+                } else if (!_makeZip) { //unzip
+                    extractTarball(_path, _archiveName);
+                } else {
+                    extractZip(_path, _archiveName);
                 }
-                stop();
+
+                _elapsedTime = System.nanoTime() - startTime;
+                stop(); //stop thread after operation was successful
+
             } catch (IOException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
-                System.exit(1);
             }
         }
     }
