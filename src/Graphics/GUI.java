@@ -17,8 +17,7 @@
 package Graphics;
 
 import Exceptions.ConfigErrorException;
-import Operations.PauseControl;
-import Operations.Zipper;
+import Operations.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -62,7 +61,7 @@ import javax.swing.text.DefaultCaret;
 
 public class GUI extends JFrame implements Runnable {
 
-    //ATTRIBUTES
+    //ATTRIBUTES OF GUI COMPONENTS
     private JMenu _fileMenu;
     private JMenu _helpMenu;
     private JMenuItem _exitMenuItem;
@@ -96,7 +95,7 @@ public class GUI extends JFrame implements Runnable {
     /**
      * Associated class used for archiving operations
      */
-    private Zipper _zipper;
+    private AbstractAlgorithm _zipper;
 
     /**
      * The additional thread of this class
@@ -131,7 +130,7 @@ public class GUI extends JFrame implements Runnable {
     /**
      * Constructor of this class for initialization of graphical user interface
      *
-     * @param path The path of the JAR-file, which is the initialPath
+     * @param path The path of the JAR-file, which is the initial path
      */
     public GUI(String path) {
         _initialPath = path;
@@ -196,7 +195,7 @@ public class GUI extends JFrame implements Runnable {
         _textOutput.setBackground(Color.WHITE);
 
         _fileChooser.setFileHidingEnabled(true);
-        
+
         _startButton.setEnabled(false);
         _startButton.addActionListener((ActionEvent evt) -> {
             this.startButtonActionPerformed(evt);
@@ -282,7 +281,7 @@ public class GUI extends JFrame implements Runnable {
                 _zipper.interrupt();
                 _zipper.stop();
                 try {
-                    if (_zipper.waitForExecEnd() != false) {
+                    if (_zipper.waitForExecutionEnd()) {
                         _zipper = null;
                     }
                 } catch (InterruptedException ex) {
@@ -444,7 +443,7 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("About");
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + _initialPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-11</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-14</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -484,19 +483,19 @@ public class GUI extends JFrame implements Runnable {
      */
     private void startCompressing() throws InterruptedException {
         if (_zipper == null) {
-            _zipper = new Zipper(_initialPath, "gzipper",
-                    _fileChooser.getSelectedFiles(), true, _useClassicZipMode);
-            try {
-                _zipper.start();
-            } catch (IOException ex) {
-                _textOutput.append(ex.toString() + "\n");
-            } finally {
-                if (_zipper.waitForExecEnd() != false & _zipper != null) {
-                    /*calculate elapsed time in seconds*/
-                    double seconds = ((double) _zipper.getElapsedTime() / 1E9);
-                    _textOutput.append("Job done!\n" + "Elapsed time: "
-                            + seconds + " seconds\n");
-                }
+
+            if (!_useClassicZipMode) { //tar.gz
+                _zipper = new Gzip(_initialPath, "gzipper", _fileChooser.getSelectedFiles(), true);
+            } else { //zip
+                _zipper = new Zip(_initialPath, "gzipper", _fileChooser.getSelectedFiles(), true);
+            }
+
+            _zipper.start();
+
+            if (_zipper.waitForExecutionEnd() & _zipper != null) {
+                /*calculate elapsed time in seconds*/
+                double seconds = ((double) _zipper.getElapsedTime() / 1E9);
+                _textOutput.append("Job done!\n" + "Elapsed time: " + seconds + " seconds\n");
             }
         }
     }
@@ -508,27 +507,31 @@ public class GUI extends JFrame implements Runnable {
      */
     private void startDecompressing() throws InterruptedException {
         if (_zipper == null) {
+
             _abortButton.setEnabled(true);
-            if (_isUnix) { //check for OS
-                _zipper = new Zipper(_fileChooser.getSelectedFile().getParent() + "/",
-                        _fileChooser.getSelectedFile().getName(),
-                        _fileChooser.getSelectedFiles(), false, _useClassicZipMode);
+            String separator; //depending on operating systems
+
+            if (_isUnix) {
+                separator = "/";
             } else {
-                _zipper = new Zipper(_fileChooser.getSelectedFile().getParent() + "\\",
-                        _fileChooser.getSelectedFile().getName(),
-                        _fileChooser.getSelectedFiles(), false, _useClassicZipMode);
+                separator = "\\";
             }
-            try {
-                _zipper.start();
-            } catch (IOException ex) {
-                _textOutput.append(ex.toString() + "\n");
-            } finally {
-                if (_zipper.waitForExecEnd() != false & _zipper != null) {
-                    /*calculate elapsed time in seconds*/
-                    double seconds = ((double) _zipper.getElapsedTime() / 1E9);
-                    _textOutput.append("Job done!\n" + "Elapsed time: "
-                            + seconds + " seconds\n");
-                }
+            if (!_useClassicZipMode) { //tar.gz
+                _zipper = new Gzip(_fileChooser.getSelectedFile().getParent()
+                        + separator, _fileChooser.getSelectedFile().getName(),
+                        _fileChooser.getSelectedFiles(), false);
+            } else { //zip
+                _zipper = new Zip(_fileChooser.getSelectedFile().getParent()
+                        + separator, _fileChooser.getSelectedFile().getName(),
+                        _fileChooser.getSelectedFiles(), false);
+            }
+
+            _zipper.start();
+
+            if (_zipper.waitForExecutionEnd() & _zipper != null) {
+                /*calculate elapsed time in seconds*/
+                double seconds = ((double) _zipper.getElapsedTime() / 1E9);
+                _textOutput.append("Job done!\n" + "Elapsed time: " + seconds + " seconds\n");
             }
         }
     }
@@ -560,7 +563,7 @@ public class GUI extends JFrame implements Runnable {
      *
      * @author Matthias Fussenegger
      * @param args The command line arguments
-     * @version 2016-01-11
+     * @version 2016-01-14
      */
     public static void main(String[] args) {
         try { //create file handler for logger if enabled via configuration
@@ -607,7 +610,7 @@ public class GUI extends JFrame implements Runnable {
      * the options menu of the GUI
      *
      * @return @throws ConfigErrorException If configuration file is corrupt
-     * @throws IOException If an error reading file occurs
+     * @throws IOException If an error while reading configuration file occurs
      */
     public static boolean checkLoggerConfig() throws ConfigErrorException, IOException {
         String line;

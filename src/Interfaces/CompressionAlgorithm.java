@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Matthias Fussenegger
+ * Copyright (C) 2016 Matthias
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Operations;
+package Interfaces;
 
 /**
  *
  * @author Matthias Fussenegger
  */
-public class PauseControl {
-
-    private boolean needToPause;
-
-    public synchronized void pausePoint() throws InterruptedException {
-        while (needToPause) {
-            wait();
-        }
-    }
-
-    public synchronized void pause() {
-        needToPause = true;
-    }
-
-    public synchronized void unpause() {
-        needToPause = false;
-        this.notifyAll();
-    }
+public interface CompressionAlgorithm {
+    //marker interface
 }
