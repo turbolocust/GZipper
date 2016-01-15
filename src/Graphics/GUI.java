@@ -21,7 +21,6 @@ import Operations.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -56,6 +55,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
 
@@ -166,7 +167,7 @@ public class GUI extends JFrame implements Runnable {
         /*set frame properties*/
         setLayout(new BorderLayout());
         setTitle("GZipper");
-        setPreferredSize(new Dimension(520, 250));
+        setPreferredSize(new Dimension(600, 300));
         setIconImage(_frameIcon);
         setJMenuBar(_menuBar);
 
@@ -188,7 +189,6 @@ public class GUI extends JFrame implements Runnable {
             this.aboutMenuActionPerformed(evt);
         });
 
-        _textOutput.setFont(new Font("Consolas", Font.PLAIN, 12));
         _textOutput.setText("run: \n");
         _textOutput.append("Output path: " + _initialPath + "\n");
         _textOutput.setEditable(false);
@@ -366,8 +366,6 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("Options");
             JCheckBox loggingCheckBox = new JCheckBox("Enable logging (requires restart)");
             JCheckBox archiveTypeCheckBox = new JCheckBox("Switch to ZIP-mode (for session only)");
-            loggingCheckBox.setFont(new Font("Consolas", Font.BOLD, 12));
-            archiveTypeCheckBox.setFont(new Font("Consolas", Font.BOLD, 12));
             if (_loggingEnabled) {
                 loggingCheckBox.setSelected(true);
             }
@@ -443,7 +441,7 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("About");
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + _initialPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-14</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-15</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -455,7 +453,6 @@ public class GUI extends JFrame implements Runnable {
                     frame.dispose();
                 }
             });
-            label.setFont(new Font("Consolas", Font.BOLD, 12));
             button.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent evt) {
@@ -563,7 +560,7 @@ public class GUI extends JFrame implements Runnable {
      *
      * @author Matthias Fussenegger
      * @param args The command line arguments
-     * @version 2016-01-14
+     * @version 2016-01-15
      */
     public static void main(String[] args) {
         try { //create file handler for logger if enabled via configuration
@@ -591,6 +588,10 @@ public class GUI extends JFrame implements Runnable {
              the image folder can be found in the main directory of the project*/
             FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
             _frameIcon = ImageIO.read(imgStream);
+
+            /*set look & feel to system default*/
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
             /*draw application frame*/
             java.awt.EventQueue.invokeLater(() -> {
                 new GUI(decPath).setVisible(true);
@@ -598,8 +599,9 @@ public class GUI extends JFrame implements Runnable {
             Thread.sleep(300);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-            System.exit(1);
         } catch (InterruptedException | IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         }
     }
