@@ -122,8 +122,7 @@ public abstract class AbstractAlgorithm implements Runnable {
     public abstract boolean waitForExecutionEnd() throws InterruptedException;
 
     /**
-     * Extracts an archive using the defined algorithm of class to the specified
-     * path, which is the initialPath of GUI.class
+     * Extracts archive using defined algorithm of class to the specified path
      *
      * @param path The absolute path of the archive
      * @param name The filename of the archive
@@ -132,9 +131,8 @@ public abstract class AbstractAlgorithm implements Runnable {
     protected abstract void extract(String path, String name) throws IOException;
 
     /**
-     * Compresses files using the defined algorithm of class with default
-     * settings and creates an archive to the specified path, which is the
-     * initialPath of GUI.class
+     * Compresses files using defined algorithm of class with default settings
+     * and creates an archive to the specified path
      *
      * @param files The files selected from the file chooser
      * @param base The root path of the specified folder
