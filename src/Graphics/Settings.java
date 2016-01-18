@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Matthias Fussenegger
+ * Copyright (C) 2016 Matthias
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Exceptions;
+package Graphics;
+
+import java.awt.image.BufferedImage;
 
 /**
  *
  * @author Matthias Fussenegger
  */
-public class ConfigErrorException extends Exception {
+public abstract class Settings {
 
-    @Override
-    public String toString() {
-        return "Configuration error, check \"gzipper.ini\" file,\n"
-                + "line must end with \"false\" or \"true\" "
-                + "or with a valid String depending on prefix!";
-    }
+    /**
+     * To determine whether operating system is Unix-based or not
+     */
+    public static boolean _isUnix;
+
+    /**
+     * To store the default icon of each frame
+     */
+    protected static BufferedImage _frameIcon;
+
+    /**
+     * True if logging via options menu has been enabled
+     */
+    protected static boolean _loggingEnabled;
+
+    /**
+     * True if user prefers to make classic zip-file instead of tar-archive
+     */
+    protected static boolean _useClassicZipMode;
 }

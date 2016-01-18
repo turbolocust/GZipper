@@ -16,8 +16,12 @@
  */
 package Graphics;
 
+import Operations.PauseControl;
+import Algorithms.AbstractAlgorithm;
+import Algorithms.Gzip;
+import Algorithms.Zip;
 import Exceptions.ConfigErrorException;
-import Operations.*;
+import Operations.ConfigFileParser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,18 +29,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,8 +84,12 @@ public class GUI extends JFrame implements Runnable {
     private JPanel _northernPanel;
 
     /**
-     * The output path of the compressed archive. Stores the decoded standard
-     * path of JAR-file location by default.
+     * The decoded path of JAR-file
+     */
+    private final String INITIAL_PATH;
+
+    /**
+     * The output path of the compressed archive. Stores initial path by default
      */
     private String _outputPath;
 
@@ -113,24 +114,9 @@ public class GUI extends JFrame implements Runnable {
     private boolean _runFlag;
 
     /**
-     * To determine whether operating system is Unix-based or not
+     * To parse the configuration file and update values
      */
-    public static boolean _isUnix;
-
-    /**
-     * To store the default icon of each frame
-     */
-    private static BufferedImage _frameIcon;
-
-    /**
-     * True if logging via options menu has been enabled
-     */
-    private static boolean _loggingEnabled;
-
-    /**
-     * True if user prefers to make classic zip-file instead of tar-archive
-     */
-    private static boolean _useClassicZipMode;
+    private static ConfigFileParser _configFileParser;
 
     /**
      * Constructor of this class for initialization of graphical user interface
@@ -138,7 +124,8 @@ public class GUI extends JFrame implements Runnable {
      * @param path The path of the JAR-file, which is the initial path
      */
     public GUI(String path) {
-        _outputPath = path;
+        INITIAL_PATH = path;
+        _outputPath = INITIAL_PATH;
         _pauseControl = new PauseControl();
         initComponents();
     }
@@ -173,7 +160,7 @@ public class GUI extends JFrame implements Runnable {
         setLayout(new BorderLayout());
         setTitle("GZipper");
         setPreferredSize(new Dimension(600, 300));
-        setIconImage(_frameIcon);
+        setIconImage(Settings._frameIcon);
         setJMenuBar(_menuBar);
 
         /*define components*/
@@ -387,27 +374,21 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("Options");
             JCheckBox loggingCheckBox = new JCheckBox("Enable logging (requires restart)");
             JCheckBox archiveTypeCheckBox = new JCheckBox("Switch to ZIP-mode (for session only)");
-            if (_loggingEnabled) {
+            if (Settings._loggingEnabled) {
                 loggingCheckBox.setSelected(true);
             }
-            if (_useClassicZipMode) {
+            if (Settings._useClassicZipMode) {
                 archiveTypeCheckBox.setSelected(true);
             }
             loggingCheckBox.addActionListener((ActionEvent e) -> {
                 if (e.getSource() == loggingCheckBox) {
-                    /*updates config file on change of settings; 
-                     as this file only contains two lines I chose to write them manually,
-                     otherwise using List<String> would be a much handier solution*/
-                    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
-                        bw.write("[OPTIONS]");
-                        bw.newLine();
+                    try {
                         if (loggingCheckBox.isSelected()) {
-                            bw.write("LoggingEnabled=true;");
-                            _loggingEnabled = true;
+                            _configFileParser.updateValue("LoggingEnabled", true);
+                            Settings._loggingEnabled = true;
                         } else {
-                            bw.write("LoggingEnabled=false;");
-                            _loggingEnabled = false;
+                            _configFileParser.updateValue("LoggingEnabled", false);
+                            Settings._loggingEnabled = false;
                         }
                     } catch (IOException ex) {
                         Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error writing config file!", ex);
@@ -418,8 +399,8 @@ public class GUI extends JFrame implements Runnable {
                 /*this setting won't be stored in configuration file as 
                  this application's main purpose is to handle tar-archives*/
                 if (e.getSource() == archiveTypeCheckBox) {
-                    _useClassicZipMode = archiveTypeCheckBox.isSelected();
-                    if (_useClassicZipMode) {
+                    Settings._useClassicZipMode = archiveTypeCheckBox.isSelected();
+                    if (Settings._useClassicZipMode) {
                         _extFilter = new FileNameExtensionFilter(".zip", "zip");
                     } else {
                         _extFilter = new FileNameExtensionFilter(".tar.gz", "gz");
@@ -429,7 +410,7 @@ public class GUI extends JFrame implements Runnable {
             frame.setLayout(new GridLayout());
             frame.setMinimumSize(new Dimension(300, 100));
             frame.setResizable(false);
-            frame.setIconImage(_frameIcon);
+            frame.setIconImage(Settings._frameIcon);
             frame.add(loggingCheckBox);
             frame.add(archiveTypeCheckBox);
             frame.pack();
@@ -461,8 +442,8 @@ public class GUI extends JFrame implements Runnable {
         if (evt.getSource() == _aboutMenuItem) {
             JFrame frame = new JFrame("About");
             JLabel label = new JLabel("<html><br><p align=\"center\">"
-                    + "<img src=\"file:" + _outputPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-17</b></p>"
+                    + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-18</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -483,7 +464,7 @@ public class GUI extends JFrame implements Runnable {
                 }
             });
             frame.setResizable(false);
-            frame.setIconImage(_frameIcon);
+            frame.setIconImage(Settings._frameIcon);
             frame.add(label, BorderLayout.CENTER);
             frame.add(button, BorderLayout.SOUTH);
             frame.addKeyListener(null);
@@ -502,7 +483,7 @@ public class GUI extends JFrame implements Runnable {
     private void startCompressing() throws InterruptedException {
         if (_zipper == null) {
 
-            if (!_useClassicZipMode) { //tar.gz
+            if (!Settings._useClassicZipMode) { //tar.gz
                 _zipper = new Gzip(_outputPath, "gzipper", _fileChooser.getSelectedFiles(), true);
             } else { //zip
                 _zipper = new Zip(_outputPath, "gzipper", _fileChooser.getSelectedFiles(), true);
@@ -529,12 +510,12 @@ public class GUI extends JFrame implements Runnable {
             _abortButton.setEnabled(true);
             String separator; //depending on operating systems
 
-            if (_isUnix) {
+            if (Settings._isUnix) {
                 separator = "/";
             } else {
                 separator = "\\";
             }
-            if (!_useClassicZipMode) { //tar.gz
+            if (!Settings._useClassicZipMode) { //tar.gz
                 _zipper = new Gzip(_fileChooser.getSelectedFile().getParent()
                         + separator, _fileChooser.getSelectedFile().getName(),
                         _fileChooser.getSelectedFiles(), false);
@@ -585,7 +566,7 @@ public class GUI extends JFrame implements Runnable {
      */
     private String validatePath(String path) {
         String validPath = "";
-        if (_isUnix) {
+        if (Settings._isUnix) {
             for (int i = 0; i < path.length(); ++i) {
                 if (path.charAt(i) == '\\') {
                     validPath = validPath + '/';
@@ -615,34 +596,39 @@ public class GUI extends JFrame implements Runnable {
      *
      * @author Matthias Fussenegger
      * @param args The command line arguments
-     * @version 2016-01-17
+     * @version 2016-01-18
      */
     public static void main(String[] args) {
-        try { //create file handler for logger if enabled via configuration
-            _loggingEnabled = checkLoggerConfig();
-        } catch (ConfigErrorException | IOException ex) {
-            System.err.println(ex.toString());
-        }
 
-        /*String path and decPath are used to make directory where JAR-file is 
-         located to the current working directory for creating a new archive*/
         String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decPath; //the decoded path of JAR-file
 
         try {
-            String decPath;
             if (System.getProperty("os.name").startsWith("Windows")) {
                 /*decode path without adding the name of the JAR-file (GZipper.jar = 11 characters)
                  - for debugging inside an IDE please remove the minus operation (- 11)*/
                 decPath = URLDecoder.decode(path.substring(1, path.length() - 11), "UTF-8");
             } else {
-                _isUnix = true;
+                Settings._isUnix = true;
                 decPath = path.substring(0, path.length() - 11);
             }
             /*get icon image for frame from res-folder in root application folder;
              do not forget to copy it to class files directory when debugging app,
              the image folder can be found in the main directory of the project*/
-            FileInputStream imgStream = new FileInputStream(decPath + "/res/icon_32.png");
-            _frameIcon = ImageIO.read(imgStream);
+            FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
+            Settings._frameIcon = ImageIO.read(imgStream);
+
+            try {
+                _configFileParser = new ConfigFileParser(decPath);
+                Settings._loggingEnabled = _configFileParser.checkValue("LoggingEnabled");
+                if (Settings._loggingEnabled) { //create new logger
+                    Logger logger = Logger.getLogger((GUI.class.getName()));
+                    FileHandler fh = new FileHandler(decPath + "logs/gzipper.log", true);
+                    logger.addHandler(fh);
+                }
+            } catch (ConfigErrorException | IOException ex) {
+                System.err.println(ex.toString());
+            }
 
             /*set look & feel to system default*/
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -659,36 +645,5 @@ public class GUI extends JFrame implements Runnable {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         }
-    }
-
-    /**
-     * Checks the configuration file if logging has been enabled. If so, it will
-     * create a new file handler for the logger. Logging can also be enabled via
-     * the options menu of the GUI
-     *
-     * @return @throws ConfigErrorException If configuration file is corrupt
-     * @throws IOException If an error while reading configuration file occurs
-     */
-    public static boolean checkLoggerConfig() throws ConfigErrorException, IOException {
-        String line;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                new FileInputStream("gzipper.ini"), Charset.forName("UTF-8")))) {
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("LoggingEnabled=")) {
-                    if (line.endsWith("true;")) {
-                        /*create new logger*/
-                        Logger logger = Logger.getLogger((GUI.class.getName()));
-                        FileHandler fh = new FileHandler("logs/gzipper.log", true);
-                        logger.addHandler(fh);
-                        return true;
-                    } else if (line.endsWith("false;")) {
-                        return false;
-                    } else {
-                        throw new ConfigErrorException();
-                    }
-                }
-            }
-        }
-        return false;
     }
 }
