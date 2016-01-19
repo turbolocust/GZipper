@@ -16,12 +16,9 @@
  */
 package Graphics;
 
-import Operations.PauseControl;
-import Algorithms.AbstractAlgorithm;
-import Algorithms.Gzip;
-import Algorithms.Zip;
+import Operations.*;
+import Algorithms.*;
 import Exceptions.ConfigErrorException;
-import Operations.ConfigFileParser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -76,7 +73,7 @@ public class GUI extends JFrame implements Runnable {
     private JButton _selectButton;
     private JRadioButton _compressButton;
     private JRadioButton _decompressButton;
-    private ButtonGroup _buttonGroup1;
+    private ButtonGroup _modeButtonGroup;
     private JFileChooser _fileChooser;
     private FileNameExtensionFilter _extFilter;
     private JPanel _centerPanel;
@@ -87,11 +84,6 @@ public class GUI extends JFrame implements Runnable {
      * The decoded path of JAR-file
      */
     private final String INITIAL_PATH;
-
-    /**
-     * The output path of the compressed archive. Stores initial path by default
-     */
-    private String _outputPath;
 
     /**
      * Used to pause GUI-thread after archiving operation
@@ -125,7 +117,7 @@ public class GUI extends JFrame implements Runnable {
      */
     public GUI(String path) {
         INITIAL_PATH = path;
-        _outputPath = INITIAL_PATH;
+        Settings._outputPath = INITIAL_PATH;
         _pauseControl = new PauseControl();
         initComponents();
     }
@@ -145,12 +137,12 @@ public class GUI extends JFrame implements Runnable {
         _selectButton = new JButton("Select...");
         _compressButton = new JRadioButton("Compress");
         _decompressButton = new JRadioButton("Decompress");
-        _buttonGroup1 = new ButtonGroup();
+        _modeButtonGroup = new ButtonGroup();
         _fileChooser = new JFileChooser();
         _extFilter = new FileNameExtensionFilter(".tar.gz", "gz");
         _menuBar = new JMenuBar();
         _chooseModeLabel = new JLabel("Choose mode:");
-        _outputPathTextField = new JTextField(_outputPath);
+        _outputPathTextField = new JTextField(INITIAL_PATH);
         _textOutput = new JTextArea();
         _centerPanel = new JPanel();
         _southernPanel = new JPanel();
@@ -182,11 +174,12 @@ public class GUI extends JFrame implements Runnable {
         });
 
         _textOutput.setText("run: \n");
-        _textOutput.append("Output path can be changed in text field above" + "\n");
+        _textOutput.append("Output path can be changed in text field above." + "\n");
         _textOutput.setEditable(false);
         _textOutput.setBackground(Color.WHITE);
 
         _outputPathTextField.setBackground(Color.WHITE);
+        _outputPathTextField.setToolTipText("The output path of file(s)");
 
         _fileChooser.setFileHidingEnabled(true);
 
@@ -212,8 +205,8 @@ public class GUI extends JFrame implements Runnable {
             this.decompressButtonActionPerformed(evt);
         });
 
-        _buttonGroup1.add(_compressButton);
-        _buttonGroup1.add(_decompressButton);
+        _modeButtonGroup.add(_compressButton);
+        _modeButtonGroup.add(_decompressButton);
 
         _menuBar.add(_fileMenu);
         _menuBar.add(_helpMenu);
@@ -255,15 +248,15 @@ public class GUI extends JFrame implements Runnable {
 
             String path = _outputPathTextField.getText();
 
-            if (!path.equals(_outputPath)) {
+            if (!path.equals(Settings._outputPath)) {
                 File f = new File(path);
                 if (!f.exists() || !f.isDirectory()) {
                     _textOutput.append("Entered path does not exist "
-                            + "or is no directory! Will use initial path instead.");
+                            + "or is no directory! Will use previous path instead.");
                 } else {
                     path = validatePath(path);
                     _textOutput.append("New output path: " + path + "\n");
-                    _outputPath = path; //set new output path
+                    Settings._outputPath = path; //set new output path
                 }
             }
             _abortButton.setEnabled(true);
@@ -308,7 +301,7 @@ public class GUI extends JFrame implements Runnable {
      */
     private void selectButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _selectButton) {
-            if (_buttonGroup1.getSelection() != null) {
+            if (_modeButtonGroup.getSelection() != null) {
                 _fileChooser.removeChoosableFileFilter(_extFilter);
                 if (_compressButton.isSelected()) {
                     _fileChooser.setAcceptAllFileFilterUsed(true);
@@ -443,7 +436,7 @@ public class GUI extends JFrame implements Runnable {
             JFrame frame = new JFrame("About");
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-18</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-19</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -484,9 +477,11 @@ public class GUI extends JFrame implements Runnable {
         if (_zipper == null) {
 
             if (!Settings._useClassicZipMode) { //tar.gz
-                _zipper = new Gzip(_outputPath, "gzipper", _fileChooser.getSelectedFiles(), true);
+                _zipper = new Gzip(Settings._outputPath, "gzipper",
+                        _fileChooser.getSelectedFiles(), true);
             } else { //zip
-                _zipper = new Zip(_outputPath, "gzipper", _fileChooser.getSelectedFiles(), true);
+                _zipper = new Zip(Settings._outputPath, "gzipper",
+                        _fileChooser.getSelectedFiles(), true);
             }
 
             _zipper.start();
@@ -508,7 +503,7 @@ public class GUI extends JFrame implements Runnable {
         if (_zipper == null) {
 
             _abortButton.setEnabled(true);
-            String separator; //depending on operating systems
+            String separator; //depends on operating system
 
             if (Settings._isUnix) {
                 separator = "/";
@@ -596,7 +591,7 @@ public class GUI extends JFrame implements Runnable {
      *
      * @author Matthias Fussenegger
      * @param args The command line arguments
-     * @version 2016-01-18
+     * @version 2016-01-19
      */
     public static void main(String[] args) {
 
@@ -613,8 +608,7 @@ public class GUI extends JFrame implements Runnable {
                 decPath = path.substring(0, path.length() - 11);
             }
             /*get icon image for frame from res-folder in root application folder;
-             do not forget to copy it to class files directory when debugging app,
-             the image folder can be found in the main directory of the project*/
+             do not forget to copy it to class files directory when debugging app*/
             FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
             Settings._frameIcon = ImageIO.read(imgStream);
 
@@ -633,11 +627,12 @@ public class GUI extends JFrame implements Runnable {
             /*set look & feel to system default*/
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-            /*draw application frame*/
-            java.awt.EventQueue.invokeLater(() -> {
+            java.awt.EventQueue.invokeLater(() -> { //draw application frame
                 new GUI(decPath).setVisible(true);
             });
+
             Thread.sleep(300);
+
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         } catch (InterruptedException | IOException ex) {

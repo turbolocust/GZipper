@@ -30,6 +30,11 @@ public abstract class Settings {
     public static boolean _isUnix;
 
     /**
+     * The output path of the compressed archive
+     */
+    public static String _outputPath;
+
+    /**
      * To store the default icon of each frame
      */
     protected static BufferedImage _frameIcon;

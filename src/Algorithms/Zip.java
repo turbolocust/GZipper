@@ -107,7 +107,7 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
             ArchiveEntry entry = zis.getNextEntry();
 
             /*create main folder of gzip archive*/
-            File folder = new File(path + name.substring(0, 7));
+            File folder = new File(Settings._outputPath + name.substring(0, 7));
             if (!folder.exists()) {
                 folder.mkdir();
             }
