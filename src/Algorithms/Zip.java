@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias
+ * Copyright (C) 2016 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
                 if (newFile.isFile()) {
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
-                        /*create next archive entry and put it on output strom*/
+                        /*create next archive entry and put it on output stream*/
                         ArchiveEntry entry = _zos.createArchiveEntry(newFile, entryName);
                         _zos.putArchiveEntry(entry);
                         /*write bytes to file*/
