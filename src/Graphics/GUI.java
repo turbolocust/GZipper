@@ -58,6 +58,8 @@ import javax.swing.text.DefaultCaret;
 
 public class GUI extends JFrame implements Runnable {
 
+    private static final long serialVersionUID = 1L;
+
     //ATTRIBUTES OF GUI COMPONENTS
     private JMenu _fileMenu;
     private JMenu _helpMenu;

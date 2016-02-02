@@ -58,7 +58,7 @@ public class ConfigFileParser {
     }
 
     /**
-     * Parses the configuration file and stores all entries to a List
+     * Parses the configuration file and stores all entries in list
      *
      * @throws IOException If an error while reading configuration file occurs
      */

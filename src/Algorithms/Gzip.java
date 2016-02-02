@@ -78,7 +78,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
             }
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Output stream could not be closed", ex);
-            File file; //used to delete prevously created archive on error
+            File file; //to delete previously created archive on error
             file = new File(_path + _archiveName + ".tar.gz");
             if (file.exists()) {
                 file.delete();
