@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Abstract class that offers generally used attributes and methods for
+ * archiving algorithms. Any class that contains an archiving algorithm will
+ * extend this class
  *
  * @author Matthias Fussenegger
  */

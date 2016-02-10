@@ -17,6 +17,7 @@
 package Operations;
 
 /**
+ * Offers functionality to pause a thread and make it wait if necessary
  *
  * @author Matthias Fussenegger
  */

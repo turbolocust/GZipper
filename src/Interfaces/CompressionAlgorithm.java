@@ -17,6 +17,7 @@
 package Interfaces;
 
 /**
+ * A marker interface to mark the classes that contain compression algorithms
  *
  * @author Matthias Fussenegger
  */

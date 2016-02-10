@@ -34,6 +34,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
+ * Offers algorithms to compress and decompress {@code tar.gz} archives
  *
  * @author Matthias Fussenegger
  */

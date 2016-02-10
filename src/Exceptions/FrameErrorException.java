@@ -14,39 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Graphics;
-
-import java.awt.image.BufferedImage;
+package Exceptions;
 
 /**
- * Abstract class with static attributes only to store various settings
+ * Class to handle errors that can occur while trying to draw a {@code SubFrame}
  *
  * @author Matthias Fussenegger
  */
-public abstract class Settings {
+public class FrameErrorException extends Exception {
+
+    private static final long serialVersionUID = 1L;
 
     /**
-     * To determine whether operating system is Unix-based or not
+     * Delegates error message to its super class, which is {@code Exception}
+     *
+     * @param errorMessage The specified error message
      */
-    public static boolean _isUnix;
-
-    /**
-     * The output path of the compressed archive
-     */
-    public static String _outputPath;
-
-    /**
-     * To store the default icon of each frame
-     */
-    protected static BufferedImage _frameIcon;
-
-    /**
-     * True if logging via options menu has been enabled
-     */
-    protected static boolean _loggingEnabled;
-
-    /**
-     * True if user prefers to make classic zip-file instead of tar-archive
-     */
-    protected static boolean _useClassicZipMode;
+    public FrameErrorException(String errorMessage) {
+        super(errorMessage);
+    }
 }

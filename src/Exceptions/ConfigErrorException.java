@@ -17,10 +17,14 @@
 package Exceptions;
 
 /**
+ * Class to handle errors that can occur while trying to parse the configuration
+ * file. The {@code ConfigFileParser} class makes use of this
  *
  * @author Matthias Fussenegger
  */
 public class ConfigErrorException extends Exception {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public String toString() {

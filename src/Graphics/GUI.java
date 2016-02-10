@@ -56,6 +56,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
 
+/**
+ * Main frame of application (graphical user interface)
+ *
+ * @author Matthias Fussenegger
+ * @version 2016-02-10
+ */
 public class GUI extends JFrame implements Runnable {
 
     private static final long serialVersionUID = 1L;
@@ -256,7 +262,7 @@ public class GUI extends JFrame implements Runnable {
                     _textOutput.append("Entered path does not exist "
                             + "or is no directory! Will use previous path instead.");
                 } else {
-                    path = validatePath(path);
+                    path = new FileValidator().validatePath(path);
                     _textOutput.append("New output path: " + path + "\n");
                     Settings._outputPath = path; //set new output path
                 }
@@ -366,7 +372,7 @@ public class GUI extends JFrame implements Runnable {
      */
     private void optionsMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _optionsMenuItem) {
-            JFrame frame = new JFrame("Options");
+            SubFrame frame = new SubFrame("Options", new GridLayout());
             JCheckBox loggingCheckBox = new JCheckBox("Enable logging (requires restart)");
             JCheckBox archiveTypeCheckBox = new JCheckBox("Switch to ZIP-mode (for session only)");
             if (Settings._loggingEnabled) {
@@ -402,16 +408,9 @@ public class GUI extends JFrame implements Runnable {
                     }
                 }
             });
-            frame.setLayout(new GridLayout());
-            frame.setMinimumSize(new Dimension(300, 100));
-            frame.setResizable(false);
-            frame.setIconImage(Settings._frameIcon);
-            frame.add(loggingCheckBox);
-            frame.add(archiveTypeCheckBox);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setVisible(true);
+            frame.addWithKeyListener(loggingCheckBox, KeyEvent.VK_ESCAPE);
+            frame.addWithKeyListener(archiveTypeCheckBox, KeyEvent.VK_ESCAPE);
+            frame.drawFrame();
         }
     }
 
@@ -435,10 +434,10 @@ public class GUI extends JFrame implements Runnable {
      */
     private void aboutMenuActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _aboutMenuItem) {
-            JFrame frame = new JFrame("About");
+            SubFrame frame = new SubFrame("About", new BorderLayout());
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-01-19</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-10</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -453,20 +452,14 @@ public class GUI extends JFrame implements Runnable {
             button.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent evt) {
-                    if (evt.getKeyCode() == 10) { //10 = return key
+                    if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                         button.doClick();
                     }
                 }
             });
-            frame.setResizable(false);
-            frame.setIconImage(Settings._frameIcon);
             frame.add(label, BorderLayout.CENTER);
             frame.add(button, BorderLayout.SOUTH);
-            frame.addKeyListener(null);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setVisible(true);
+            frame.drawFrame();
         }
     }
 
@@ -556,44 +549,9 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Validates the file path based on operating system
+     * Main method that will set up and draw application's main frame
      *
-     * @param path The path to be validated
-     * @return The new valid path
-     */
-    private String validatePath(String path) {
-        String validPath = "";
-        if (Settings._isUnix) {
-            for (int i = 0; i < path.length(); ++i) {
-                if (path.charAt(i) == '\\') {
-                    validPath = validPath + '/';
-                } else {
-                    validPath = validPath + path.charAt(i);
-                }
-            }
-            if (validPath.charAt(validPath.length() - 1) != '/') {
-                validPath = validPath + '/';
-            }
-        } else {
-            for (int i = 0; i < path.length(); ++i) {
-                if (path.charAt(i) == '/') {
-                    validPath = validPath + '\\';
-                } else {
-                    validPath = validPath + path.charAt(i);
-                }
-            }
-            if (validPath.charAt(validPath.length() - 1) != '\\') {
-                validPath = validPath + '\\';
-            }
-        }
-        return validPath;
-    }
-
-    /**
-     *
-     * @author Matthias Fussenegger
      * @param args The command line arguments
-     * @version 2016-01-19
      */
     public static void main(String[] args) {
 
@@ -629,7 +587,7 @@ public class GUI extends JFrame implements Runnable {
             /*set look & feel to system default*/
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-            java.awt.EventQueue.invokeLater(() -> { //draw application frame
+            java.awt.EventQueue.invokeLater(() -> { //draw main application frame
                 new GUI(decPath).setVisible(true);
             });
 

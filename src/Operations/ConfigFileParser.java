@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class for parsing configuration file. Also stores all the entries of the file
  *
  * @author Matthias Fussenegger
  */
@@ -45,7 +46,7 @@ public class ConfigFileParser {
     private final String _settingsPath;
 
     /**
-     * Parser for configuration file; also stores all the entries of file
+     * Instantiates a new {@code ConfigFileParser} to parse configuration file
      *
      * @param rootPath The decoded standard path of JAR-file
      * @throws java.io.IOException If an error parsing file occurred

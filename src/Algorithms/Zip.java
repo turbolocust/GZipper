@@ -32,6 +32,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 
 /**
+ * Offers algorithms to compress and decompress {@code .zip} archives
  *
  * @author Matthias Fussenegger
  */
@@ -45,7 +46,7 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
     /**
      * The thread of this class
      */
-    protected Thread _zipThread;
+    private Thread _zipThread;
 
     /**
      * Creates a new object for zip/unzip operations on zip-archives
