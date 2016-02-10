@@ -12,5 +12,6 @@ This app also supports compressing and extracting archives using the ZIP (.zip) 
 <br><br>
 <b>This application requires Java 1.8 (Java 8)</b>
 
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui.PNG" alt="main gui"/>
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui.PNG" alt="main frame"/>
 <img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_options.PNG" alt="options frame"/>
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_demo.PNG" alt="compression demo"/>

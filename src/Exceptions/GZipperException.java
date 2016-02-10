@@ -17,20 +17,46 @@
 package Exceptions;
 
 /**
- * Class to handle errors that can occur while trying to draw a {@code SubFrame}
+ * Class to handle generic errors that can occur while using application
  *
  * @author Matthias Fussenegger
  */
-public class FrameErrorException extends Exception {
+public class GZipperException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Delegates error message to its super class, which is {@code Exception}
+     * Delegates exception to its super class {@code Exception}
+     */
+    public GZipperException() {
+        super();
+    }
+
+    /**
+     * Delegates error message to its super class {@code Exception}
      *
      * @param errorMessage The specified error message
      */
-    public FrameErrorException(String errorMessage) {
+    public GZipperException(String errorMessage) {
         super(errorMessage);
+    }
+
+    /**
+     * Delegates exception cause to its super class {@code Exception}
+     *
+     * @param cause The cause of this exception
+     */
+    public GZipperException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Delegates error message and cause to its super class {@code Exception}
+     *
+     * @param errorMessage The specified error message
+     * @param cause The cause of this exception
+     */
+    public GZipperException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
     }
 }
