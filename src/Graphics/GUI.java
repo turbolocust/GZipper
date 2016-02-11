@@ -26,7 +26,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -60,7 +59,7 @@ import javax.swing.text.DefaultCaret;
  * Main frame of application (graphical user interface)
  *
  * @author Matthias Fussenegger
- * @version 2016-02-10
+ * @version 2016-02-11
  */
 public class GUI extends JFrame implements Runnable {
 
@@ -125,7 +124,11 @@ public class GUI extends JFrame implements Runnable {
      */
     public GUI(String path) {
         INITIAL_PATH = path;
-        Settings._outputPath = INITIAL_PATH;
+        if (FileValidator.isValidPath(Settings._outputPath)) {
+            Settings._outputPath = new FileValidator().validatePath(Settings._outputPath);
+        } else {
+            Settings._outputPath = INITIAL_PATH;
+        }
         _pauseControl = new PauseControl();
         initComponents();
     }
@@ -150,7 +153,7 @@ public class GUI extends JFrame implements Runnable {
         _extFilter = new FileNameExtensionFilter(".tar.gz", "gz");
         _menuBar = new JMenuBar();
         _chooseModeLabel = new JLabel("Choose mode:");
-        _outputPathTextField = new JTextField(INITIAL_PATH);
+        _outputPathTextField = new JTextField(Settings._outputPath);
         _textOutput = new JTextArea();
         _centerPanel = new JPanel();
         _southernPanel = new JPanel();
@@ -204,11 +207,9 @@ public class GUI extends JFrame implements Runnable {
         _selectButton.addActionListener((ActionEvent evt) -> {
             this.selectButtonActionPerformed(evt);
         });
-
         _compressButton.addActionListener((ActionEvent evt) -> {
             this.compressButtonActionPerformed(evt);
         });
-
         _decompressButton.addActionListener((ActionEvent evt) -> {
             this.decompressButtonActionPerformed(evt);
         });
@@ -257,14 +258,14 @@ public class GUI extends JFrame implements Runnable {
             String path = _outputPathTextField.getText();
 
             if (!path.equals(Settings._outputPath)) {
-                File f = new File(path);
-                if (!f.exists() || !f.isDirectory()) {
+                if (!FileValidator.isValidPath(path)) {
                     _textOutput.append("Entered path does not exist "
-                            + "or is no directory! Will use previous path instead.");
+                            + "or is no directory! Will use previous path instead.\n");
                 } else {
                     path = new FileValidator().validatePath(path);
-                    _textOutput.append("New output path: " + path + "\n");
                     Settings._outputPath = path; //set new output path
+                    _textOutput.append("New output path: " + path + "\n");
+                    _configFileParser.updateValue("recentPath", path);
                 }
             }
             _abortButton.setEnabled(true);
@@ -333,7 +334,7 @@ public class GUI extends JFrame implements Runnable {
                                 + "Characters not allowed: "
                                 + "\\ / | : * \" ? < >\n");
                     } else {
-                        _textOutput.append("Selection successful; ready to start compression\n");
+                        _textOutput.append("Selection successful; ready to start operation\n");
                         _startButton.setEnabled(true);
                     }
                 }
@@ -383,16 +384,12 @@ public class GUI extends JFrame implements Runnable {
             }
             loggingCheckBox.addActionListener((ActionEvent e) -> {
                 if (e.getSource() == loggingCheckBox) {
-                    try {
-                        if (loggingCheckBox.isSelected()) {
-                            _configFileParser.updateValue("LoggingEnabled", true);
-                            Settings._loggingEnabled = true;
-                        } else {
-                            _configFileParser.updateValue("LoggingEnabled", false);
-                            Settings._loggingEnabled = false;
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error writing config file!", ex);
+                    if (loggingCheckBox.isSelected()) {
+                        _configFileParser.updateValue("LoggingEnabled", true);
+                        Settings._loggingEnabled = true;
+                    } else {
+                        _configFileParser.updateValue("LoggingEnabled", false);
+                        Settings._loggingEnabled = false;
                     }
                 }
             });
@@ -437,7 +434,7 @@ public class GUI extends JFrame implements Runnable {
             SubFrame frame = new SubFrame("About", new BorderLayout());
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-10</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-11</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -478,7 +475,6 @@ public class GUI extends JFrame implements Runnable {
                 _zipper = new Zip(Settings._outputPath, "gzipper",
                         _fileChooser.getSelectedFiles(), true);
             }
-
             _zipper.start();
 
             if (_zipper.waitForExecutionEnd() & _zipper != null) {
@@ -514,7 +510,6 @@ public class GUI extends JFrame implements Runnable {
                         + separator, _fileChooser.getSelectedFile().getName(),
                         _fileChooser.getSelectedFiles(), false);
             }
-
             _zipper.start();
 
             if (_zipper.waitForExecutionEnd() & _zipper != null) {
@@ -549,7 +544,9 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Main method that will set up and draw application's main frame
+     * Main method that will set up and draw application's main frame. It also
+     * sets the icon image of the application's frames and decodes the path of
+     * JAR-file to receive location of configuration file
      *
      * @param args The command line arguments
      */
@@ -575,6 +572,7 @@ public class GUI extends JFrame implements Runnable {
             try {
                 _configFileParser = new ConfigFileParser(decPath);
                 Settings._loggingEnabled = _configFileParser.checkValue("LoggingEnabled");
+                Settings._outputPath = _configFileParser.getValue("recentPath");
                 if (Settings._loggingEnabled) { //create new logger
                     Logger logger = Logger.getLogger((GUI.class.getName()));
                     FileHandler fh = new FileHandler(decPath + "logs/gzipper.log", true);
@@ -590,7 +588,6 @@ public class GUI extends JFrame implements Runnable {
             java.awt.EventQueue.invokeLater(() -> { //draw main application frame
                 new GUI(decPath).setVisible(true);
             });
-
             Thread.sleep(300);
 
         } catch (UnsupportedEncodingException ex) {

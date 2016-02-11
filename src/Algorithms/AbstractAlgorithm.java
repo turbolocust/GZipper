@@ -82,7 +82,7 @@ public abstract class AbstractAlgorithm implements Runnable {
     /**
      * Retrieves files from a specific directory; mandatory for compression
      *
-     * @param path The path that contains files to be compressed
+     * @param path The path that contains the files to be compressed
      * @return And array of files from the specified path
      * @throws IOException If an error occurred
      */
@@ -93,7 +93,7 @@ public abstract class AbstractAlgorithm implements Runnable {
     }
 
     /**
-     * Returns the elapsed time of the chosen archiving operation
+     * Returns the elapsed time of the chosen operation
      *
      * @return The elapsed time of the chosen operation
      */

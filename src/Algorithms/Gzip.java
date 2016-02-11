@@ -16,6 +16,7 @@
  */
 package Algorithms;
 
+import Exceptions.GZipperException;
 import Graphics.GUI;
 import Graphics.Settings;
 import Interfaces.CompressionAlgorithm;
@@ -187,8 +188,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
         if so, add index to file name an re-check*/
         if (_createArchive) {
             try {
-                File file; //will be the output file of archive
-                file = new File(_path + _archiveName + ".tar.gz");
+                File file = new File(_path + _archiveName + ".tar.gz");
                 while (file.exists()) {
                     ++_nameIndex;
                     _archiveName = _archiveName.substring(0, 7) + _nameIndex;
@@ -205,19 +205,21 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
         }
         while (_runFlag) {
             try {
-
                 long startTime = System.nanoTime();
 
-                if (_createArchive != false & _selectedFiles != null) {
-                    compress(_selectedFiles, "");
+                if (_selectedFiles != null) {
+                    if (_createArchive != false) {
+                        compress(_selectedFiles, "");
+                    } else {
+                        extract(_path, _archiveName);
+                    }
                 } else {
-                    extract(_path, _archiveName);
+                    throw new GZipperException("File selection must not be null");
                 }
-
                 _elapsedTime = System.nanoTime() - startTime;
                 stop(); //stop thread after successful operation
 
-            } catch (IOException ex) {
+            } catch (IOException | GZipperException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
             }
         }

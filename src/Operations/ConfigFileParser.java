@@ -17,6 +17,7 @@
 package Operations;
 
 import Exceptions.ConfigErrorException;
+import Graphics.GUI;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -27,6 +28,8 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class for parsing configuration file. Also stores all the entries of the file
@@ -59,7 +62,7 @@ public class ConfigFileParser {
     }
 
     /**
-     * Parses the configuration file and stores all entries in list
+     * Parses the configuration file and stores all entries in a list
      *
      * @throws IOException If an error while reading configuration file occurs
      */
@@ -79,11 +82,12 @@ public class ConfigFileParser {
     }
 
     /**
-     * Check an entry for true or false, if it stores Boolean values
+     * Check an entry for true or false, if it stores {@code boolean} values
      *
      * @param prefix The prefix of which to check value
-     * @return True or False, depending on value
-     * @throws ConfigErrorException If prefix does not exist or is no Boolean
+     * @return True or false, depending on value
+     * @throws ConfigErrorException If prefix does not exist or if value of
+     * prefix is not a {@code boolean}
      */
     public boolean checkValue(String prefix) throws ConfigErrorException {
         for (String entry : _configEntries) {
@@ -99,16 +103,16 @@ public class ConfigFileParser {
     }
 
     /**
-     * Returns the full entry of the given prefix
+     * Returns the {@code String} entry of the given prefix
      *
      * @param prefix The prefix of which to get full entry
-     * @return The full entry of the given prefix
+     * @return The entry of the given prefix
      * @throws Exceptions.ConfigErrorException If prefix does not exist
      */
     public String getValue(String prefix) throws ConfigErrorException {
         for (String entry : _configEntries) {
             if (entry.startsWith(prefix)) {
-                return entry;
+                return makeToken(entry.substring(entry.indexOf('=') + 1));
             }
         }
         throw new ConfigErrorException();
@@ -119,20 +123,22 @@ public class ConfigFileParser {
      *
      * @param prefix The prefix of which value will be updated
      * @param value The new value to be set, respectively updated
-     * @throws IOException If an error writing configuration file occurred
      */
-    public void updateValue(String prefix, String value) throws IOException {
+    public void updateValue(String prefix, String value) {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(_settingsPath), Charset.forName("UTF-8")))) {
 
             for (String entry : _configEntries) {
                 if (entry.startsWith(prefix)) {
-                    bw.write(prefix + value);
+                    bw.write(prefix + "=\"" + value + "\"");
                 } else {
                     bw.write(entry);
                 }
                 bw.newLine();
             }
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE,
+                    "Error writing configuration file", ex);
         }
     }
 
@@ -141,9 +147,8 @@ public class ConfigFileParser {
      *
      * @param prefix The prefix of which value will be updated
      * @param value The new value to be set, respectively updated
-     * @throws IOException If an error writing configuration file occurred
      */
-    public void updateValue(String prefix, boolean value) throws IOException {
+    public void updateValue(String prefix, boolean value) {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(_settingsPath), Charset.forName("UTF-8")))) {
 
@@ -159,6 +164,25 @@ public class ConfigFileParser {
                 }
                 bw.newLine();
             }
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE,
+                    "Error writing configuration file", ex);
         }
+    }
+
+    /**
+     * Removes any quotes and whitespace from a {@code String}
+     *
+     * @param value The {@code String} value to be converted into a token
+     * @return The new {@code String} value that is a token
+     */
+    private String makeToken(String value) {
+        String tokenizedString = "";
+        for (int i = 0; i < value.length(); ++i) {
+            if (value.charAt(i) != '"') {
+                tokenizedString += value.charAt(i);
+            }
+        }
+        return tokenizedString.trim();
     }
 }

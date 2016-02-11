@@ -17,18 +17,19 @@
 package Operations;
 
 import Graphics.Settings;
+import java.io.File;
 
 /**
- * Currently used to validate file paths depending on operating system
+ * Used to validate file paths depending on operating system
  *
  * @author Matthias Fussenegger
  */
 public class FileValidator {
 
     /**
-     * Validates the file path depending on operating system
+     * Validates and updates the file path depending on operating system
      *
-     * @param path The path to be validated
+     * @param path The path to be validated and updated
      * @return The new valid path
      */
     public String validatePath(String path) {
@@ -57,5 +58,16 @@ public class FileValidator {
             }
         }
         return validPath;
+    }
+
+    /**
+     * Validates the file path depending on operating system
+     *
+     * @param path The path to be validated
+     * @return True if path is valid, false otherwise
+     */
+    public static boolean isValidPath(String path) {
+        File filePath = new File(path);
+        return filePath.exists() && filePath.isDirectory();
     }
 }

@@ -31,7 +31,7 @@ public abstract class Settings {
     public static boolean _isUnix;
 
     /**
-     * The output path of the compressed archive
+     * The output path of the compressed archive or the decompressed files
      */
     public static String _outputPath;
 

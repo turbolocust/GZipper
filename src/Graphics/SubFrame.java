@@ -24,7 +24,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 
 /**
- * A class for creating frames with pre-defined properties
+ * A class for creating additional frames with pre-defined properties
  *
  * @author Matthias Fussenegger
  */
