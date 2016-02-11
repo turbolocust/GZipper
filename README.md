@@ -14,4 +14,3 @@ This app also supports compressing and extracting archives using the ZIP (.zip) 
 
 <img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui.PNG" alt="main frame"/>
 <img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_options.PNG" alt="options frame"/>
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_demo.PNG" alt="compression demo"/>
