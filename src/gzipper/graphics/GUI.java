@@ -14,11 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Graphics;
+package gzipper.graphics;
 
-import Operations.*;
-import Algorithms.*;
-import Exceptions.ConfigErrorException;
+import gzipper.algorithms.Gzip;
+import gzipper.algorithms.AbstractAlgorithm;
+import gzipper.algorithms.Zip;
+import gzipper.operations.FileValidator;
+import gzipper.operations.PauseControl;
+import gzipper.operations.ConfigFileParser;
+import gzipper.exceptions.ConfigErrorException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

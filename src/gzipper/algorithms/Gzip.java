@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Algorithms;
+package gzipper.algorithms;
 
-import Exceptions.GZipperException;
-import Graphics.GUI;
-import Graphics.Settings;
-import Interfaces.CompressionAlgorithm;
+import gzipper.exceptions.GZipperException;
+import gzipper.graphics.GUI;
+import gzipper.graphics.Settings;
+import gzipper.interfaces.CompressionAlgorithm;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -28,58 +28,60 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * Offers algorithms to compress and decompress {@code .zip} archives
+ * Offers algorithms to compress and decompress {@code tar.gz} archives
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
+public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
 
     /**
-     * The output stream for creating a zip-archive
+     * The output stream for creating a tar-archive
      */
-    private ZipArchiveOutputStream _zos;
+    private TarArchiveOutputStream _tos;
 
     /**
      * The thread of this class
      */
-    private Thread _zipThread;
+    private Thread _gzipThread;
 
     /**
-     * Creates a new object for zip/unzip operations on zip-archives
+     * Creates a new object for zip/unzip operations on tar-archives
      *
      * @param path The path of the output directory
      * @param name The name of the target archive
      * @param files The selected files from GUI
      * @param zipMode True if zip, false if unzip
      */
-    public Zip(String path, String name, File[] files, boolean zipMode) {
+    public Gzip(String path, String name, File[] files, boolean zipMode) {
         super(path, name, files, zipMode);
     }
 
     @Override
     public void start() {
         _runFlag = true;
-        _zipThread = new Thread(this);
-        _zipThread.start();
+        _gzipThread = new Thread(this);
+        _gzipThread.start();
     }
 
     @Override
     public void stop() {
         _runFlag = false;
         try {
-            if (_zos != null) {
-                _zos.flush();
-                _zos.close();
+            if (_tos != null) {
+                _tos.flush();
+                _tos.close();
             }
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Output stream could not be closed", ex);
             File file; //to delete previously created archive on error
-            file = new File(_path + _archiveName + ".zip");
+            file = new File(_path + _archiveName + ".tar.gz");
             if (file.exists()) {
                 file.delete();
             }
@@ -89,13 +91,13 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
     @Override
     public void interrupt() {
         _runFlag = false;
-        _zipThread.interrupt();
+        _gzipThread.interrupt();
     }
 
     @Override
     public boolean waitForExecutionEnd() throws InterruptedException {
-        if (_zipThread != null) {
-            _zipThread.join();
+        if (_gzipThread != null) {
+            _gzipThread.join();
             return true;
         }
         return false;
@@ -103,10 +105,10 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
 
     @Override
     protected void extract(String path, String name) throws IOException {
-        try (ZipArchiveInputStream zis = new ZipArchiveInputStream(
-                new BufferedInputStream(new FileInputStream(path + name)))) {
+        try (TarArchiveInputStream tis = new TarArchiveInputStream(
+                new GZIPInputStream(new BufferedInputStream(new FileInputStream(path + name))))) {
 
-            ArchiveEntry entry = zis.getNextEntry();
+            ArchiveEntry entry = tis.getNextEntry();
 
             /*create main folder of gzip archive*/
             File folder = new File(Settings._outputPath + name.substring(0, 7));
@@ -141,11 +143,11 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
                         new FileOutputStream(newFilePath))) {
                     byte[] buffer = new byte[4096];
                     int readBytes;
-                    while ((readBytes = zis.read(buffer)) != -1) {
+                    while ((readBytes = tis.read(buffer)) != -1) {
                         buf.write(buffer, 0, readBytes);
                     }
                 }
-                entry = zis.getNextEntry();
+                entry = tis.getNextEntry();
             }
         }
     }
@@ -164,13 +166,13 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         /*create next archive entry and put it on output stream*/
-                        ArchiveEntry entry = _zos.createArchiveEntry(newFile, entryName);
-                        _zos.putArchiveEntry(entry);
+                        ArchiveEntry entry = _tos.createArchiveEntry(newFile, entryName);
+                        _tos.putArchiveEntry(entry);
                         /*write bytes to file*/
                         while ((readBytes = buf.read(buffer)) != -1) {
-                            _zos.write(buffer, 0, readBytes);
+                            _tos.write(buffer, 0, readBytes);
                         }
-                        _zos.closeArchiveEntry();
+                        _tos.closeArchiveEntry();
                     }
                 } else { //child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
@@ -186,14 +188,16 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
         if so, add index to file name an re-check*/
         if (_createArchive) {
             try {
-                File file = new File(_path + _archiveName + ".zip");
+                File file = new File(_path + _archiveName + ".tar.gz");
                 while (file.exists()) {
                     ++_nameIndex;
                     _archiveName = _archiveName.substring(0, 7) + _nameIndex;
-                    file = new File(_path + _archiveName + ".zip");
+                    file = new File(_path + _archiveName + ".tar.gz");
                 }
-                _zos = new ZipArchiveOutputStream(new BufferedOutputStream(
-                        new FileOutputStream(_path + _archiveName + ".zip")));
+                _tos = new TarArchiveOutputStream(new GZIPOutputStream(
+                        new BufferedOutputStream(new FileOutputStream(
+                                _path + _archiveName + ".tar.gz"))));
+                _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             } catch (IOException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
                 System.exit(1);

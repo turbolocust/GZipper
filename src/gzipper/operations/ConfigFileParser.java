@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package Operations;
+package gzipper.operations;
 
-import Exceptions.ConfigErrorException;
-import Graphics.GUI;
+import gzipper.exceptions.ConfigErrorException;
+import gzipper.graphics.GUI;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -53,7 +53,8 @@ public class ConfigFileParser {
      *
      * @param rootPath The decoded standard path of JAR-file
      * @throws java.io.IOException If an error parsing file occurred
-     * @throws Exceptions.ConfigErrorException If configuration file is corrupt
+     * @throws gzipper.exceptions.ConfigErrorException If configuration file is
+     * corrupt
      */
     public ConfigFileParser(String rootPath) throws IOException, ConfigErrorException {
         _configEntries = new ArrayList<>();
@@ -65,6 +66,7 @@ public class ConfigFileParser {
      * Parses the configuration file and stores all entries in a list
      *
      * @throws IOException If an error while reading configuration file occurs
+     * @throws ConfigErrorException If configuration file has errors
      */
     private void parseLoggerConfig() throws IOException, ConfigErrorException {
         String line;
@@ -107,7 +109,7 @@ public class ConfigFileParser {
      *
      * @param prefix The prefix of which to get full entry
      * @return The entry of the given prefix
-     * @throws Exceptions.ConfigErrorException If prefix does not exist
+     * @throws gzipper.exceptions.ConfigErrorException If prefix does not exist
      */
     public String getValue(String prefix) throws ConfigErrorException {
         for (String entry : _configEntries) {
