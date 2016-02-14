@@ -63,7 +63,7 @@ import javax.swing.text.DefaultCaret;
  * Main frame of application (graphical user interface)
  *
  * @author Matthias Fussenegger
- * @version 2016-02-11
+ * @version 2016-02-14
  */
 public class GUI extends JFrame implements Runnable {
 
@@ -97,7 +97,7 @@ public class GUI extends JFrame implements Runnable {
     private final String INITIAL_PATH;
 
     /**
-     * Used to pause GUI-thread after archiving operation
+     * Used to pause {@code _guiThread} after archiving operation
      */
     private final PauseControl _pauseControl;
 
@@ -112,22 +112,23 @@ public class GUI extends JFrame implements Runnable {
     private Thread _guiThread;
 
     /**
-     * The run flag to keep guiThread alive
+     * The run flag to keep {@code _guiThread} alive, see {@code run()}
      */
     private boolean _runFlag;
 
     /**
-     * To parse the configuration file and update values
+     * To parse the configuration file and for updating values
      */
     private static ConfigFileParser _configFileParser;
 
     /**
-     * Constructor of this class for initialization of graphical user interface
+     * Constructor of this class to initialize graphical user interface
      *
      * @param path The path of the JAR-file, which is the initial path
      */
     public GUI(String path) {
         INITIAL_PATH = path;
+        /*set recent path to output path if it exists and is valid*/
         if (FileValidator.isValidPath(Settings._outputPath)) {
             Settings._outputPath = new FileValidator().validatePath(Settings._outputPath);
         } else {
@@ -334,7 +335,7 @@ public class GUI extends JFrame implements Runnable {
                     if (filename.contains("<") || filename.contains(">") || filename.contains("/")
                             || filename.contains("\\") || filename.contains("|") || filename.contains(":")
                             || filename.contains("*") || filename.contains("\"") || filename.contains("?")) {
-                        _textOutput.append("\nIllegal characters found in file name!\n"
+                        _textOutput.append("Illegal characters found in file name!\n"
                                 + "Characters not allowed: "
                                 + "\\ / | : * \" ? < >\n");
                     } else {
@@ -349,29 +350,33 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Called if zip-mode has been selected
+     * Called if {@code _compressButton} has been selected
      *
      * @param evt The event that caused this method to be called
      */
     private void compressButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _compressButton) {
+            _fileChooser.cancelSelection();
+            _startButton.setEnabled(false);
             _selectButton.setText("Select files/folders...");
         }
     }
 
     /**
-     * Called if unzip-mode has been selected
+     * Called if {@code _decompressButton} has been selected
      *
      * @param evt The event that caused this method to be called
      */
     private void decompressButtonActionPerformed(ActionEvent evt) {
         if (evt.getSource() == _decompressButton) {
+            _fileChooser.cancelSelection();
+            _startButton.setEnabled(false);
             _selectButton.setText("Select archive...");
         }
     }
 
     /**
-     * Called if options-menu has been selected
+     * Called if {@code _optionsMenuItem} has been selected
      *
      * @param evt The event that caused this method to be called
      */
@@ -416,7 +421,7 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Called if exit-menu has been selected
+     * Called if {@code _exitMenuItem} has been selected
      *
      * @param evt The event that caused this method to be called
      */
@@ -429,7 +434,7 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Called if about-menu has been selected
+     * Called if {@code _aboutMenuItem} has been selected
      *
      * @param evt The event that caused this method to be called
      */
@@ -438,7 +443,7 @@ public class GUI extends JFrame implements Runnable {
             SubFrame frame = new SubFrame("About", new BorderLayout());
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-11</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-14</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -549,8 +554,8 @@ public class GUI extends JFrame implements Runnable {
 
     /**
      * Main method that will set up and draw application's main frame. It also
-     * sets the icon image of the application's frames and decodes the path of
-     * JAR-file to receive location of configuration file
+     * sets the icon image for the application frames and decodes the path of
+     * JAR-file to receive location of configuration file and other resources
      *
      * @param args The command line arguments
      */
@@ -562,16 +567,12 @@ public class GUI extends JFrame implements Runnable {
         try {
             if (System.getProperty("os.name").startsWith("Windows")) {
                 /*decode path without adding the name of the JAR-file (GZipper.jar = 11 characters)
-                 - for debugging inside an IDE please remove the minus operation (- 11)*/
+                 - for debugging using an IDE make sure to remove the minus operation (- 11)*/
                 decPath = URLDecoder.decode(path.substring(1, path.length() - 11), "UTF-8");
             } else {
                 Settings._isUnix = true;
                 decPath = path.substring(0, path.length() - 11);
             }
-            /*get icon image for frame from res-folder in root application folder;
-             do not forget to copy it to class files directory when debugging app*/
-            FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
-            Settings._frameIcon = ImageIO.read(imgStream);
 
             try {
                 _configFileParser = new ConfigFileParser(decPath);
@@ -585,6 +586,10 @@ public class GUI extends JFrame implements Runnable {
             } catch (ConfigErrorException | IOException ex) {
                 System.err.println(ex.toString());
             }
+
+            /*get icon image for frame from res-folder in root application folder*/
+            FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
+            Settings._frameIcon = ImageIO.read(imgStream);
 
             /*set look & feel to system default*/
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

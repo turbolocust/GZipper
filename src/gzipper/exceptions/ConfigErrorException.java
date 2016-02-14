@@ -28,8 +28,8 @@ public class ConfigErrorException extends Exception {
 
     @Override
     public String toString() {
-        return "Configuration error, check \"gzipper.ini\" file,\n"
-                + "line must end with \"false\" or \"true\" "
-                + "or with a valid String depending on prefix!";
+        return " Error parsing configuration file! \nCheck \"gzipper.ini\" file in"
+                + " installation directory (where GZipper.jar is located). \n"
+                + "Line must end with a valid String depending on prefix!";
     }
 }

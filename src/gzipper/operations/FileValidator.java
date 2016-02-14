@@ -30,7 +30,7 @@ public class FileValidator {
      * Validates and updates the file path depending on operating system
      *
      * @param path The path to be validated and updated
-     * @return The new valid path
+     * @return The validated path
      */
     public String validatePath(String path) {
         String validPath = "";
