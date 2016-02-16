@@ -77,6 +77,7 @@ public abstract class AbstractAlgorithm implements Runnable {
         _archiveName = name;
         _createArchive = zipMode;
         _selectedFiles = files;
+        _elapsedTime = 0L;
     }
 
     /**

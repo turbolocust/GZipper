@@ -28,6 +28,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -119,7 +120,7 @@ public class GUI extends JFrame implements Runnable {
     /**
      * Constructor of this class to initialize graphical user interface
      *
-     * @param path The path of the JAR-file, which is the initial path
+     * @param path The path of the JAR-file, which is the {@code INITIAL_PATH}
      */
     public GUI(String path) {
         INITIAL_PATH = path;
@@ -531,8 +532,8 @@ public class GUI extends JFrame implements Runnable {
             try {
                 _pauseControl.pausePoint();
                 if (_compressButton.isSelected()) {
-                    _textOutput.append("Selected files/folders will be compressed, "
-                            + "please wait...\n");
+                    _textOutput.append("Selected files/folders will be compressed...\n"
+                            + "This might take a while depending on size of file(s)\n");
                     startCompressing();
                 } else { //unzip
                     _textOutput.append("Selected archive will be decompressed...\n");
@@ -570,10 +571,7 @@ public class GUI extends JFrame implements Runnable {
                 decPath = path.substring(0, path.length() - 11);
             }
 
-            /*set look & feel to system default*/
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-            try {
+            try { //parse configuration file
                 _configFileParser = new ConfigFileParser(decPath);
                 Settings._loggingEnabled = _configFileParser.checkValue("LoggingEnabled");
                 Settings._outputPath = _configFileParser.getValue("recentPath");
@@ -587,19 +585,30 @@ public class GUI extends JFrame implements Runnable {
                 System.exit(1);
             }
 
-            /*get icon image for frame from res-folder in root application folder*/
-            FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
-            Settings._frameIcon = ImageIO.read(imgStream);
+            try { //set look and feel to system default
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                MessageBox.showWarningMessage("Error setting Look & Feel to system default\n"
+                        + "Applicaton will launch with standard Look & Feel");
+                Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Error setting look and feel", ex);
+            }
 
-            java.awt.EventQueue.invokeLater(() -> { //draw main application frame
+            try { //get icon image for frame from "res" folder in application directory
+                FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
+                Settings._frameIcon = ImageIO.read(imgStream);
+            } catch (IOException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Resources are missing", ex);
+            }
+
+            /*draw main application frame*/
+            java.awt.EventQueue.invokeLater(() -> {
                 new GUI(decPath).setVisible(true);
             });
             Thread.sleep(300);
 
-        } catch (ClassNotFoundException | InterruptedException | IOException ex) {
+        } catch (InterruptedException | UnsupportedEncodingException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
         }
     }
 }

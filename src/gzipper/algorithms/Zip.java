@@ -195,6 +195,7 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
                 }
                 _zos = new ZipArchiveOutputStream(new BufferedOutputStream(
                         new FileOutputStream(_path + _archiveName + ".zip")));
+                _zos.setUseZip64(Zip64Mode.AsNeeded);
             } catch (IOException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
                 System.exit(1);
