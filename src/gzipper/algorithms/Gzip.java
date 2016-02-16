@@ -198,6 +198,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
                         new BufferedOutputStream(new FileOutputStream(
                                 _path + _archiveName + ".tar.gz"))));
                 _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+                _tos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
             } catch (IOException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
                 System.exit(1);
@@ -217,10 +218,11 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
                     throw new GZipperException("File selection must not be null");
                 }
                 _elapsedTime = System.nanoTime() - startTime;
-                stop(); //stop thread after successful operation
 
             } catch (IOException | GZipperException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
+            } finally {
+                stop(); //stop thread after successful operation
             }
         }
     }

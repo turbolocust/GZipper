@@ -33,7 +33,7 @@ public class SubFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor of {@code ChildFrame} class that extends {@code JFrame}
+     * Constructor of this class that extends {@code JFrame}
      *
      * @param manager The default layout of this sub frame to be set
      */
@@ -43,7 +43,7 @@ public class SubFrame extends JFrame {
     }
 
     /**
-     * Constructor of {@code ChildFrame} class that extends {@code JFrame}
+     * Constructor of this class that extends {@code JFrame}
      *
      * @param title The title of the frame to be set
      * @param manager The default layout of this sub frame to be set
@@ -74,7 +74,6 @@ public class SubFrame extends JFrame {
     protected void drawFrame() {
         pack();
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
     }
 

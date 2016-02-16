@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 
@@ -217,6 +218,8 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
 
             } catch (IOException | GZipperException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
+            } finally {
+                stop(); //stop thread after successful operation
             }
         }
     }

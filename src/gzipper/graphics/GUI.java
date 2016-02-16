@@ -16,12 +16,8 @@
  */
 package gzipper.graphics;
 
-import gzipper.algorithms.Gzip;
-import gzipper.algorithms.AbstractAlgorithm;
-import gzipper.algorithms.Zip;
-import gzipper.operations.FileValidator;
-import gzipper.operations.PauseControl;
-import gzipper.operations.ConfigFileParser;
+import gzipper.algorithms.*;
+import gzipper.operations.*;
 import gzipper.exceptions.ConfigErrorException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,7 +28,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -63,7 +58,7 @@ import javax.swing.text.DefaultCaret;
  * Main frame of application (graphical user interface)
  *
  * @author Matthias Fussenegger
- * @version 2016-02-14
+ * @version 2016-02-16
  */
 public class GUI extends JFrame implements Runnable {
 
@@ -301,6 +296,7 @@ public class GUI extends JFrame implements Runnable {
                     }
                 } catch (InterruptedException ex) {
                     _textOutput.append(ex.toString() + "\n");
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 _textOutput.append("Operation aborted!\n");
             }
@@ -443,7 +439,7 @@ public class GUI extends JFrame implements Runnable {
             SubFrame frame = new SubFrame("About", new BorderLayout());
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-14</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-16</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -543,7 +539,7 @@ public class GUI extends JFrame implements Runnable {
                     startDecompressing();
                 }
             } catch (InterruptedException ex) {
-                _textOutput.append(ex.toString() + "\n");
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 _abortButton.setEnabled(false);
                 _zipper = null;
@@ -574,6 +570,9 @@ public class GUI extends JFrame implements Runnable {
                 decPath = path.substring(0, path.length() - 11);
             }
 
+            /*set look & feel to system default*/
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
             try {
                 _configFileParser = new ConfigFileParser(decPath);
                 Settings._loggingEnabled = _configFileParser.checkValue("LoggingEnabled");
@@ -584,27 +583,23 @@ public class GUI extends JFrame implements Runnable {
                     logger.addHandler(fh);
                 }
             } catch (ConfigErrorException | IOException ex) {
-                System.err.println(ex.toString());
+                MessageBox.showErrorMessage(ex);
+                System.exit(1);
             }
 
             /*get icon image for frame from res-folder in root application folder*/
             FileInputStream imgStream = new FileInputStream(decPath + "res/icon_32.png");
             Settings._frameIcon = ImageIO.read(imgStream);
 
-            /*set look & feel to system default*/
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
             java.awt.EventQueue.invokeLater(() -> { //draw main application frame
                 new GUI(decPath).setVisible(true);
             });
             Thread.sleep(300);
 
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-        } catch (InterruptedException | IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+        } catch (ClassNotFoundException | InterruptedException | IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
