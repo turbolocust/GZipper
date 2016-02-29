@@ -18,7 +18,7 @@ package gzipper.exceptions;
 
 /**
  * Class to handle errors that can occur while trying to parse the configuration
- * file. The {@code ConfigFileParser} class makes use of this
+ * file. The {@link ConfigFileParser} class makes use of this
  *
  * @author Matthias Fussenegger
  */

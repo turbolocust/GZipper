@@ -49,7 +49,7 @@ public class ConfigFileParser {
     private final String _settingsPath;
 
     /**
-     * Instantiates a new {@code ConfigFileParser} to parse configuration file
+     * Instantiates a new {@link ConfigFileParser} to parse configuration file
      *
      * @param rootPath The decoded standard path of JAR-file
      * @throws java.io.IOException If an error parsing file occurred

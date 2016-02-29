@@ -33,7 +33,7 @@ public class SubFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor of this class that extends {@code JFrame}
+     * Constructor of this class that extends {@link JFrame}
      *
      * @param manager The default layout of this sub frame to be set
      */
@@ -43,7 +43,7 @@ public class SubFrame extends JFrame {
     }
 
     /**
-     * Constructor of this class that extends {@code JFrame}
+     * Constructor of this class that extends {@link JFrame}
      *
      * @param title The title of the frame to be set
      * @param manager The default layout of this sub frame to be set

@@ -29,7 +29,7 @@ public class MessageBox extends JFrame {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor of this class that extends {@code JFrame}
+     * Constructor of this class that extends {@link JFrame}
      */
     private MessageBox() {
         super();
@@ -47,7 +47,7 @@ public class MessageBox extends JFrame {
     /**
      * Brings up an information-message dialog titled "Message"
      *
-     * @param message The {@code Object} to display
+     * @param message The {@link Object} to display
      */
     public static void showDefaultMessage(Object message) {
         JOptionPane.showMessageDialog(new MessageBox(), message);
@@ -56,7 +56,7 @@ public class MessageBox extends JFrame {
     /**
      * Brings up a warning-message dialog titled "Warning"
      *
-     * @param message The {@code Object} to display
+     * @param message The {@link Object} to display
      */
     public static void showWarningMessage(Object message) {
         JOptionPane.showMessageDialog(new MessageBox(), message, "Warning", JOptionPane.WARNING_MESSAGE);
@@ -65,7 +65,7 @@ public class MessageBox extends JFrame {
     /**
      * Brings up an error-message dialog titled "Error"
      *
-     * @param message The {@code Object} to display
+     * @param message The {@link Object} to display
      */
     public static void showErrorMessage(Object message) {
         JOptionPane.showMessageDialog(new MessageBox(), message, "Error", JOptionPane.ERROR_MESSAGE);
