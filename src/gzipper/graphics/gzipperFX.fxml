@@ -7,9 +7,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gzipper.graphics.gzipperFXController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gzipper.graphics.gzipperFXController">
     <children>
-        <BorderPane layoutX="146.0" layoutY="85.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <BorderPane layoutX="146.0" layoutY="85.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
                 <GridPane prefHeight="212.0" prefWidth="393.0" BorderPane.alignment="CENTER">
                     <columnConstraints>
@@ -85,12 +85,12 @@
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="Help">
                                     <items>
-                                        <MenuItem mnemonicParsing="false" text="About" />
+                                        <MenuItem fx:id="_aboutMenuItem" mnemonicParsing="false" onAction="#handleAboutMenuItemAction" text="About" />
                                     </items>
                                 </Menu>
                             </menus>
                         </MenuBar>
-                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.rowIndex="1">
+                        <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="1">
                             <children>
                                 <Label text="Choose mode:" />
                                 <RadioButton mnemonicParsing="false" text="Compress" />

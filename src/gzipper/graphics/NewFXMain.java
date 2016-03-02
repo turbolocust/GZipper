@@ -26,12 +26,18 @@ import javafx.stage.Stage;
 /**
  *
  * @author Matthias Fussenegger
+ * @version 2016-03-02
  */
 public class NewFXMain extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("gzipperFX.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("gzipperFX.fxml"));
+        Parent root = loader.load();
+
+        /*associate primary stage with controller*/
+        gzipperFXController gfc = loader.getController();
+        gfc.setPrimaryStage(stage);
 
         Scene scene = new Scene(root);
 
@@ -41,7 +47,7 @@ public class NewFXMain extends Application {
     }
 
     /**
-     * @param args the command line arguments
+     * @param args The command line arguments
      */
     public static void main(String[] args) {
         launch(args);
