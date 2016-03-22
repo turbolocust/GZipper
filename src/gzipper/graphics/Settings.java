@@ -17,6 +17,7 @@
 package gzipper.graphics;
 
 import java.awt.image.BufferedImage;
+import javafx.scene.image.Image;
 
 /**
  * Abstract class with static attributes only to store various settings
@@ -36,9 +37,19 @@ public abstract class Settings {
     public static String _outputPath;
 
     /**
+     * The decoded path of JAR-file
+     */
+    protected static String _initialPath;
+
+    /**
      * To store the default icon of each frame
      */
     protected static BufferedImage _frameIcon;
+
+    /**
+     * To store the default image of each frame
+     */
+    protected static Image _frameImage;
 
     /**
      * True if logging via options menu has been enabled

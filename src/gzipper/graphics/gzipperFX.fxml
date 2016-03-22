@@ -99,7 +99,8 @@
                                 <Label text="Then:" />
                                 <Button mnemonicParsing="false" prefWidth="100.0" text="Select..." />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                <CheckBox mnemonicParsing="false" text="ZIP" />
+                        <Label text="Use instead:" />
+                                <CheckBox mnemonicParsing="false" text=".zip" />
                             </children>
                             <GridPane.margin>
                                 <Insets left="15.0" />

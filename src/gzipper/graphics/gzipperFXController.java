@@ -23,12 +23,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -73,15 +75,7 @@ public class gzipperFXController implements Initializable {
     @FXML
     private void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?", ButtonType.YES, ButtonType.NO);
-            alert.setTitle("Confirmation");
-            alert.setHeaderText("This will clear the text area");
-            /*change default button to {@code ButtonType.NO} to avoid accidential press of return key*/
-            Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.YES);
-            Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);
-            yesButton.setDefaultButton(false);
-            noButton.setDefaultButton(true);
-            Optional<ButtonType> result = alert.showAndWait();
+            Optional<ButtonType> result = AlertDialog.showConfirmationDialog("This will clear the text area", "Are you sure?");
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -93,14 +87,16 @@ public class gzipperFXController implements Initializable {
     private void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
             Stage aboutWindow = new Stage();
+            aboutWindow.getIcons().add(Settings._frameImage);
             GridPane gridPane = new GridPane();
             Button button = new Button("OK");
             button.setMaxSize(Double.MAX_VALUE, 30);
             WebView webView = new WebView();
             webView.getEngine().loadContent("<html><br /><p align=\"center\">"
-                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2016-03-02</b><br />"
+                    + "<img src=\"file:/" + Settings._initialPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
+                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2016-03-22</b><br />"
                     + "<br />This program uses parts of the commons-compress library by Apache Foundation"
-                    + "&nbsp;and is licensed under the GNU General Public License 3"
+                    + "&nbsp;and is licensed under the GNU General Public License 3 "
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
                     + "&nbsp;<br />&nbsp;</p></html>");
             webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -111,6 +107,11 @@ public class gzipperFXController implements Initializable {
             aboutWindow.initOwner(_primaryStage);
             aboutWindow.setScene(new Scene(gridPane, 600, 500));
             aboutWindow.setResizable(false);
+            webView.setOnKeyPressed((KeyEvent event) -> {
+                if (event.getCode().equals(KeyCode.ESCAPE)) {
+                    aboutWindow.close();
+                }
+            });
             button.setOnAction((ActionEvent e) -> {
                 if (e.getSource().equals(button)) {
                     aboutWindow.close();
@@ -122,6 +123,21 @@ public class gzipperFXController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        String decPath = location.getPath();
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /*decode path without adding the name of the JAR-file (gzipperFX.fxml = 14 chars)
+              - for debugging using an IDE make sure to remove the minus operation (- 14)*/
+            decPath = decPath.substring(1, decPath.length() - 14);
+        } else {
+            Settings._isUnix = true;
+            decPath = decPath.substring(0, decPath.length() - 14);
+        }
+
+        Settings._frameImage = new Image("file:" + decPath + "res/icon_32.png");
+        Settings._initialPath = decPath;
+
         _textArea.setEditable(false);
         _textArea.setText("run:\nOutput path can be changed in text field above.\n");
     }

@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 /**
  *
  * @author Matthias Fussenegger
- * @version 2016-03-02
+ * @version 2016-03-22
  */
 public class NewFXMain extends Application {
 
@@ -42,6 +42,7 @@ public class NewFXMain extends Application {
         Scene scene = new Scene(root);
 
         stage.setTitle("GZipper");
+        stage.getIcons().add(Settings._frameImage);
         stage.setScene(scene);
         stage.show();
     }
