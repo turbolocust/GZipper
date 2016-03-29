@@ -97,7 +97,10 @@
                                 <RadioButton mnemonicParsing="false" text="Decompress" />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                                 <Label text="Then:" />
-                                <Button mnemonicParsing="false" prefWidth="100.0" text="Select..." />
+                                <Button mnemonicParsing="false" prefWidth="100.0" text="Select...">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding></Button>
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <Label text="Use instead:" />
                                 <CheckBox mnemonicParsing="false" text=".zip" />
@@ -106,7 +109,13 @@
                                 <Insets left="15.0" />
                             </GridPane.margin>
                         </HBox>
-                        <TextField fx:id="_outputPath" promptText="Output path" GridPane.rowIndex="2" />
+                        <TextField fx:id="_outputPath" promptText=" Output path" GridPane.rowIndex="2">
+                     <GridPane.margin>
+                        <Insets left="2.0" right="2.0" />
+                     </GridPane.margin>
+                     <padding>
+                        <Insets bottom="4.0" top="2.0" />
+                     </padding></TextField>
                     </children>
                 </GridPane>
             </top>

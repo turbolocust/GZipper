@@ -68,6 +68,7 @@ public class gzipperFXController implements Initializable {
     @FXML
     private void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
+            _primaryStage.close();
             System.exit(0);
         }
     }
@@ -89,7 +90,7 @@ public class gzipperFXController implements Initializable {
             Stage aboutWindow = new Stage();
             aboutWindow.getIcons().add(Settings._frameImage);
             GridPane gridPane = new GridPane();
-            Button button = new Button("OK");
+            Button button = new Button("Close");
             button.setMaxSize(Double.MAX_VALUE, 30);
             WebView webView = new WebView();
             webView.getEngine().loadContent("<html><br /><p align=\"center\">"
