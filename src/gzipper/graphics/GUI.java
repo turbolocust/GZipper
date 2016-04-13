@@ -26,6 +26,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -559,16 +560,15 @@ public class GUI extends JFrame implements Runnable {
     public static void main(String[] args) {
 
         String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        File f = new File(path);
         String decPath; //the decoded path of JAR-file
 
         try {
             if (System.getProperty("os.name").startsWith("Windows")) {
-                /*decode path without adding the name of the JAR-file (GZipper.jar = 11 characters)
-                 - for debugging using an IDE make sure to remove the minus operation (- 11)*/
-                decPath = URLDecoder.decode(path.substring(1, path.length() - 11), "UTF-8");
+                decPath = URLDecoder.decode(path.substring(1, path.length() - f.getName().length()), "UTF-8");
             } else {
                 Settings._isUnix = true;
-                decPath = path.substring(0, path.length() - 11);
+                decPath = path.substring(0, path.length() - f.getName().length());
             }
 
             try { //parse configuration file
