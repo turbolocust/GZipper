@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.operations;
+package gzipper.application.util;
 
-import gzipper.graphics.Settings;
+import gzipper.presentation.Settings;
 import java.io.File;
 
 /**
- * Used to validate file paths depending on operating system
+ * Used to validate file paths depending on operating system.
  *
  * @author Matthias Fussenegger
  */
 public class FileValidator {
 
     /**
-     * Validates and updates the file path depending on operating system
+     * Validates and updates the file path depending on operating system.
      *
      * @param path The path to be validated and updated
      * @return The validated path
@@ -61,7 +61,7 @@ public class FileValidator {
     }
 
     /**
-     * Validates the file path depending on operating system
+     * Validates the file path depending on operating system.
      *
      * @param path The path to be validated
      * @return True if path is valid, false otherwise

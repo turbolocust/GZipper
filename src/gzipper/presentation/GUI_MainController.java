@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.graphics;
+package gzipper.presentation;
 
 import java.net.URL;
 import java.util.Optional;
@@ -39,7 +39,7 @@ import javafx.stage.Stage;
  *
  * @author Matthias Fussenegger
  */
-public class gzipperFXController implements Initializable {
+public class GUI_MainController implements Initializable {
 
     /**
      * The associated primary stage
@@ -95,7 +95,7 @@ public class gzipperFXController implements Initializable {
             WebView webView = new WebView();
             webView.getEngine().loadContent("<html><br /><p align=\"center\">"
                     + "<img src=\"file:/" + Settings._initialPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2016-03-22</b><br />"
+                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-07-17</b><br />"
                     + "<br />This program uses parts of the commons-compress library by Apache Foundation"
                     + "&nbsp;and is licensed under the GNU General Public License 3 "
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"

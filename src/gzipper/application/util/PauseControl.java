@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.operations;
+package gzipper.application.util;
 
 /**
- * Offers functionality to pause a thread and make it wait if necessary
+ * Offers functionality to pause a thread and make it wait if necessary.
  *
  * @author Matthias Fussenegger
  */
 public class PauseControl {
 
     /**
-     * True if thread needs to pause
+     * True if thread needs to pause.
      */
     private boolean _needToPause;
 
     /**
      * This method lets a thread of another class to be paused. Behavior of this
-     * method depends on whether pause() or unpause() has been called before
+     * method depends on whether pause() or unpause() has been called before.
      *
      * @throws InterruptedException If an error occurred
      */
@@ -41,14 +41,14 @@ public class PauseControl {
     }
 
     /**
-     * To pause execution of thread when pause point has been called
+     * To pause execution of thread when pause point has been called.
      */
     public synchronized void pause() {
         _needToPause = true;
     }
 
     /**
-     * To continue execution of thread when pause point has been called
+     * To continue execution of thread when pause point has been called.
      */
     public synchronized void unpause() {
         _needToPause = false;

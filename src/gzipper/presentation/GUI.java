@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.graphics;
+package gzipper.presentation;
 
-import gzipper.algorithms.*;
-import gzipper.operations.*;
-import gzipper.exceptions.ConfigErrorException;
+import gzipper.application.util.FileValidator;
+import gzipper.application.util.PauseControl;
+import gzipper.application.algorithms.Gzip;
+import gzipper.application.algorithms.Zip;
+import gzipper.application.algorithms.AbstractAlgorithm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,13 +32,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -113,11 +113,6 @@ public class GUI extends JFrame implements Runnable {
     private boolean _runFlag;
 
     /**
-     * To parse the configuration file and for updating values
-     */
-    private static ConfigFileParser _configFileParser;
-
-    /**
      * Constructor of this class to initialize graphical user interface
      *
      * @param path The path of the JAR-file, which is the {@code INITIAL_PATH}
@@ -177,9 +172,6 @@ public class GUI extends JFrame implements Runnable {
 
         _exitMenuItem.addActionListener((ActionEvent evt) -> {
             this.exitMenuActionPerformed(evt);
-        });
-        _optionsMenuItem.addActionListener((ActionEvent evt) -> {
-            this.optionsMenuActionPerformed(evt);
         });
         _aboutMenuItem.addActionListener((ActionEvent evt) -> {
             this.aboutMenuActionPerformed(evt);
@@ -266,7 +258,7 @@ public class GUI extends JFrame implements Runnable {
                     path = new FileValidator().validatePath(path);
                     Settings._outputPath = path; //set new output path
                     _textOutput.append("New output path: " + path + "\n");
-                    _configFileParser.updateValue("recentPath", path);
+                    //todo: update recent path using properties file
                 }
             }
             _abortButton.setEnabled(true);
@@ -373,51 +365,6 @@ public class GUI extends JFrame implements Runnable {
     }
 
     /**
-     * Called if {@code _optionsMenuItem} has been selected
-     *
-     * @param evt The event that caused this method to be called
-     */
-    private void optionsMenuActionPerformed(ActionEvent evt) {
-        if (evt.getSource() == _optionsMenuItem) {
-            SubFrame frame = new SubFrame("Options", new GridLayout());
-            JCheckBox loggingCheckBox = new JCheckBox("Enable logging (requires restart)");
-            JCheckBox archiveTypeCheckBox = new JCheckBox("Switch to ZIP-mode (for session only)");
-            if (Settings._loggingEnabled) {
-                loggingCheckBox.setSelected(true);
-            }
-            if (Settings._useClassicZipMode) {
-                archiveTypeCheckBox.setSelected(true);
-            }
-            loggingCheckBox.addActionListener((ActionEvent e) -> {
-                if (e.getSource() == loggingCheckBox) {
-                    if (loggingCheckBox.isSelected()) {
-                        _configFileParser.updateValue("LoggingEnabled", true);
-                        Settings._loggingEnabled = true;
-                    } else {
-                        _configFileParser.updateValue("LoggingEnabled", false);
-                        Settings._loggingEnabled = false;
-                    }
-                }
-            });
-            archiveTypeCheckBox.addActionListener((ActionEvent e) -> {
-                /*this setting won't be stored in configuration file as 
-                 this application's main purpose is to handle tar-archives*/
-                if (e.getSource() == archiveTypeCheckBox) {
-                    Settings._useClassicZipMode = archiveTypeCheckBox.isSelected();
-                    if (Settings._useClassicZipMode) {
-                        _extFilter = new FileNameExtensionFilter(".zip", "zip");
-                    } else {
-                        _extFilter = new FileNameExtensionFilter(".tar.gz", "gz");
-                    }
-                }
-            });
-            frame.addWithKeyListener(loggingCheckBox, KeyEvent.VK_ESCAPE);
-            frame.addWithKeyListener(archiveTypeCheckBox, KeyEvent.VK_ESCAPE);
-            frame.drawFrame();
-        }
-    }
-
-    /**
      * Called if {@code _exitMenuItem} has been selected
      *
      * @param evt The event that caused this method to be called
@@ -474,7 +421,7 @@ public class GUI extends JFrame implements Runnable {
     private void startCompressing() throws InterruptedException {
         if (_zipper == null) {
 
-            if (!Settings._useClassicZipMode) { //tar.gz
+            if (!Settings._isClassicZipMode) { //tar.gz
                 _zipper = new Gzip(Settings._outputPath, "gzipper",
                         _fileChooser.getSelectedFiles(), true);
             } else { //zip
@@ -507,7 +454,7 @@ public class GUI extends JFrame implements Runnable {
             } else {
                 separator = "\\";
             }
-            if (!Settings._useClassicZipMode) { //tar.gz
+            if (!Settings._isClassicZipMode) { //tar.gz
                 _zipper = new Gzip(_fileChooser.getSelectedFile().getParent()
                         + separator, _fileChooser.getSelectedFile().getName(),
                         _fileChooser.getSelectedFiles(), false);
@@ -555,6 +502,7 @@ public class GUI extends JFrame implements Runnable {
      * JAR-file to receive location of configuration file and other resources
      *
      * @param args The command line arguments
+     * @deprecated No longer working
      */
     public static void main(String[] args) {
 
@@ -569,20 +517,6 @@ public class GUI extends JFrame implements Runnable {
             } else {
                 Settings._isUnix = true;
                 decPath = path.substring(0, path.length() - 11);
-            }
-
-            try { //parse configuration file
-                _configFileParser = new ConfigFileParser(decPath);
-                Settings._loggingEnabled = _configFileParser.checkValue("LoggingEnabled");
-                Settings._outputPath = _configFileParser.getValue("recentPath");
-                if (Settings._loggingEnabled) { //create new logger
-                    Logger logger = Logger.getLogger((GUI.class.getName()));
-                    FileHandler fh = new FileHandler(decPath + "logs/gzipper.log", true);
-                    logger.addHandler(fh);
-                }
-            } catch (ConfigErrorException | IOException ex) {
-                MessageBox.showErrorMessage(ex);
-                System.exit(1);
             }
 
             try { //set look and feel to system default

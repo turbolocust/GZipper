@@ -14,29 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.graphics;
+package gzipper.presentation;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import static javafx.application.Application.launch;
 
 /**
  *
  * @author Matthias Fussenegger
- * @version 2016-03-22
+ * @version 2016-07-17
  */
-public class NewFXMain extends Application {
+public class GZipper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("gzipperFX.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI_Main.fxml"));
+        loader.setResources(ResourceBundle.getBundle("gzipperMainView", Locale.ENGLISH));
+
         Parent root = loader.load();
 
         /*associate primary stage with controller*/
-        gzipperFXController gfc = loader.getController();
+        GUI_MainController gfc = loader.getController();
         gfc.setPrimaryStage(stage);
 
         Scene scene = new Scene(root);

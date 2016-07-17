@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.graphics;
+package gzipper.presentation;
 
 import java.util.Optional;
 import javafx.scene.control.Alert;
@@ -22,14 +22,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 
 /**
- * A class that offers the functionality of creating alert dialogs
+ * A class that offers the functionality of creating alert dialogs.
  *
  * @author Matthias Fussenegger
  */
 public class AlertDialog {
 
     /**
-     * Brings up a confirmation dialog titled "Please confirm"
+     * Brings up a confirmation dialog titled "Please confirm".
      *
      * @param header The header text of the dialog
      * @param content The content text of the dialog
@@ -48,7 +48,7 @@ public class AlertDialog {
     }
 
     /**
-     * Brings up a warning dialog titled "Warning"
+     * Brings up a warning dialog titled "Warning".
      *
      * @param header The header text of the dialog
      * @param content The content text of the dialog
@@ -62,7 +62,7 @@ public class AlertDialog {
     }
 
     /**
-     * Brings up an error dialog titled "Error"
+     * Brings up an error dialog titled "Error".
      *
      * @param header The header text of the dialog
      * @param content The content text of the dialog
@@ -74,4 +74,5 @@ public class AlertDialog {
         alert.setHeaderText(header);
         return alert.showAndWait();
     }
+    
 }

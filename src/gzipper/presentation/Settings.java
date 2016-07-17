@@ -14,22 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.graphics;
+package gzipper.presentation;
 
 import java.awt.image.BufferedImage;
 import javafx.scene.image.Image;
 
 /**
- * Abstract class with static attributes only to store various settings
+ * Abstract class with static members only to store various settings during the
+ * usage of this application.
  *
  * @author Matthias Fussenegger
  */
-public abstract class Settings {
+public final class Settings {
+
+    /**
+     * Class holds static members only.
+     */
+    private Settings() {
+    }
 
     /**
      * To determine whether operating system is Unix-based or not
      */
     public static boolean _isUnix;
+
+    /**
+     * True if user prefers to make classic zip-file instead of tar-archive
+     */
+    public static boolean _isClassicZipMode;
 
     /**
      * The output path of the compressed archive or the decompressed files
@@ -39,25 +51,16 @@ public abstract class Settings {
     /**
      * The decoded path of JAR-file
      */
-    protected static String _initialPath;
+    static String _initialPath;
 
     /**
      * To store the default icon of each frame
      */
-    protected static BufferedImage _frameIcon;
+    static BufferedImage _frameIcon;
 
     /**
      * To store the default image of each frame
      */
-    protected static Image _frameImage;
+    static Image _frameImage;
 
-    /**
-     * True if logging via options menu has been enabled
-     */
-    protected static boolean _loggingEnabled;
-
-    /**
-     * True if user prefers to make classic zip-file instead of tar-archive
-     */
-    protected static boolean _useClassicZipMode;
 }

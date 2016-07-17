@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.exceptions;
+package gzipper.application.algorithms;
 
 /**
- * Class to handle errors that can occur while trying to parse the configuration
- * file. The {@link ConfigFileParser} class makes use of this
+ * A marker interface to mark the classes that contain compression algorithms
  *
  * @author Matthias Fussenegger
  */
-public class ConfigErrorException extends Exception {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public String toString() {
-        return "Error parsing configuration file! \nCheck \"gzipper.ini\" file"
-                + " in installation directory (where GZipper.jar is located). \n";
-    }
+public interface CompressionAlgorithm {
+    //marker interface
 }

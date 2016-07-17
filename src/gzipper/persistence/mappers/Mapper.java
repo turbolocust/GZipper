@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2016 Matthias
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.interfaces;
+package gzipper.persistence.mappers;
 
 /**
- * A marker interface to mark the classes that contain compression algorithms
  *
  * @author Matthias Fussenegger
  */
-public interface CompressionAlgorithm {
-    //marker interface
+public interface Mapper {
+
 }

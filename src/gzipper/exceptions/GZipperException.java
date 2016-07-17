@@ -17,7 +17,7 @@
 package gzipper.exceptions;
 
 /**
- * Class to handle generic errors that can occur while using application
+ * Class to handle generic errors that can occur while using this application.
  *
  * @author Matthias Fussenegger
  */
