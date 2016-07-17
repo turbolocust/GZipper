@@ -108,7 +108,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="1">
                             <children>
                                 <Label text="%mode.text" />
-                                <RadioButton mnemonicParsing="false" text="%compress.text">
+                                <RadioButton mnemonicParsing="false" selected="true" text="%compress.text">
                            <toggleGroup>
                               <ToggleGroup fx:id="compressionType" />
                            </toggleGroup></RadioButton>
@@ -130,13 +130,12 @@
                         <Insets left="15.0" />
                      </GridPane.margin>
                      <children>
-                                <Label text="%then.text" />
                                 <Button mnemonicParsing="false" prefWidth="100.0" text="%select.text" textAlignment="CENTER">
                            <padding>
                               <Insets bottom="5.0" top="5.0" />
                            </padding></Button>
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Label text="%useInstead.text" />
+                        <Label text="%compressAs.text" />
                                 <CheckBox mnemonicParsing="false" text=".zip" />
                      </children>
                   </HBox>

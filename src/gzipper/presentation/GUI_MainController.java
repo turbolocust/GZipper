@@ -16,9 +16,14 @@
  */
 package gzipper.presentation;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -125,21 +130,24 @@ public class GUI_MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        String decPath = location.getPath();
+        String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decPath = null; //to hold decoded path of JAR-file
+        File jarFile = new File(path);
 
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            /*decode path without adding the name of the JAR-file (gzipperFX.fxml = 14 chars)
-              - for debugging using an IDE make sure to remove the minus operation (- 14)*/
-            decPath = decPath.substring(1, decPath.length() - 14);
-        } else {
-            Settings._isUnix = true;
-            decPath = decPath.substring(0, decPath.length() - 14);
+        try {
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                decPath = URLDecoder.decode(path.substring(1, path.length() - jarFile.getName().length()), "UTF-8");
+            } else {
+                Settings._isUnix = true;
+                decPath = URLDecoder.decode(path.substring(0, path.length() - jarFile.getName().length()), "UTF-8");
+            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        Settings._frameImage = new Image("file:" + decPath + "res/icon_32.png");
-        Settings._initialPath = decPath;
+        Settings._frameImage = new Image("/images/icon_32.png");
+        Settings._initialPath = decPath != null ? decPath : "";
 
-        _textArea.setEditable(false);
         _textArea.setText("run:\nOutput path can be changed in text field above.\n");
     }
 }
