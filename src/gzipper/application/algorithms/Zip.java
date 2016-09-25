@@ -214,7 +214,6 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
                     throw new GZipperException("File selection must not be null");
                 }
                 _elapsedTime = System.nanoTime() - startTime;
-                stop(); //stop thread after successful operation
 
             } catch (IOException | GZipperException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);

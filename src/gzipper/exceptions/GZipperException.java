@@ -26,14 +26,14 @@ public class GZipperException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Delegates exception to its super class {@link Exception}
+     * Delegates exception to its super class {@link Exception}.
      */
     public GZipperException() {
         super();
     }
 
     /**
-     * Delegates error message to its super class {@link Exception}
+     * Delegates error message to its super class {@link Exception}.
      *
      * @param errorMessage The specified error message
      */
@@ -42,7 +42,7 @@ public class GZipperException extends Exception {
     }
 
     /**
-     * Delegates exception cause to its super class {@link Exception}
+     * Delegates exception cause to its super class {@link Exception}.
      *
      * @param cause The cause of this exception
      */
@@ -51,7 +51,7 @@ public class GZipperException extends Exception {
     }
 
     /**
-     * Delegates error message and cause to its super class {@link Exception}
+     * Delegates error message and cause to its super class {@link Exception}.
      *
      * @param errorMessage The specified error message
      * @param cause The cause of this exception
