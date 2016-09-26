@@ -16,6 +16,7 @@
  */
 package gzipper.application.util;
 
+import gzipper.application.model.OperatingSystem;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

@@ -14,13 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.util;
+package gzipper.application.model;
 
 /**
  *
  * @author Matthias Fussenegger
  */
-public interface OperatingSystem {
-    
-    String getDefaultUserDirectory();
+public enum OS {
+
+    WINDOWS("Windows"), UNIX("Unix");
+
+    private final String _name;
+
+    OS(String name) {
+        _name = name;
+    }
+
+    public String getName() {
+        return _name;
+    }
 }

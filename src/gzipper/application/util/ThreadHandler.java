@@ -28,7 +28,7 @@ public class ThreadHandler {
     private final ExecutorService _executorService;
 
     private ThreadHandler() {
-        _executorService = Executors.newCachedThreadPool();
+        _executorService = Executors.newSingleThreadExecutor();
     }
 
     public static ThreadHandler getInstance() {
