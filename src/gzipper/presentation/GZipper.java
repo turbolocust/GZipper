@@ -26,21 +26,22 @@ import javafx.stage.Stage;
 import static javafx.application.Application.launch;
 
 /**
+ * EXPERIMENTAL, use with caution as this application may not work at all
  *
  * @author Matthias Fussenegger
- * @version 2016-07-17
+ * @version 2016-10-02
  */
 public class GZipper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI_Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
         loader.setResources(ResourceBundle.getBundle("gzipperMainView", Locale.ENGLISH));
 
         Parent root = loader.load();
 
         /*associate primary stage with controller*/
-        GUI_MainController gfc = loader.getController();
+        MainViewController gfc = loader.getController();
         gfc.setPrimaryStage(stage);
 
         Scene scene = new Scene(root);

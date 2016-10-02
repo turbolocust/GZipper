@@ -26,7 +26,7 @@ import java.io.IOException;
  *
  * @author Matthias Fussenegger
  */
-public abstract class AbstractAlgorithm implements Runnable {
+public abstract class AbstractAlgorithm {
 
     /**
      * The name of the archive to be processed.
@@ -39,30 +39,14 @@ public abstract class AbstractAlgorithm implements Runnable {
     protected final String _path;
 
     /**
-     * To calculate the elapsed time for archiving operation.
-     */
-    protected long _elapsedTime;
-
-    /**
      * True for compressing, false for extracting an archive.
      */
-    protected final boolean _createArchive;
+    protected final boolean _isCreateArchive;
 
     /**
      * The selected files to be put in an archive by file chooser.
      */
     protected final File[] _selectedFiles;
-
-    /**
-     * The run flag to keep thread alive.
-     */
-    protected boolean _runFlag;
-
-    /**
-     * To avoid overwriting recent archives, if any exist. The index will be
-     * appended at the end of the filename.
-     */
-    protected static int _nameIndex;
 
     /**
      * Creates a new object of the child class for archiving operations.
@@ -75,9 +59,8 @@ public abstract class AbstractAlgorithm implements Runnable {
     protected AbstractAlgorithm(String path, String name, File[] files, boolean zipMode) {
         _path = path;
         _archiveName = name;
-        _createArchive = zipMode;
+        _isCreateArchive = zipMode;
         _selectedFiles = files;
-        _elapsedTime = 0L;
     }
 
     /**
@@ -94,45 +77,13 @@ public abstract class AbstractAlgorithm implements Runnable {
     }
 
     /**
-     * Returns the elapsed time of the chosen operation.
-     *
-     * @return The elapsed time of the chosen operation
-     */
-    public long getElapsedTime() {
-        return _elapsedTime;
-    }
-
-    /**
-     * Creates a new thread and starts it.
-     */
-    public abstract void start();
-
-    /**
-     * Stops the thread and tries to close any open file streams.
-     */
-    public abstract void stop();
-
-    /**
-     * Tries to interrupt the current thread.
-     */
-    public abstract void interrupt();
-
-    /**
-     * Called by other classes to wait for this thread to die.
-     *
-     * @return True if thread is dead
-     * @throws InterruptedException If an error occurred
-     */
-    public abstract boolean waitForExecutionEnd() throws InterruptedException;
-
-    /**
      * Extracts archive using defined algorithm of class to the specified path.
      *
      * @param path The absolute path of the archive
      * @param name The filename of the archive
      * @throws IOException If an error during extraction error occurred
      */
-    protected abstract void extract(String path, String name) throws IOException;
+    public abstract void extract(String path, String name) throws IOException;
 
     /**
      * Compresses files using defined algorithm of class with default settings
@@ -142,5 +93,6 @@ public abstract class AbstractAlgorithm implements Runnable {
      * @param base The root path of the specified folder
      * @throws IOException If an error during compressing occurred
      */
-    protected abstract void compress(File[] files, String base) throws IOException;
+    public abstract void compress(File[] files, String base) throws IOException;
+
 }

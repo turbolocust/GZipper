@@ -16,8 +16,6 @@
  */
 package gzipper.application.algorithms;
 
-import gzipper.exceptions.GZipperException;
-import gzipper.presentation.GUI;
 import gzipper.presentation.Settings;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,8 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -41,16 +37,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
 
     /**
-     * The output stream for creating a tar-archive
-     */
-    private TarArchiveOutputStream _tos;
-
-    /**
-     * The thread of this class
-     */
-    private Thread _gzipThread;
-
-    /**
      * Creates a new object for zip/unzip operations on tar-archives
      *
      * @param path The path of the output directory
@@ -63,49 +49,12 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
     }
 
     @Override
-    public void start() {
-        _runFlag = true;
-        _gzipThread = new Thread(this);
-        _gzipThread.start();
-    }
-
-    @Override
-    public void stop() {
-        _runFlag = false;
-        try {
-            if (_tos != null) {
-                _tos.flush();
-                _tos.close();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "Output stream could not be closed", ex);
-            File file; //to delete previously created archive on error
-            file = new File(_path + _archiveName + ".tar.gz");
-            if (file.exists()) {
-                file.delete();
-            }
-        }
-    }
-
-    @Override
-    public void interrupt() {
-        _runFlag = false;
-        _gzipThread.interrupt();
-    }
-
-    @Override
-    public boolean waitForExecutionEnd() throws InterruptedException {
-        if (_gzipThread != null) {
-            _gzipThread.join();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    protected void extract(String path, String name) throws IOException {
-        try (TarArchiveInputStream tis = new TarArchiveInputStream(
-                new GZIPInputStream(new BufferedInputStream(new FileInputStream(path + name))))) {
+    public void extract(String path, String name) throws IOException {
+        try (TarArchiveInputStream tis
+                = new TarArchiveInputStream(
+                        new GZIPInputStream(
+                                new BufferedInputStream(
+                                        new FileInputStream(path + name))))) {
 
             ArchiveEntry entry = tis.getNextEntry();
 
@@ -114,7 +63,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
             if (!folder.exists()) {
                 folder.mkdir();
             }
-            while (entry != null & _runFlag) {
+            while (entry != null) {
                 String entryName = entry.getName();
                 /*check if entry contains a directory*/
                 if (entryName.contains("/")) {
@@ -152,76 +101,40 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
     }
 
     @Override
-    protected void compress(File[] files, String base) throws IOException {
-        byte[] buffer = new byte[4096];
-        int readBytes;
-        if (files.length >= 1) {
-            for (int i = 0; i < files.length & _runFlag; ++i) {
-                /*create next file and define entry name based on folder level*/
-                File newFile = files[i];
-                String entryName = base + newFile.getName();
-                /*start compressing the file*/
-                if (newFile.isFile()) {
-                    try (BufferedInputStream buf = new BufferedInputStream(
-                            new FileInputStream(newFile))) {
-                        /*create next archive entry and put it on output stream*/
-                        ArchiveEntry entry = _tos.createArchiveEntry(newFile, entryName);
-                        _tos.putArchiveEntry(entry);
-                        /*write bytes to file*/
-                        while ((readBytes = buf.read(buffer)) != -1) {
-                            _tos.write(buffer, 0, readBytes);
+    public void compress(File[] files, String base) throws IOException {
+        try (TarArchiveOutputStream tos
+                = new TarArchiveOutputStream(new GZIPOutputStream(
+                        new BufferedOutputStream(
+                                new FileOutputStream(_path + _archiveName + ".tar.gz"))))) {
+
+            tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+            tos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
+
+            byte[] buffer = new byte[4096];
+            int readBytes;
+            if (files.length >= 1) {
+                for (int i = 0; i < files.length; ++i) {
+                    /*create next file and define entry name based on folder level*/
+                    File newFile = files[i];
+                    String entryName = base + newFile.getName();
+                    /*start compressing the file*/
+                    if (newFile.isFile()) {
+                        try (BufferedInputStream buf = new BufferedInputStream(
+                                new FileInputStream(newFile))) {
+                            /*create next archive entry and put it on output stream*/
+                            ArchiveEntry entry = tos.createArchiveEntry(newFile, entryName);
+                            tos.putArchiveEntry(entry);
+                            /*write bytes to file*/
+                            while ((readBytes = buf.read(buffer)) != -1) {
+                                tos.write(buffer, 0, readBytes);
+                            }
+                            tos.closeArchiveEntry();
                         }
-                        _tos.closeArchiveEntry();
+                    } else { //child is a directory
+                        File[] children = getFiles(newFile.getAbsolutePath());
+                        compress(children, entryName + "/"); //the slash indicates a folder
                     }
-                } else { //child is a directory
-                    File[] children = getFiles(newFile.getAbsolutePath());
-                    compress(children, entryName + "/"); //the slash indicates a folder
                 }
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        /*check whether archive with given name already exists; 
-        if so, add index to file name an re-check*/
-        if (_createArchive) {
-            try {
-                File file = new File(_path + _archiveName + ".tar.gz");
-                while (file.exists()) {
-                    ++_nameIndex;
-                    _archiveName = _archiveName.substring(0, 7) + _nameIndex;
-                    file = new File(_path + _archiveName + ".tar.gz");
-                }
-                _tos = new TarArchiveOutputStream(new GZIPOutputStream(
-                        new BufferedOutputStream(new FileOutputStream(
-                                _path + _archiveName + ".tar.gz"))));
-                _tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-                _tos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
-            } catch (IOException ex) {
-                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error creating output stream", ex);
-                System.exit(1);
-            }
-        }
-        while (_runFlag) {
-            try {
-                long startTime = System.nanoTime();
-
-                if (_selectedFiles != null) {
-                    if (_createArchive != false) {
-                        compress(_selectedFiles, "");
-                    } else {
-                        extract(_path, _archiveName);
-                    }
-                } else {
-                    throw new GZipperException("File selection must not be null");
-                }
-                _elapsedTime = System.nanoTime() - startTime;
-
-            } catch (IOException | GZipperException ex) {
-                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, "Error compressing archive", ex);
-            } finally {
-                stop(); //stop thread after successful operation
             }
         }
     }

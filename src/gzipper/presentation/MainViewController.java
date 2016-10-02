@@ -44,7 +44,7 @@ import javafx.stage.Stage;
  *
  * @author Matthias Fussenegger
  */
-public class GUI_MainController implements Initializable {
+public class MainViewController implements Initializable {
 
     /**
      * The associated primary stage
@@ -100,7 +100,7 @@ public class GUI_MainController implements Initializable {
             WebView webView = new WebView();
             webView.getEngine().loadContent("<html><br /><p align=\"center\">"
                     + "<img src=\"file:/" + Settings._initialPath + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-07-17</b><br />"
+                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-10-02</b><br />"
                     + "<br />This program uses parts of the commons-compress library by Apache Foundation"
                     + "&nbsp;and is licensed under the GNU General Public License 3 "
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
@@ -130,16 +130,19 @@ public class GUI_MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        String path = GUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String path = MainViewController.class.getProtectionDomain()
+                .getCodeSource().getLocation().getPath();
         String decPath = null; //to hold decoded path of JAR-file
         File jarFile = new File(path);
 
         try {
             if (System.getProperty("os.name").startsWith("Windows")) {
-                decPath = URLDecoder.decode(path.substring(1, path.length() - jarFile.getName().length()), "UTF-8");
+                decPath = URLDecoder.decode(path.substring(
+                        1, path.length() - jarFile.getName().length()), "UTF-8");
             } else {
                 Settings._isUnix = true;
-                decPath = URLDecoder.decode(path.substring(0, path.length() - jarFile.getName().length()), "UTF-8");
+                decPath = URLDecoder.decode(path.substring(
+                        0, path.length() - jarFile.getName().length()), "UTF-8");
             }
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
