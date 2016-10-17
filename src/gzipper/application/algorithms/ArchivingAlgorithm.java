@@ -16,11 +16,33 @@
  */
 package gzipper.application.algorithms;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * A marker interface to mark the classes that contain compression algorithms
  *
  * @author Matthias Fussenegger
  */
 public interface ArchivingAlgorithm {
-    // marker interface
+
+    /**
+     * Extracts archive using defined algorithm of class to the specified path.
+     *
+     * @param path The absolute path of the archive
+     * @param name The filename of the archive
+     * @throws java.io.IOException On any IO error during extraction.
+     */
+    void extract(String path, String name) throws IOException;
+
+    /**
+     * Compresses files using defined algorithm of class with default settings
+     * and creates an archive to the specified path.
+     *
+     * @param files The files selected from the file chooser
+     * @param base The root path of the specified folder
+     * @throws java.io.IOException On any IO error during compression.
+     */
+    void compress(File[] files, String base) throws IOException;
+
 }

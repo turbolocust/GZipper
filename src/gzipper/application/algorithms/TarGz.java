@@ -22,41 +22,45 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * Offers algorithms to compress and decompress ZIP archives.
+ * Offers algorithms to compress and decompress TAR+GZIP archives.
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm {
+public class TarGz extends AbstractAlgorithm {
 
     /**
-     * Creates a new object for zip/unzip operations on zip-archives
+     * Creates a new object for zip/unzip operations on tar-archives
      *
      * @param path The path of the output directory
      * @param name The name of the target archive
      * @param files The selected files from GUI
      */
-    public Zip(String path, String name, File[] files) {
-        super(path, name, ".zip", files);
+    public TarGz(String path, String name, File[] files) {
+        super(path, name, ".tar.gz", files);
     }
 
     @Override
     protected ArchiveInputStream getInputStream() throws IOException {
-        return new ZipArchiveInputStream(
-                new BufferedInputStream(
-                        new FileInputStream(Path + Name)));
+        return new TarArchiveInputStream(
+                new GZIPInputStream(
+                        new BufferedInputStream(
+                                new FileInputStream(Path + Name))));
     }
 
     @Override
     protected ArchiveOutputStream getOutputStream() throws IOException {
-        return new ZipArchiveOutputStream(
-                new BufferedOutputStream(
-                        new FileOutputStream(Path + Name + ArchiveType)));
+        return new TarArchiveOutputStream(
+                new GZIPOutputStream(
+                        new BufferedOutputStream(
+                                new FileOutputStream(Path + Name + ArchiveType))));
     }
 
 }
