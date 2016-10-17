@@ -21,6 +21,6 @@ package gzipper.application.algorithms;
  *
  * @author Matthias Fussenegger
  */
-public interface CompressionAlgorithm {
-    //marker interface
+public interface ArchivingAlgorithm {
+    // marker interface
 }

@@ -34,7 +34,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  *
  * @author Matthias Fussenegger
  */
-public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
+public class Gzip extends AbstractAlgorithm implements ArchivingAlgorithm {
 
     /**
      * Creates a new object for zip/unzip operations on tar-archives
@@ -42,10 +42,10 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
      * @param path The path of the output directory
      * @param name The name of the target archive
      * @param files The selected files from GUI
-     * @param zipMode True if zip, false if unzip
+     * @param mode True if compress, false if decompress
      */
-    public Gzip(String path, String name, File[] files, boolean zipMode) {
-        super(path, name, files, zipMode);
+    public Gzip(String path, String name, File[] files, boolean mode) {
+        super(path, name, files, mode);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
 
             ArchiveEntry entry = tis.getNextEntry();
 
-            /*create main folder of gzip archive*/
+            /*create main folder of archive*/
             File folder = new File(Settings._outputPath + name.substring(0, 7));
             if (!folder.exists()) {
                 folder.mkdir();
@@ -73,9 +73,9 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
                     } else {
                         newFile = new File(folder.getAbsolutePath() + "\\" + entryName);
                     }
-                    /*mkdirs also creates parent directories*/
+
                     if (!newFile.getParentFile().exists()) {
-                        newFile.getParentFile().mkdirs();
+                        newFile.getParentFile().mkdirs(); // also creates parent directories
                     }
                 }
 
@@ -112,7 +112,7 @@ public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
 
             byte[] buffer = new byte[4096];
             int readBytes;
-            if (files.length >= 1) {
+            if (files.length > 0) {
                 for (int i = 0; i < files.length; ++i) {
                     /*create next file and define entry name based on folder level*/
                     File newFile = files[i];
