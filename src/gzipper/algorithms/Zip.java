@@ -32,6 +32,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 
 /**
  * Offers algorithms to compress and decompress {@code .zip} archives
@@ -105,7 +106,7 @@ public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
     @Override
     protected void extract(String path, String name) throws IOException {
         try (ZipArchiveInputStream zis = new ZipArchiveInputStream(
-                new BufferedInputStream(new FileInputStream(path + name)))) {
+                new DeflateCompressorInputStream(new BufferedInputStream(new FileInputStream(path + name))))) {
 
             ArchiveEntry entry = zis.getNextEntry();
 
