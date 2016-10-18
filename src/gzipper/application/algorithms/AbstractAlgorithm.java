@@ -16,7 +16,6 @@
  */
 package gzipper.application.algorithms;
 
-import gzipper.presentation.Settings;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -24,8 +23,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -37,77 +42,53 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
 
     /**
-     * The name of the archive.
+     * Type of the archive.
      */
-    protected final String Name;
+    private final String _archiveType;
 
     /**
-     * The type of the archive.
+     * Type of compressor stream.
      */
-    protected final String ArchiveType;
+    private final String _compressionType;
 
     /**
-     * The path of the archive.
+     * Factory to create archive streams.
      */
-    protected final String Path;
+    private static final ArchiveStreamFactory ARCHIVE_STREAM_FACTORY;
 
     /**
-     * The selected files to be put into an archive by file chooser.
+     * Factory to create compressor streams.
      */
-    private final File[] _selectedFiles;
+    private static final CompressorStreamFactory COMPRESSOR_STREAM_FACTORY;
+
+    static {
+        ARCHIVE_STREAM_FACTORY = new ArchiveStreamFactory();
+        COMPRESSOR_STREAM_FACTORY = new CompressorStreamFactory();
+    }
 
     /**
      * Creates a new object of the child class for archiving operations.
      *
-     * @param path The path of the output directory
-     * @param name The name of the target archive
-     * @param type The type of the archive
-     * @param files The selected files from GUI
+     * @param archiveType The type of the archive
+     * @param compressionType The type of the compressor stream
      */
-    protected AbstractAlgorithm(String path, String name, String type, File[] files) {
-        Path = path;
-        Name = name;
-        ArchiveType = type;
-        _selectedFiles = files;
+    protected AbstractAlgorithm(String archiveType, String compressionType) {
+        _archiveType = archiveType;
+        _compressionType = compressionType;
     }
-
-    /**
-     * Retrieves files from a specific directory; mandatory for compression.
-     *
-     * @param path The path that contains the files to be compressed
-     * @return And array of files from the specified path
-     * @throws IOException If an error occurred
-     */
-    protected File[] getFiles(String path) throws IOException {
-        final File dir = new File(path);
-        File[] files = dir.listFiles();
-        return files;
-    }
-
-    /**
-     * Returns a new archive input stream of the corresponding child class.
-     *
-     * @return A new {@link ArchiveInputStream}.
-     * @throws IOException If e.g. the path or name of the archive is invalid.
-     */
-    protected abstract ArchiveInputStream getInputStream() throws IOException;
-
-    /**
-     * Returns a new archive output stream of the corresponding child class.
-     *
-     * @return A new {@link ArchiveOutputStream}.
-     * @throws IOException If e.g. the path or name of the archive is invalid.
-     */
-    protected abstract ArchiveOutputStream getOutputStream() throws IOException;
 
     @Override
-    public void extract(String path, String name) throws IOException {
-        try (ArchiveInputStream inputStream = getInputStream()) {
+    public void extract(String location, String name) throws IOException, ArchiveException, CompressorException {
+
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(location + name));
+        CompressorInputStream cis = COMPRESSOR_STREAM_FACTORY.createCompressorInputStream(_compressionType, bis);
+
+        try (ArchiveInputStream inputStream = ARCHIVE_STREAM_FACTORY.createArchiveInputStream(_archiveType, cis)) {
 
             ArchiveEntry entry = inputStream.getNextEntry();
 
-            /*create main folder of archive*/
-            File folder = new File(Settings._outputPath + name.substring(0, 7));
+            // create main folder of archive without file type
+            File folder = new File(location + name.substring(0, name.lastIndexOf('.')));
 
             if (!folder.exists()) {
                 folder.mkdir();
@@ -115,19 +96,19 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
 
             while (entry != null) {
                 String entryName = entry.getName();
-                /*check if entry contains a directory*/
-                if (entryName.contains("/")) {
+                // check if entry contains a directory
+                if (entryName.contains(File.separator)) {
 
-                    File newFile = new File(folder.getAbsolutePath() + "/" + entryName);
+                    File newFile = new File(folder.getAbsolutePath() + File.separator + entryName);
 
                     if (!newFile.getParentFile().exists()) {
                         newFile.getParentFile().mkdirs(); // also creates parent directories
                     }
                 }
 
-                final String newFilePath = folder.getAbsolutePath() + "/" + entryName;
+                final String newFilePath = folder.getAbsolutePath() + File.separator + entryName;
 
-                /*create new OutputStream and write bytes to file*/
+                // create new output stream and write bytes to file
                 try (BufferedOutputStream buf = new BufferedOutputStream(
                         new FileOutputStream(newFilePath))) {
                     byte[] buffer = new byte[4096];
@@ -143,37 +124,69 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     }
 
     @Override
-    public void compress(File[] files, String base) throws IOException {
-        try (ArchiveOutputStream outputStream = getOutputStream()) {
+    public void compress(File[] files, String location, String name) throws IOException, ArchiveException, CompressorException {
 
-            byte[] buffer = new byte[4096];
-            int readBytes;
+        // check if location ends with separator, which is required for output stream
+        String path = location.endsWith(File.separator) ? location : location + File.separator;
 
-            if (files.length > 0) {
-                for (int i = 0; i < files.length; ++i) {
-                    /*create next file and define entry name based on folder level*/
-                    File newFile = files[i];
-                    String entryName = base + newFile.getName();
-                    /*start compressing the file*/
-                    if (newFile.isFile()) {
-                        try (BufferedInputStream buf = new BufferedInputStream(
-                                new FileInputStream(newFile))) {
-                            /*create next archive entry and put it on output stream*/
-                            ArchiveEntry entry = outputStream.createArchiveEntry(newFile, entryName);
-                            outputStream.putArchiveEntry(entry);
-                            /*write bytes to file*/
-                            while ((readBytes = buf.read(buffer)) != -1) {
-                                outputStream.write(buffer, 0, readBytes);
-                            }
-                            outputStream.closeArchiveEntry();
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
+        CompressorOutputStream cos = COMPRESSOR_STREAM_FACTORY.createCompressorOutputStream(_compressionType, bos);
+
+        try (ArchiveOutputStream outputStream
+                = ARCHIVE_STREAM_FACTORY.createArchiveOutputStream(_archiveType, cos)) {
+            compress(files, name, outputStream);
+        }
+    }
+
+    /**
+     * Internal method for compression and recursive call.
+     *
+     * @param files The files to compress
+     * @param base The base path to store files to
+     * @param outputStream The output stream to use
+     * @throws IOException
+     */
+    private void compress(File[] files, String base, ArchiveOutputStream outputStream) throws IOException {
+
+        byte[] buffer = new byte[4096];
+        int readBytes;
+
+        if (files.length > 0) {
+            for (int i = 0; i < files.length; ++i) {
+                // create next file and define entry name based on folder level
+                File newFile = files[i];
+                String entryName = base + newFile.getName();
+                // start compressing the file
+                if (newFile.isFile()) {
+                    try (BufferedInputStream buf = new BufferedInputStream(
+                            new FileInputStream(newFile))) {
+                        // create next archive entry and put it on output stream
+                        ArchiveEntry entry = outputStream.createArchiveEntry(newFile, entryName);
+                        outputStream.putArchiveEntry(entry);
+                        // write bytes to file
+                        while ((readBytes = buf.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, readBytes);
                         }
-                    } else { //child is a directory
-                        File[] children = getFiles(newFile.getAbsolutePath());
-                        compress(children, entryName + "/"); //the slash indicates a folder
+                        outputStream.closeArchiveEntry();
                     }
+                } else { // child is a directory
+                    File[] children = getFiles(newFile.getAbsolutePath());
+                    compress(children, entryName + File.separator, outputStream);
                 }
             }
         }
     }
 
+    /**
+     * Retrieves files from a specific directory; mandatory for compression.
+     *
+     * @param path The path that contains the files to be compressed
+     * @return And array of files from the specified path
+     * @throws IOException If an error occurred
+     */
+    private File[] getFiles(String path) throws IOException {
+        final File dir = new File(path);
+        File[] files = dir.listFiles();
+        return files;
+    }
 }

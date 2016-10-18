@@ -16,16 +16,8 @@
  */
 package gzipper.application.algorithms;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
  * Offers algorithms to compress and decompress ZIP archives.
@@ -34,29 +26,16 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
  */
 public class Zip extends AbstractAlgorithm {
 
-    /**
-     * Creates a new object for zip/unzip operations on zip-archives
-     *
-     * @param path The path of the output directory
-     * @param name The name of the target archive
-     * @param files The selected files from GUI
-     */
-    public Zip(String path, String name, File[] files) {
-        super(path, name, ".zip", files);
+    private Zip() {
+        super(ArchiveStreamFactory.ZIP, CompressorStreamFactory.DEFLATE);
     }
 
-    @Override
-    protected ArchiveInputStream getInputStream() throws IOException {
-        return new ZipArchiveInputStream(
-                new BufferedInputStream(
-                        new FileInputStream(Path + Name)));
+    public static Zip getInstance() {
+        return ZipHolder.INSTANCE;
     }
 
-    @Override
-    protected ArchiveOutputStream getOutputStream() throws IOException {
-        return new ZipArchiveOutputStream(
-                new BufferedOutputStream(
-                        new FileOutputStream(Path + Name + ArchiveType)));
-    }
+    private static class ZipHolder {
 
+        private static final Zip INSTANCE = new Zip();
+    }
 }

@@ -20,22 +20,22 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
- * Offers algorithms to compress and decompress TAR+GZIP archives.
+ * Offers algorithms to compress and decompress TAR+BZIP2 archives.
  *
  * @author Matthias Fussenegger
  */
-public class TarGz extends AbstractAlgorithm {
+public class TarBzip2 extends AbstractAlgorithm {
 
-    private TarGz() {
-        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);
+    private TarBzip2() {
+        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
     }
 
-    public static TarGz getInstance() {
-        return TarGzHolder.INSTANCE;
+    public static TarBzip2 getInstance() {
+        return TarBzip2Holder.INSTANCE;
     }
 
-    private static class TarGzHolder {
+    private static class TarBzip2Holder {
 
-        private static final TarGz INSTANCE = new TarGz();
+        private static final TarBzip2 INSTANCE = new TarBzip2();
     }
 }
