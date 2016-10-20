@@ -22,7 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 
 /**
- * A class that offers the functionality of creating alert dialogs.
+ * Convenience class that offers the creation of alert dialogs.
  *
  * @author Matthias Fussenegger
  */
@@ -39,7 +39,7 @@ public class AlertDialog {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content, ButtonType.YES, ButtonType.NO);
         alert.setTitle("Please confirm");
         alert.setHeaderText(header);
-        /*change default button to {@code ButtonType.NO} to avoid accidential press of return key*/
+        // changing default button to {@code ButtonType.NO} to avoid accidential press of return key
         Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.YES);
         Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);
         yesButton.setDefaultButton(false);
@@ -74,5 +74,5 @@ public class AlertDialog {
         alert.setHeaderText(header);
         return alert.showAndWait();
     }
-    
+
 }

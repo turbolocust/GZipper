@@ -25,5 +25,4 @@ public class Windows extends OperatingSystem {
     public Windows() {
         super(OS.WINDOWS);
     }
-
 }

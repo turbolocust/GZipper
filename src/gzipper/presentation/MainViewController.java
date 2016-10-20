@@ -30,6 +30,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -69,6 +70,9 @@ public class MainViewController implements Initializable {
 
     @FXML
     private TextField _outputPath;
+
+    @FXML
+    private ComboBox _archiveTypeComboBox;
 
     @FXML
     private void handleCloseMenuItemAction(ActionEvent evt) {

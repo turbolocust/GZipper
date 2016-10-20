@@ -14,28 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.algorithms;
+package gzipper.application.algorithm.type;
 
+import gzipper.application.algorithm.AbstractAlgorithm;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
- * Offers algorithms to compress and decompress TAR+BZIP2 archives.
+ * Offers algorithms to compress and decompress TAR+GZIP archives.
  *
  * @author Matthias Fussenegger
  */
-public class TarBzip2 extends AbstractAlgorithm {
+public class TarGz extends AbstractAlgorithm implements ArchiveType {
 
-    private TarBzip2() {
-        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
+    private TarGz() {
+        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);
     }
 
-    public static TarBzip2 getInstance() {
-        return TarBzip2Holder.INSTANCE;
+    public static TarGz getInstance() {
+        return TarGzHolder.INSTANCE;
     }
 
-    private static class TarBzip2Holder {
+    private static class TarGzHolder {
 
-        private static final TarBzip2 INSTANCE = new TarBzip2();
+        private static final TarGz INSTANCE = new TarGz();
     }
 }

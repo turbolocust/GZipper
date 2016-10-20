@@ -25,5 +25,4 @@ public class Unix extends OperatingSystem {
     public Unix() {
         super(OS.UNIX);
     }
-
 }

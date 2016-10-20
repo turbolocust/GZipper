@@ -14,25 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.util;
+package gzipper.application.algorithm.type;
 
-import java.io.File;
+import gzipper.application.algorithm.AbstractAlgorithm;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
- * Used to validate files, e.g. file paths.
+ * Offers algorithms to compress and decompress TAR+BZIP2 archives.
  *
  * @author Matthias Fussenegger
  */
-public class FileValidator {
+public class TarBzip2 extends AbstractAlgorithm implements ArchiveType {
 
-    /**
-     * Validates the file path.
-     *
-     * @param path The path to be validated
-     * @return True if path is valid, false otherwise
-     */
-    public static boolean isValidPath(String path) {
-        File file = new File(path);
-        return file.exists() && file.isDirectory();
+    private TarBzip2() {
+        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
+    }
+
+    public static TarBzip2 getInstance() {
+        return TarBzip2Holder.INSTANCE;
+    }
+
+    private static class TarBzip2Holder {
+
+        private static final TarBzip2 INSTANCE = new TarBzip2();
     }
 }

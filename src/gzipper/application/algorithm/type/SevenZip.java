@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.algorithms;
+package gzipper.application.algorithm.type;
 
+import gzipper.application.algorithm.AbstractAlgorithm;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
- * Offers algorithms to compress and decompress TAR+GZIP archives.
  *
  * @author Matthias Fussenegger
  */
-public class TarGz extends AbstractAlgorithm {
+public class SevenZip extends AbstractAlgorithm implements ArchiveType {
 
-    private TarGz() {
-        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);
+    private SevenZip() {
+        super(ArchiveStreamFactory.SEVEN_Z, CompressorStreamFactory.LZMA);
     }
 
-    public static TarGz getInstance() {
-        return TarGzHolder.INSTANCE;
+    public static SevenZip getInstance() {
+        return SevenZipHolder.INSTANCE;
     }
 
-    private static class TarGzHolder {
+    private static class SevenZipHolder {
 
-        private static final TarGz INSTANCE = new TarGz();
+        private static final SevenZip INSTANCE = new SevenZip();
     }
 }

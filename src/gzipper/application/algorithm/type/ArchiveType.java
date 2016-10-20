@@ -14,25 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.util;
-
-import java.io.File;
+package gzipper.application.algorithm.type;
 
 /**
- * Used to validate files, e.g. file paths.
  *
  * @author Matthias Fussenegger
  */
-public class FileValidator {
-
-    /**
-     * Validates the file path.
-     *
-     * @param path The path to be validated
-     * @return True if path is valid, false otherwise
-     */
-    public static boolean isValidPath(String path) {
-        File file = new File(path);
-        return file.exists() && file.isDirectory();
-    }
+public interface ArchiveType {
+    // marker interface
 }

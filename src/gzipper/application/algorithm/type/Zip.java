@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.algorithms;
+package gzipper.application.algorithm.type;
 
+import gzipper.application.algorithm.AbstractAlgorithm;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
@@ -24,7 +25,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm {
+public class Zip extends AbstractAlgorithm implements ArchiveType {
 
     private Zip() {
         super(ArchiveStreamFactory.ZIP, CompressorStreamFactory.DEFLATE);

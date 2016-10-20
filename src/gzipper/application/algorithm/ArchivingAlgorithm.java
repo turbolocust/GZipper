@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gzipper.application.algorithms;
+package gzipper.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 
 /**
- * A marker interface to mark the classes that contain compression algorithms
+ * Implementing class offers methods for compressing and extracting archives.
  *
  * @author Matthias Fussenegger
  */
