@@ -29,7 +29,7 @@ import static javafx.application.Application.launch;
  * EXPERIMENTAL, use with caution as this application may not work at all
  *
  * @author Matthias Fussenegger
- * @version 2016-10-02
+ * @version 2016-10-22
  */
 public class GZipper extends Application {
 
@@ -47,7 +47,7 @@ public class GZipper extends Application {
         Scene scene = new Scene(root);
 
         stage.setTitle("GZipper");
-        stage.getIcons().add(Settings._frameImage);
+        stage.getIcons().add(BaseController._frameImage);
         stage.setScene(scene);
         stage.show();
     }
