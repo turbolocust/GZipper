@@ -19,7 +19,6 @@ package gzipper.algorithms;
 import gzipper.exceptions.GZipperException;
 import gzipper.graphics.GUI;
 import gzipper.graphics.Settings;
-import gzipper.interfaces.CompressionAlgorithm;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,11 +34,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 
 /**
- * Offers algorithms to compress and decompress {@code .zip} archives
+ * Offers algorithms to compress and decompress ZIP archives.
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm implements CompressionAlgorithm {
+public class Zip extends AbstractAlgorithm {
 
     /**
      * The output stream for creating a zip-archive

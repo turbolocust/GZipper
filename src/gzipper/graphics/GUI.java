@@ -60,7 +60,7 @@ import javax.swing.text.DefaultCaret;
  * Main frame of application (graphical user interface)
  *
  * @author Matthias Fussenegger
- * @version 2016-02-16
+ * @version 2016-10-22
  */
 public class GUI extends JFrame implements Runnable {
 
@@ -441,7 +441,7 @@ public class GUI extends JFrame implements Runnable {
             SubFrame frame = new SubFrame("About", new BorderLayout());
             JLabel label = new JLabel("<html><br><p align=\"center\">"
                     + "<img src=\"file:" + INITIAL_PATH + "res/icon_256.png\" alt=\"res/icon_256.png\">"
-                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-02-16</b></p>"
+                    + "<br>&nbsp;Author: Matthias Fussenegger&nbsp;<br>E-mail: matfu2@me.com<br><b>v2016-10-22</b></p>"
                     + "<br>&nbsp;This program uses parts of the commons-compress library by Apache Foundation&nbsp;<br>"
                     + "&nbsp;and is licensed under the GNU General Public License 3&nbsp;"
                     + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"

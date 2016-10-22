@@ -19,7 +19,6 @@ package gzipper.algorithms;
 import gzipper.exceptions.GZipperException;
 import gzipper.graphics.GUI;
 import gzipper.graphics.Settings;
-import gzipper.interfaces.CompressionAlgorithm;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,11 +34,11 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * Offers algorithms to compress and decompress {@code tar.gz} archives
+ * Offers algorithms to compress and decompress TAR+GZIP archives.
  *
  * @author Matthias Fussenegger
  */
-public class Gzip extends AbstractAlgorithm implements CompressionAlgorithm {
+public class Gzip extends AbstractAlgorithm {
 
     /**
      * The output stream for creating a tar-archive
