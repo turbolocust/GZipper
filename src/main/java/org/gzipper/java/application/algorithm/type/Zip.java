@@ -25,7 +25,7 @@ import org.gzipper.java.application.algorithm.AbstractAlgorithm;
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm implements ArchiveType {
+public class Zip extends AbstractAlgorithm {
 
     private Zip() {
         super(ArchiveStreamFactory.ZIP, CompressorStreamFactory.DEFLATE);

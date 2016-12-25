@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.presentation;
 
+import org.gzipper.java.presentation.control.BaseController;
+import org.gzipper.java.presentation.control.MainViewController;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -26,16 +28,17 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * EXPERIMENTAL, use with caution as this application may not work at all
+ * EXPERIMENTAL - still in active development. Use with caution as this
+ * application may not work at all.
  *
  * @author Matthias Fussenegger
- * @version 2016-10-22
+ * @version 2016-12-25
  */
 public class GZipper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
         loader.setResources(ResourceBundle.getBundle("gzipperMainView", Locale.ENGLISH));
 
         Parent root = loader.load();
@@ -47,7 +50,7 @@ public class GZipper extends Application {
         Scene scene = new Scene(root);
 
         stage.setTitle("GZipper");
-        stage.getIcons().add(BaseController._frameImage);
+        stage.getIcons().add(BaseController.getFrameImage());
         stage.setScene(scene);
         stage.show();
     }

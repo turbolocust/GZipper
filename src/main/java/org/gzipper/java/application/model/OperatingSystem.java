@@ -29,7 +29,7 @@ public abstract class OperatingSystem {
     }
 
     public String getDefaultUserDirectory() {
-		return System.getProperty("user.home");
+        return System.getProperty("user.home");
     }
 
     public OS getCurrentSystem() {

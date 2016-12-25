@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation;
+package org.gzipper.java.presentation.control;
 
 import java.util.ResourceBundle;
 
@@ -22,6 +22,7 @@ import org.gzipper.java.application.util.Settings;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -35,7 +36,7 @@ import javafx.stage.Stage;
  *
  * @author Matthias Fussenegger
  */
-public abstract class BaseController {
+public abstract class BaseController implements Initializable {
 
     protected static Settings _settings;
 
@@ -63,12 +64,12 @@ public abstract class BaseController {
      */
     protected Stage _primaryStage;
 
-    protected void setPrimaryStage(Stage primaryStage) {
+    public void setPrimaryStage(Stage primaryStage) {
         _primaryStage = primaryStage;
     }
 
     @FXML
-    private void handleAboutMenuItemAction(ActionEvent evt) {
+    protected void handleAboutMenuItemAction(ActionEvent evt) {
         Stage aboutWindow = new Stage();
         aboutWindow.getIcons().add(_frameImage);
         GridPane gridPane = new GridPane();
