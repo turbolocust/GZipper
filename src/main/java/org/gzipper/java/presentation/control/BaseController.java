@@ -25,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -69,37 +70,43 @@ public abstract class BaseController implements Initializable {
     }
 
     @FXML
+    protected MenuItem _aboutMenuItem;
+
+    @FXML
     protected void handleAboutMenuItemAction(ActionEvent evt) {
-        Stage aboutWindow = new Stage();
-        aboutWindow.getIcons().add(_frameImage);
-        GridPane gridPane = new GridPane();
-        Button button = new Button("Close");
-        button.setMaxSize(Double.MAX_VALUE, 30);
-        WebView webView = new WebView();
-        webView.getEngine().loadContent("<html><br /><p align=\"center\">"
-                + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-10-02</b><br />"
-                + "<br />This program uses parts of the commons-compress library by Apache Foundation"
-                + "&nbsp;and is licensed under the GNU General Public License 3 "
-                + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
-                + "&nbsp;<br />&nbsp;</p></html>");
-        webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        webView.setContextMenuEnabled(false);
-        gridPane.add(webView, 0, 0);
-        gridPane.add(button, 0, 1);
-        aboutWindow.setTitle("About");
-        aboutWindow.initOwner(_primaryStage);
-        aboutWindow.setScene(new Scene(gridPane, 600, 500));
-        aboutWindow.setResizable(false);
-        webView.setOnKeyPressed((KeyEvent event) -> {
-            if (event.getCode().equals(KeyCode.ESCAPE)) {
-                aboutWindow.close();
-            }
-        });
-        button.setOnAction((ActionEvent e) -> {
-            if (e.getSource().equals(button)) {
-                aboutWindow.close();
-            }
-        });
-        aboutWindow.show();
+        if (evt.getSource().equals(_aboutMenuItem)) {
+            Stage aboutWindow = new Stage();
+            aboutWindow.getIcons().add(_frameImage);
+            GridPane gridPane = new GridPane();
+            Button button = new Button("Close");
+            button.setMaxSize(Double.MAX_VALUE, 30);
+            WebView webView = new WebView();
+            // TODO: replace with internationalized string
+            webView.getEngine().loadContent("<html><br /><p align=\"center\">"
+                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-10-02</b><br />"
+                    + "<br />This program uses parts of the commons-compress library by Apache Foundation"
+                    + "&nbsp;and is licensed under the GNU General Public License 3 "
+                    + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
+                    + "&nbsp;<br />&nbsp;</p></html>");
+            webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            webView.setContextMenuEnabled(false);
+            gridPane.add(webView, 0, 0);
+            gridPane.add(button, 0, 1);
+            aboutWindow.setTitle("About");
+            aboutWindow.initOwner(_primaryStage);
+            aboutWindow.setScene(new Scene(gridPane, 600, 500));
+            aboutWindow.setResizable(false);
+            webView.setOnKeyPressed((KeyEvent event) -> {
+                if (event.getCode().equals(KeyCode.ESCAPE)) {
+                    aboutWindow.close();
+                }
+            });
+            button.setOnAction((ActionEvent e) -> {
+                if (e.getSource().equals(button)) {
+                    aboutWindow.close();
+                }
+            });
+            aboutWindow.show();
+        }
     }
 }

@@ -28,7 +28,7 @@ public class TaskHandler {
     private final Executor _executor;
 
     private TaskHandler() {
-        _executor = Executors.newSingleThreadExecutor();
+        _executor = Executors.newCachedThreadPool();
     }
 
     public static TaskHandler getInstance() {

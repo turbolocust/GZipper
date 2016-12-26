@@ -16,9 +16,12 @@
  */
 package org.gzipper.java.presentation.control;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -45,7 +48,9 @@ import javafx.stage.FileChooser;
 import org.gzipper.java.presentation.AlertDialog;
 import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.presentation.model.ArchivingOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 
 /**
@@ -54,14 +59,21 @@ import org.gzipper.java.presentation.util.ArchiveInfoFactory;
  */
 public class MainViewController extends BaseController {
 
+    /**
+     * The currently active task. Multiple tasks may be supported in the future.
+     */
+    private Task<Boolean> _activeTask;
+
+    /**
+     * A list consisting of the selected files or the selected archive.
+     */
+    private List<File> _selectedFiles;
+
     @FXML
     private MenuItem _closeMenuItem;
 
     @FXML
     private MenuItem _deleteMenuItem;
-
-    @FXML
-    private MenuItem _aboutMenuItem;
 
     @FXML
     private RadioButton _compressRadioButton;
@@ -85,7 +97,7 @@ public class MainViewController extends BaseController {
     private Button _selectButton;
 
     @FXML
-    private void handleCloseMenuItemAction(ActionEvent evt) {
+    void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
             _primaryStage.close();
             System.exit(0);
@@ -93,10 +105,11 @@ public class MainViewController extends BaseController {
     }
 
     @FXML
-    private void handleDeleteMenuItemAction(ActionEvent evt) {
+    void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
             Optional<ButtonType> result = AlertDialog.showConfirmationDialog(
-                    _resources.getString("clearTextWarning.text"), _resources.getString("confirmation.text"));
+                    _resources.getString("clearTextWarning.text"),
+                    _resources.getString("confirmation.text"));
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -116,12 +129,15 @@ public class MainViewController extends BaseController {
                         ? ArchiveInfoFactory.createArchiveInfo(archiveType, 0)
                         : ArchiveInfoFactory.createArchiveInfo(archiveType);
 
-                Task< Boolean> task = new Task<Boolean>() {
-                    @Override
-                    protected Boolean call() throws Exception {
-                        return true;
-                    }
-                };
+                // TODO: set archive name, file(s) and output path (needs validation)
+                ArchivingOperation operation = new ArchivingOperation(info, compress);
+
+                Task<Boolean> task = initArchivingJob(operation);
+
+                _activeTask = task;
+                toggleStartAndAbortButton();
+                TaskHandler.getInstance().execute(_activeTask);
+
             } catch (GZipperException ex) {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -131,17 +147,94 @@ public class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            ArchiveInfo op = null;
-            // TODO
+            _activeTask.cancel(true);
         }
     }
 
     @FXML
     void handleSelectButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectButton)) {
+
             FileChooser fc = new FileChooser();
-            // TODO: select archive or files
+            fc.setTitle(_resources.getString("select.text"));
+
+            // TODO: extension filter
+            if (_compressRadioButton.isSelected()) {
+                _selectedFiles = new LinkedList<>();
+                _selectedFiles.add(fc.showOpenDialog(_primaryStage));
+            } else {
+                _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
+            }
         }
+    }
+
+    /**
+     * Toggles both, the start and the abort button.
+     */
+    private void toggleStartAndAbortButton() {
+        // toggle start button
+        if (_startButton.isDisabled()) {
+            _startButton.setDisable(false);
+        } else {
+            _startButton.setDisable(true);
+        }
+
+        // toggle abort button
+        if (_abortButton.isDisabled()) {
+            _abortButton.setDisable(false);
+        } else {
+            _abortButton.setDisable(true);
+        }
+    }
+
+    /**
+     * Appends text to the text area and inserts a new line after it.
+     *
+     * @param text The text to be appended.
+     */
+    private void appendToTextArea(String text) {
+        _textArea.appendText(text + "\n");
+    }
+
+    private Task<Boolean> initArchivingJob(ArchivingOperation operation) {
+        Task<Boolean> task = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                return operation.performOperation();
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            appendToTextArea(_resources.getString("operationSuccess.text"));
+            finalizeArchivingJob(operation);
+            e.consume();
+        });
+        task.setOnCancelled(e -> {
+            appendToTextArea(_resources.getString("operationCancel.text"));
+            finalizeArchivingJob(operation);
+            e.consume();
+        });
+        task.setOnFailed(e -> {
+            appendToTextArea(_resources.getString("operationFail.text"));
+            appendToTextArea(e.getSource().getException().getMessage());
+            finalizeArchivingJob(operation);
+        });
+
+        return task;
+    }
+
+    /**
+     * Calculates the total duration in seconds of the specified
+     * {@link ArchivingOperation} and appends it via
+     * {@link #appendToTextArea(java.lang.String)}. Also toggles
+     * {@link #_startButton} and {@link #_abortButton}.
+     *
+     * @param operation {@link ArchivingOperation} that holds elapsed time.
+     */
+    private void finalizeArchivingJob(ArchivingOperation operation) {
+        appendToTextArea(_resources.getString("elapsedTime.text")
+                + operation.calculateElapsedTime());
+        toggleStartAndAbortButton();
     }
 
     @Override

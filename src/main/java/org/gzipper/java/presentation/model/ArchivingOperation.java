@@ -36,6 +36,8 @@ public class ArchivingOperation {
 
     private final boolean _compress;
 
+    private long _elapsedTime;
+
     public ArchivingOperation(ArchiveInfo info, boolean compress) {
         _archiveInfo = info;
         _compress = compress;
@@ -45,6 +47,8 @@ public class ArchivingOperation {
 
         ArchiveType archiveType = _archiveInfo.getArchiveType();
         ArchivingAlgorithm algorithm = archiveType.determineArchivingAlgorithm();
+
+        long startTime = System.nanoTime();
 
         boolean success = false;
         try {
@@ -57,9 +61,25 @@ public class ArchivingOperation {
         } catch (IOException | CompressorException | ArchiveException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        _elapsedTime = System.nanoTime() - startTime;
         return success;
     }
 
+    /**
+     * Calculates the elapsed time in seconds.
+     *
+     * @return The elapsed time in seconds.
+     */
+    public double calculateElapsedTime() {
+        return ((double) _elapsedTime / 1E9);
+    }
+
+    /**
+     * Checks whether this operation is for compression or decompression.
+     *
+     * @return True for compression, false for decompression.
+     */
     public boolean isCompress() {
         return _compress;
     }
