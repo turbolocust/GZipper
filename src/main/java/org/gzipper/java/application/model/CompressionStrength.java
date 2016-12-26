@@ -24,7 +24,7 @@ public enum CompressionStrength {
 
     VERY_LOW, LOW, MEDIUM, GOOD, BEST;
 
-    public CompressionStrength determineCompressionStrength(int value) {
+    public static CompressionStrength determineCompressionStrength(int value) {
 
         CompressionStrength compressionStrength = null;
         for (CompressionStrength strength : values()) {

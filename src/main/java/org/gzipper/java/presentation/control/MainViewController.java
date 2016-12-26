@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.concurrent.Task;
 
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.model.Unix;
@@ -36,24 +37,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.presentation.AlertDialog;
 import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.model.ArchivingOperation;
+import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 
 /**
  *
  * @author Matthias Fussenegger
  */
 public class MainViewController extends BaseController {
-
-    private final MainViewControl _control;
 
     @FXML
     private MenuItem _closeMenuItem;
@@ -65,7 +64,7 @@ public class MainViewController extends BaseController {
     private MenuItem _aboutMenuItem;
 
     @FXML
-    private ToggleGroup _compressionType;
+    private RadioButton _compressRadioButton;
 
     @FXML
     private TextArea _textArea;
@@ -108,11 +107,22 @@ public class MainViewController extends BaseController {
     @FXML
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
-            ArchivingOperation op = null;
+
+            boolean compress = _compressRadioButton.isSelected();
+            String archiveType = _archiveTypeComboBox.getValue();
+
             try {
-                // TODO
-                _control.performStartButtonAction(op);
-            } catch (IOException | ArchiveException | CompressorException ex) {
+                ArchiveInfo info = compress
+                        ? ArchiveInfoFactory.createArchiveInfo(archiveType, 0)
+                        : ArchiveInfoFactory.createArchiveInfo(archiveType);
+
+                Task< Boolean> task = new Task<Boolean>() {
+                    @Override
+                    protected Boolean call() throws Exception {
+                        return true;
+                    }
+                };
+            } catch (GZipperException ex) {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -121,7 +131,7 @@ public class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            ArchivingOperation op = null;
+            ArchiveInfo op = null;
             // TODO
         }
     }
@@ -132,10 +142,6 @@ public class MainViewController extends BaseController {
             FileChooser fc = new FileChooser();
             // TODO: select archive or files
         }
-    }
-
-    public MainViewController() {
-        _control = new MainViewControl(_settings);
     }
 
     @Override
@@ -171,4 +177,5 @@ public class MainViewController extends BaseController {
 
         _textArea.setText("run:\n" + _resources.getString("changeOutputPath.text") + "\n");
     }
+
 }

@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
  * Implementing class offers methods for compressing and extracting archives.
@@ -30,10 +31,11 @@ import org.apache.commons.compress.compressors.CompressorException;
 public interface ArchivingAlgorithm {
 
     /**
-     * Extracts archive using defined algorithm of class to the specified path.
+     * Extracts an archive using the algorithm of the concrete class and stores
+     * the files of the archive to the specified path.
      *
-     * @param path The absolute path of the archive to extract
-     * @param name The filename of the archive to extract
+     * @param path The absolute path of the archive to extract.
+     * @param name The filename of the archive to extract.
      * @throws java.io.IOException
      * @throws org.apache.commons.compress.archivers.ArchiveException
      * @throws org.apache.commons.compress.compressors.CompressorException
@@ -42,17 +44,40 @@ public interface ArchivingAlgorithm {
             throws IOException, ArchiveException, CompressorException;
 
     /**
-     * Compresses files using defined algorithm of class with default settings
-     * and creates an archive to the specified path.
+     * Extracts an archive using the algorithm of the concrete class and stores
+     * the files of the archive to the path specified in {@link ArchiveInfo}.
      *
-     * @param files The files selected from the file chooser
-     * @param location Where to store the archive
-     * @param name The name of the archive
+     * @param info POJO that holds information required for extraction.
+     * @throws IOException
+     * @throws ArchiveException
+     * @throws CompressorException
+     */
+    void extract(ArchiveInfo info) throws IOException, ArchiveException, CompressorException;
+
+    /**
+     * Compresses files using the algorithm of the concrete class with default
+     * settings and stores an archive to the specified path.
+     *
+     * @param files The files selected from the file chooser.
+     * @param location Where to store the archive.
+     * @param name The name of the archive.
      * @throws java.io.IOException
      * @throws org.apache.commons.compress.archivers.ArchiveException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
     void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException;
+
+    /**
+     * Compresses files using the algorithm of the concrete class with default
+     * settings and stores an archive to the path specified in
+     * {@link ArchiveInfo}.
+     *
+     * @param info POJO that holds information required for compression.
+     * @throws IOException
+     * @throws ArchiveException
+     * @throws CompressorException
+     */
+    void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException;
 
 }

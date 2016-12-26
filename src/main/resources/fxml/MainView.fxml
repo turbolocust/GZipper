@@ -121,12 +121,12 @@
                         <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="1">
                             <children>
                                 <Label text="%mode.text" />
-                                <RadioButton mnemonicParsing="false" selected="true" text="%compress.text">
+                                <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" selected="true" text="%compress.text">
                                     <toggleGroup>
                                         <ToggleGroup fx:id="_compressionType" />
                                     </toggleGroup>
                                 </RadioButton>
-                                <RadioButton mnemonicParsing="false" text="%decompress.text" toggleGroup="$_compressionType" />
+                                <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" text="%decompress.text" toggleGroup="$_compressionType" />
                             </children>
                             <GridPane.margin>
                                 <Insets left="15.0" />

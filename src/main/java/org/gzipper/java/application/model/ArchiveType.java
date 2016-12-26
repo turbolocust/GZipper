@@ -36,7 +36,7 @@ public enum ArchiveType {
         _name = name;
     }
 
-    public ArchiveType determineArchiveType(String name) {
+    public static ArchiveType determineArchiveType(String name) {
 
         ArchiveType archiveType = null;
         for (ArchiveType type : values()) {

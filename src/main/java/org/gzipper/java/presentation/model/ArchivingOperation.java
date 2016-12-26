@@ -16,58 +16,48 @@
  */
 package org.gzipper.java.presentation.model;
 
-import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.application.model.CompressionStrength;
+import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.presentation.GZipper;
 
 /**
- * POJO class that hold information required for archiving operations.
  *
  * @author Matthias Fussenegger
  */
 public class ArchivingOperation {
 
-    private final ArchiveType _archiveType;
-
-    private final CompressionStrength _strength;
-
-    private final List<File> _files;
-
-    private final String _archiveName;
-
-    private final String _outputPath;
+    private final ArchiveInfo _archiveInfo;
 
     private final boolean _compress;
 
-    public ArchivingOperation(ArchiveType archiveType, String archiveName, boolean compress,
-            CompressionStrength strength, List<File> files, String outputPath) {
-        _archiveType = archiveType;
-        _archiveName = archiveName;
+    public ArchivingOperation(ArchiveInfo info, boolean compress) {
+        _archiveInfo = info;
         _compress = compress;
-        _strength = strength;
-        _files = files;
-        _outputPath = outputPath;
     }
 
-    public ArchiveType getArchiveType() {
-        return _archiveType;
-    }
+    public boolean performOperation() {
 
-    public CompressionStrength getStrength() {
-        return _strength;
-    }
+        ArchiveType archiveType = _archiveInfo.getArchiveType();
+        ArchivingAlgorithm algorithm = archiveType.determineArchivingAlgorithm();
 
-    public List<File> getFiles() {
-        return _files;
-    }
-
-    public String getArchiveName() {
-        return _archiveName;
-    }
-
-    public String getOutputPath() {
-        return _outputPath;
+        boolean success = false;
+        try {
+            if (isCompress()) {
+                algorithm.compress(_archiveInfo);
+            } else {
+                algorithm.extract(_archiveInfo);
+            }
+            success = true;
+        } catch (IOException | CompressorException | ArchiveException ex) {
+            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return success;
     }
 
     public boolean isCompress() {
