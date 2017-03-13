@@ -16,31 +16,31 @@
  */
 package org.gzipper.java.application.util;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
  *
  * @author Matthias Fussenegger
  */
-public class ThreadHandler {
+public class TaskHandler {
 
-    private final ExecutorService _executorService;
+    private final Executor _executor;
 
-    private ThreadHandler() {
-        _executorService = Executors.newSingleThreadExecutor();
+    private TaskHandler() {
+        _executor = Executors.newCachedThreadPool();
     }
 
-    public static ThreadHandler getInstance() {
-        return ThreadHandlerHolder.INSTANCE;
+    public static TaskHandler getInstance() {
+        return TaskHandlerHolder.INSTANCE;
     }
 
     public void execute(Runnable command) {
-        _executorService.execute(command);
+        _executor.execute(command);
     }
 
-    private static class ThreadHandlerHolder {
+    private static class TaskHandlerHolder {
 
-        private static final ThreadHandler INSTANCE = new ThreadHandler();
+        private static final TaskHandler INSTANCE = new TaskHandler();
     }
 }

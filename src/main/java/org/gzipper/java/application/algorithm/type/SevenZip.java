@@ -24,7 +24,7 @@ import org.gzipper.java.application.algorithm.AbstractAlgorithm;
  *
  * @author Matthias Fussenegger
  */
-public class SevenZip extends AbstractAlgorithm implements ArchiveType {
+public class SevenZip extends AbstractAlgorithm {
 
     private SevenZip() {
         super(ArchiveStreamFactory.SEVEN_Z, CompressorStreamFactory.LZMA);

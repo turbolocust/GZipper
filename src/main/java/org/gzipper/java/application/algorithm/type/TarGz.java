@@ -25,7 +25,7 @@ import org.gzipper.java.application.algorithm.AbstractAlgorithm;
  *
  * @author Matthias Fussenegger
  */
-public class TarGz extends AbstractAlgorithm implements ArchiveType {
+public class TarGz extends AbstractAlgorithm {
 
     private TarGz() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);

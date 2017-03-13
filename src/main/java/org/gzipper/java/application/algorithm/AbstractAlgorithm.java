@@ -32,6 +32,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -125,8 +126,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     }
 
     @Override
-    public void compress(File[] files, String location, String name) throws IOException, ArchiveException, CompressorException {
+    public void extract(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
+        extract(info.getOutputPath(), info.getArchiveName());
+    }
 
+    @Override
+    public void compress(File[] files, String location, String name) throws IOException, ArchiveException, CompressorException {
         // check if location ends with separator, which is required for output stream
         String path = location.endsWith(File.separator) ? location : location + File.separator;
 
@@ -137,6 +142,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 = ARCHIVE_STREAM_FACTORY.createArchiveOutputStream(_archiveType, cos)) {
             compress(files, name, outputStream);
         }
+    }
+
+    @Override
+    public void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
+        final File[] files = new File[info.getFiles().size()];
+        compress(info.getFiles().toArray(files), info.getOutputPath(), info.getArchiveName());
     }
 
     /**
