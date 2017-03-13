@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-pref-height: 32em; -fx-pref-width: 48em;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.gzipper.java.presentation.MainViewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-pref-height: 32em; -fx-pref-width: 48em;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.gzipper.java.presentation.MainViewController">
     <children>
         <BorderPane layoutX="146.0" layoutY="85.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
@@ -56,12 +56,12 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                        <Button fx:id="_startButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
                                 <Insets />
                             </GridPane.margin>
                         </Button>
-                        <Button disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" prefWidth="300.0" text="%abort.text" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                        <Button fx:id="_abortButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" prefWidth="300.0" text="%abort.text" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
                                 <Insets />
                             </GridPane.margin>
@@ -101,15 +101,15 @@
                                         </MenuItem>
                                         <Menu mnemonicParsing="false" text="%compressionLevelMenuItem.text">
                                             <items>
-                                                <MenuItem mnemonicParsing="false" text="%veryLowCompression.text" />
-                                                <MenuItem mnemonicParsing="false" text="%lowCompression.text" />
-                                                <MenuItem mnemonicParsing="false" text="%mediumCompression.text" />
-                                                <MenuItem mnemonicParsing="false" text="%goodCompression.text" />
-                                                <MenuItem mnemonicParsing="false" text="%bestCompression.text" />
+                                                <MenuItem fx:id="_veryLowCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%veryLowCompression.text" />
+                                                <MenuItem fx:id="_lowCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%lowCompression.text" />
+                                                <MenuItem fx:id="_mediumCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%mediumCompression.text" />
+                                                <MenuItem fx:id="_goodCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%goodCompression.text" />
+                                                <MenuItem fx:id="_bestCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestCompression.text" />
                                             </items>
                                         </Menu>
                                         <SeparatorMenuItem mnemonicParsing="false" />
-                                        <CheckMenuItem disable="true" mnemonicParsing="false" text="%enableLoggingMenuItem.text" />
+                                        <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" disable="true" mnemonicParsing="false" text="%enableLoggingMenuItem.text" />
                                     </items>
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="%helpMenu.text">
@@ -127,11 +127,11 @@
                             <children>
                                 <Label text="%mode.text" />
                                 <RadioButton mnemonicParsing="false" selected="true" text="%compress.text">
-                                    <toggleGroup>
-                                        <ToggleGroup fx:id="compressionType" />
-                                    </toggleGroup>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="_compressionType" />
+                           </toggleGroup>
                                 </RadioButton>
-                                <RadioButton mnemonicParsing="false" text="%decompress.text" toggleGroup="$compressionType" />
+                                <RadioButton mnemonicParsing="false" text="%decompress.text" toggleGroup="$_compressionType" />
                             </children>
                             <GridPane.margin>
                                 <Insets left="15.0" />
@@ -150,7 +150,7 @@
                                 <Insets left="15.0" />
                             </GridPane.margin>
                             <children>
-                                <Button mnemonicParsing="false" prefWidth="100.0" text="%select.text" textAlignment="CENTER">
+                                <Button fx:id="_selectFilesButton" mnemonicParsing="false" prefWidth="100.0" text="%select.text" textAlignment="CENTER">
                                     <padding>
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>
