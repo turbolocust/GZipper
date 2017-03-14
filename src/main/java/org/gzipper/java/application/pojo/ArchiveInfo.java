@@ -19,7 +19,6 @@ package org.gzipper.java.application.pojo;
 import java.io.File;
 import java.util.List;
 import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.application.model.CompressionStrength;
 
 /**
  * POJO class that hold information required for archiving operations.
@@ -28,9 +27,9 @@ import org.gzipper.java.application.model.CompressionStrength;
  */
 public class ArchiveInfo {
 
-    private ArchiveType _archiveType;
+    private final ArchiveType _archiveType;
 
-    private CompressionStrength _strength;
+    private int _level;
 
     private List<File> _files;
 
@@ -38,14 +37,20 @@ public class ArchiveInfo {
 
     private String _outputPath;
 
-    public ArchiveInfo() {
+    public ArchiveInfo(ArchiveType archiveType) {
+        _archiveType = archiveType;
+    }
+
+    public ArchiveInfo(ArchiveType archiveType, int level) {
+        _archiveType = archiveType;
+        _level = level;
     }
 
     public ArchiveInfo(ArchiveType archiveType, String archiveName,
-            CompressionStrength strength, List<File> files, String outputPath) {
+            int level, List<File> files, String outputPath) {
         _archiveType = archiveType;
         _archiveName = archiveName;
-        _strength = strength;
+        _level = level;
         _files = files;
         _outputPath = outputPath;
     }
@@ -54,16 +59,12 @@ public class ArchiveInfo {
         return _archiveType;
     }
 
-    public void setArchiveType(ArchiveType archiveType) {
-        _archiveType = archiveType;
+    public int getLevel() {
+        return _level;
     }
 
-    public CompressionStrength getStrength() {
-        return _strength;
-    }
-
-    public void setStrength(CompressionStrength strength) {
-        _strength = strength;
+    public void setLevel(int level) {
+        _level = level;
     }
 
     public List<File> getFiles() {

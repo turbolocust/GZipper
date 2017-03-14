@@ -82,12 +82,7 @@ public abstract class BaseController implements Initializable {
             button.setMaxSize(Double.MAX_VALUE, 30);
             WebView webView = new WebView();
             // TODO: replace with internationalized string
-            webView.getEngine().loadContent("<html><br /><p align=\"center\">"
-                    + "<br />Author: Matthias Fussenegger<br />E-mail: matfu2@me.com<br /><b>v2017-10-02</b><br />"
-                    + "<br />This program uses parts of the commons-compress library by Apache Foundation"
-                    + "&nbsp;and is licensed under the GNU General Public License 3 "
-                    + "(<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>)"
-                    + "&nbsp;<br />&nbsp;</p></html>");
+            webView.getEngine().loadContent(_resources.getString("aboutWindow.text"));
             webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             webView.setContextMenuEnabled(false);
             gridPane.add(webView, 0, 0);

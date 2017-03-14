@@ -28,12 +28,19 @@ import org.gzipper.java.application.algorithm.type.Zip;
  */
 public enum ArchiveType {
 
-    ZIP("Zip"), TAR_GZ("TarGz"), TAR_BZ("TarBz2"), RAR("Rar"), SEVEN_Z("SevenZip");
+    ZIP("Zip", "ZIP (.zip)"),
+    TAR_GZ("TarGz", "TAR+GZ (.tar.gz)"),
+    TAR_BZ("TarBz2", "TAR+BZ2 (.tar.bz2)"),
+    RAR("Rar", "RAR (.rar)"),
+    SEVEN_Z("SevenZip", "SEVEN ZIP (.7z)");
 
     private final String _name;
 
-    ArchiveType(String name) {
+    private final String _friendlyName;
+
+    ArchiveType(String name, String friendlyName) {
         _name = name;
+        _friendlyName = friendlyName;
     }
 
     public static ArchiveType determineArchiveType(String name) {
@@ -73,4 +80,9 @@ public enum ArchiveType {
     public String getName() {
         return _name;
     }
+
+    public String getFriendlyName() {
+        return _friendlyName;
+    }
+
 }

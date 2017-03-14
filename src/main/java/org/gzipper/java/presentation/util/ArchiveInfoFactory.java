@@ -16,8 +16,8 @@
  */
 package org.gzipper.java.presentation.util;
 
+import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.application.model.CompressionStrength;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 
@@ -27,29 +27,28 @@ import org.gzipper.java.exceptions.GZipperException;
  */
 public class ArchiveInfoFactory {
 
-    public static ArchiveInfo createArchiveInfo(String archiveType, int strengthIndex) throws GZipperException {
+    public static ArchiveInfo createArchiveInfo(String type, int level) throws GZipperException {
 
-        ArchiveInfo info = new ArchiveInfo();
-        ArchiveType type = ArchiveType.determineArchiveType(archiveType);
-        CompressionStrength strength = CompressionStrength.determineCompressionStrength(strengthIndex);
+        ArchiveType archiveType = ArchiveType.determineArchiveType(type);
 
-        if (type == null || strength == null) {
-            throw new GZipperException("Archive type or compression strength could not be determined.");
+        if (archiveType == null) {
+            throw new GZipperException("Archive type could not be determined.");
+        } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
+            throw new GZipperException("Faulty compression level specified.");
         }
 
-        return info;
+        return new ArchiveInfo(archiveType, level);
     }
 
-    public static ArchiveInfo createArchiveInfo(String archiveType) throws GZipperException {
+    public static ArchiveInfo createArchiveInfo(String type) throws GZipperException {
 
-        ArchiveInfo info = new ArchiveInfo();
-        ArchiveType type = ArchiveType.determineArchiveType(archiveType);
+        ArchiveType archiveType = ArchiveType.determineArchiveType(type);
 
-        if (type == null) {
+        if (archiveType == null) {
             throw new GZipperException("Archive type could not be determined.");
         }
 
-        return info;
+        return new ArchiveInfo(archiveType);
     }
 
 }

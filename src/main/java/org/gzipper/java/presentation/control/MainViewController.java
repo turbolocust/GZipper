@@ -20,12 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.Deflater;
 import javafx.concurrent.Task;
 
 import org.gzipper.java.application.model.OperatingSystem;
@@ -44,12 +46,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.presentation.AlertDialog;
 import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.application.model.CompressionStrength;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
@@ -65,7 +66,7 @@ public class MainViewController extends BaseController {
     /**
      * Key constant used to access the properties map for menu items.
      */
-    private static final String COMPRESSION_STRENGTH_KEY = "compressionStrength";
+    private static final String COMPRESSION_LEVEL_KEY = "compressionLevel";
 
     /**
      * The currently active task. Multiple tasks may be supported in the future.
@@ -78,21 +79,18 @@ public class MainViewController extends BaseController {
     private List<File> _selectedFiles;
 
     /**
-     * The chosen compression strength.
+     * The compression level. Initialized with default compression level.
      */
-    private CompressionStrength _compressionStrength;
+    private int _compressionLevel = Deflater.DEFAULT_COMPRESSION;
 
     @FXML
-    private MenuItem _veryLowCompressionMenuItem;
+    private MenuItem _noCompressionMenuItem;
 
     @FXML
-    private MenuItem _lowCompressionMenuItem;
+    private MenuItem _bestSpeedCompressionMenuItem;
 
     @FXML
-    private MenuItem _mediumCompressionMenuItem;
-
-    @FXML
-    private MenuItem _goodCompressionMenuItem;
+    private MenuItem _defaultCompressionMenuItem;
 
     @FXML
     private MenuItem _bestCompressionMenuItem;
@@ -113,9 +111,6 @@ public class MainViewController extends BaseController {
     private CheckMenuItem _enableLoggingCheckMenuItem;
 
     @FXML
-    private ToggleGroup _compressionType;
-
-    @FXML
     private TextField _outputPath;
 
     @FXML
@@ -133,12 +128,12 @@ public class MainViewController extends BaseController {
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
-        Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_STRENGTH_KEY);
+        Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
 
         if (compressionStrength != null) {
-            _compressionStrength = (CompressionStrength) compressionStrength;
+            _compressionLevel = (int) compressionStrength;
             Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                    "Compression level set to: {0}", _compressionStrength.name());
+                    "Compression level set to: {0}", _compressionLevel);
         }
     }
 
@@ -198,7 +193,7 @@ public class MainViewController extends BaseController {
     }
 
     @FXML
-    void handleSelectButtonAction(ActionEvent evt) {
+    void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
 
             FileChooser fc = new FileChooser();
@@ -307,12 +302,24 @@ public class MainViewController extends BaseController {
 
             _settings = new Settings(settingsFile, os);
 
-            // set up properties for menu items regarding compression strength
-            _veryLowCompressionMenuItem.getProperties().put(COMPRESSION_STRENGTH_KEY, CompressionStrength.VERY_LOW);
-            _lowCompressionMenuItem.getProperties().put(COMPRESSION_STRENGTH_KEY, CompressionStrength.LOW);
-            _mediumCompressionMenuItem.getProperties().put(COMPRESSION_STRENGTH_KEY, CompressionStrength.MEDIUM);
-            _goodCompressionMenuItem.getProperties().put(COMPRESSION_STRENGTH_KEY, CompressionStrength.GOOD);
-            _bestCompressionMenuItem.getProperties().put(COMPRESSION_STRENGTH_KEY, CompressionStrength.BEST);
+            // set up properties for menu items regarding compression level
+            _noCompressionMenuItem.getProperties().put(
+                    COMPRESSION_LEVEL_KEY, Deflater.NO_COMPRESSION);
+            _bestSpeedCompressionMenuItem.getProperties().put(
+                    COMPRESSION_LEVEL_KEY, Deflater.BEST_SPEED);
+            _defaultCompressionMenuItem.getProperties().put(
+                    COMPRESSION_LEVEL_KEY, Deflater.DEFAULT_COMPRESSION);
+            _bestCompressionMenuItem.getProperties().put(
+                    COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
+
+            // set up combo box items
+            List<String> typeNames = new ArrayList<>(ArchiveType.values().length);
+            for (ArchiveType type : ArchiveType.values()) {
+                typeNames.add(type.getFriendlyName());
+            }
+
+            _archiveTypeComboBox.getItems().addAll(typeNames);
+            _archiveTypeComboBox.setValue(typeNames.get(0));
 
         } catch (IOException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
