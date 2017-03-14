@@ -23,16 +23,31 @@ import java.io.File;
  *
  * @author Matthias Fussenegger
  */
-public class FileValidator {
+public class FileUtil {
 
     /**
-     * Validates the file path.
+     * Validates the specified path, which has to be a directory.
      *
-     * @param path The path to be validated
-     * @return True if path is valid, false otherwise
+     * @param path The path as string to be validated.
+     * @return True if path exists and is a directory, false otherwise.
      */
-    public static boolean isValidPath(String path) {
+    public static boolean isValidDirectory(String path) {
         File file = new File(path);
         return file.exists() && file.isDirectory();
     }
+
+    public static String generateFileName(String name) {
+
+        File file = new File(name);
+        int suffix = 2; // will be appended to file name if it already exists
+
+        while (file.exists()) {
+            String fileName = file.getName() + " (" + suffix + ")";
+            file = new File(fileName);
+            ++suffix;
+        }
+
+        return file.getAbsolutePath();
+    }
+
 }

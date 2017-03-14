@@ -69,6 +69,11 @@ public class MainViewController extends BaseController {
     private static final String COMPRESSION_LEVEL_KEY = "compressionLevel";
 
     /**
+     * The default archive name of an archive if not explicitly specified.
+     */
+    private static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
+
+    /**
      * The currently active task. Multiple tasks may be supported in the future.
      */
     private Task<Boolean> _activeTask;
@@ -77,6 +82,11 @@ public class MainViewController extends BaseController {
      * A list consisting of the selected files or the selected archive.
      */
     private List<File> _selectedFiles;
+
+    /**
+     * The archive name specified by user.
+     */
+    private String _archiveName;
 
     /**
      * The compression level. Initialized with default compression level.
@@ -111,7 +121,7 @@ public class MainViewController extends BaseController {
     private CheckMenuItem _enableLoggingCheckMenuItem;
 
     @FXML
-    private TextField _outputPath;
+    private TextField _outputPathTextField;
 
     @FXML
     private ComboBox<String> _archiveTypeComboBox;
@@ -124,6 +134,12 @@ public class MainViewController extends BaseController {
 
     @FXML
     private Button _selectFilesButton;
+
+    public MainViewController() {
+        _archiveName = DEFAULT_ARCHIVE_NAME;
+        Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                "Default archive name set to: {0}", _archiveName);
+    }
 
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
@@ -161,26 +177,33 @@ public class MainViewController extends BaseController {
     @FXML
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
+            if (isValidOutputPath(_outputPathTextField.getText())) {
 
-            boolean compress = _compressRadioButton.isSelected();
-            String archiveType = _archiveTypeComboBox.getValue();
+                boolean compress = _compressRadioButton.isSelected();
+                String archiveType = _archiveTypeComboBox.getValue();
 
-            try {
-                ArchiveInfo info = compress
-                        ? ArchiveInfoFactory.createArchiveInfo(archiveType, 0)
-                        : ArchiveInfoFactory.createArchiveInfo(archiveType);
+                try {
+                    ArchiveInfo info = compress
+                            ? ArchiveInfoFactory.createArchiveInfo(archiveType, 0)
+                            : ArchiveInfoFactory.createArchiveInfo(archiveType);
 
-                // TODO: set archive name, file(s) and output path (needs validation)
-                ArchivingOperation operation = new ArchivingOperation(info, compress);
+                    // TODO: set archive name, file(s) and output path (needs validation)
+                    ArchivingOperation operation = new ArchivingOperation(info, compress);
 
-                Task<Boolean> task = initArchivingJob(operation);
+                    Task<Boolean> task = initArchivingJob(operation);
 
-                _activeTask = task;
-                toggleStartAndAbortButton();
-                TaskHandler.getInstance().execute(_activeTask);
+                    _activeTask = task;
+                    toggleStartAndAbortButton();
+                    TaskHandler.getInstance().execute(_activeTask);
 
-            } catch (GZipperException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (GZipperException ex) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
+                        "Operation cannot be started as an invalid path has been specified.");
+                appendToTextArea(_resources.getString("outputPathWarning.text"));
+                _outputPathTextField.requestFocus();
             }
         }
     }
@@ -207,6 +230,27 @@ public class MainViewController extends BaseController {
                 _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
             }
         }
+    }
+
+    @FXML
+    void handleSaveAsButtonAction(ActionEvent evt) {
+        //TODO
+    }
+
+    @FXML
+    void handleArchiveTypeComboBoxAction(ActionEvent evt) {
+        if (evt.getSource().equals(_archiveTypeComboBox)) {
+            int i = _archiveTypeComboBox.getSelectionModel().getSelectedIndex();
+            Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                    "Archive type selection change to: {0}",
+                    _archiveTypeComboBox.getItems().get(i)
+            );
+        }
+    }
+
+    private boolean isValidOutputPath(String input) {
+        //TODO
+        return false;
     }
 
     /**

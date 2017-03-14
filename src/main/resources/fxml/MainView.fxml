@@ -131,7 +131,7 @@
                                 <Insets left="15.0" />
                             </GridPane.margin>
                         </HBox>
-                        <TextField fx:id="_outputPath" promptText="%outputPath.text" GridPane.rowIndex="3">
+                        <TextField fx:id="_outputPathTextField" promptText="%outputPath.text" GridPane.rowIndex="3">
                             <GridPane.margin>
                                 <Insets left="2.0" right="2.0" />
                             </GridPane.margin>
@@ -149,9 +149,10 @@
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>
                                 </Button>
+                        <Button fx:id="_saveAsButton" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAs.text" />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                                 <Label text="%compressAs.text" />
-                                <ComboBox fx:id="_archiveTypeComboBox" prefWidth="150.0" promptText="..." />
+                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="150.0" promptText="..." />
                             </children>
                         </HBox>
                     </children>
