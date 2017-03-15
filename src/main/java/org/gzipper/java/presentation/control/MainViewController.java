@@ -48,6 +48,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.gzipper.java.application.model.ArchiveType;
@@ -238,19 +239,13 @@ public class MainViewController extends BaseController {
     @FXML
     void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
-
-            FileChooser fc = new FileChooser();
-
+            FileChooser fc;
             if (_compressRadioButton.isSelected()) {
-                //TODO: fix extension filter
-                ExtensionFilter extFilter
-                        = new ExtensionFilter("Archive types", EXTENION_NAMES);
-                fc.setSelectedExtensionFilter(extFilter);
-                fc.setTitle(_resources.getString("browseForFiles.text"));
+                fc = ChooserFactory.createChooserForFiles();
                 _selectedFiles = new LinkedList<>();
                 _selectedFiles.add(fc.showOpenDialog(_primaryStage));
             } else {
-                fc.setTitle(_resources.getString("browseForArchive.text"));
+                fc = ChooserFactory.createChooserForArchives();
                 _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
             }
         }
@@ -259,21 +254,19 @@ public class MainViewController extends BaseController {
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
-
-            FileChooser fc = new FileChooser();
             if (_compressRadioButton.isSelected()) {
-                ExtensionFilter extFilter
-                        = new ExtensionFilter("Archive types", EXTENION_NAMES);
-                fc.setSelectedExtensionFilter(extFilter);
-                fc.setTitle(_resources.getString("saveAsArchiveTitle.text"));
+                FileChooser fc = ChooserFactory.createChooserForSavingArchive();
+                File file = fc.showSaveDialog(_primaryStage);
+                if (file != null) {
+                    _outputPathTextField.setText(file.getAbsolutePath());
+                    _archiveName = file.getName();
+                }
             } else {
-                fc.setTitle(_resources.getString("saveAsPathTitle.text"));
-            }
-
-            File file = fc.showSaveDialog(_primaryStage);
-            if (file != null) {
-                _outputPathTextField.setText(file.getAbsolutePath());
-                _archiveName = file.getName();
+                DirectoryChooser dc = ChooserFactory.createChooserForDirectory();
+                File dir = dc.showDialog(_primaryStage);
+                if (dir != null) {
+                    _outputPathTextField.setText(dir.getAbsolutePath());
+                }
             }
         }
     }
@@ -432,6 +425,37 @@ public class MainViewController extends BaseController {
         _frameImage = new Image("/images/icon_32.png");
 
         _textArea.setText("run:\n" + _resources.getString("changeOutputPath.text") + "\n");
+    }
+
+    public static class ChooserFactory {
+
+        public static FileChooser createChooserForArchives() {
+            FileChooser fc = new FileChooser();
+            ExtensionFilter extFilter
+                    = new ExtensionFilter("Archive types", EXTENION_NAMES);
+            fc.getExtensionFilters().add(extFilter);
+            fc.setTitle(_resources.getString("browseForArchive.text"));
+            return fc;
+        }
+
+        public static FileChooser createChooserForFiles() {
+            FileChooser fc = new FileChooser();
+            fc.setTitle(_resources.getString("browseForFiles.text"));
+            return fc;
+        }
+
+        public static FileChooser createChooserForSavingArchive() {
+            FileChooser fc = new FileChooser();
+            //TODO: extension filters
+            fc.setTitle(_resources.getString("saveAsArchiveTitle.text"));
+            return fc;
+        }
+
+        public static DirectoryChooser createChooserForDirectory() {
+            DirectoryChooser dc = new DirectoryChooser();
+            dc.setTitle(_resources.getString("saveAsPathTitle.text"));
+            return dc;
+        }
     }
 
 }
