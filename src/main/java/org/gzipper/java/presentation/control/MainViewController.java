@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +49,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.presentation.AlertDialog;
 import org.gzipper.java.presentation.GZipper;
@@ -72,6 +74,18 @@ public class MainViewController extends BaseController {
      * The default archive name of an archive if not explicitly specified.
      */
     private static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
+
+    /**
+     * A list with names of supported file extensions for archives.
+     */
+    private static final List<String> EXTENION_NAMES;
+
+    static {
+        EXTENION_NAMES = new ArrayList<>(ArchiveType.values().length);
+        for (ArchiveType type : ArchiveType.values()) {
+            EXTENION_NAMES.addAll(Arrays.asList(type.getExtensionNames()));
+        }
+    }
 
     /**
      * The currently active task. Multiple tasks may be supported in the future.
@@ -115,6 +129,9 @@ public class MainViewController extends BaseController {
     private RadioButton _compressRadioButton;
 
     @FXML
+    private RadioButton _decompressRadioButton;
+
+    @FXML
     private TextArea _textArea;
 
     @FXML
@@ -134,6 +151,9 @@ public class MainViewController extends BaseController {
 
     @FXML
     private Button _selectFilesButton;
+
+    @FXML
+    private Button _saveAsButton;
 
     public MainViewController() {
         _archiveName = DEFAULT_ARCHIVE_NAME;
@@ -220,13 +240,17 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_selectFilesButton)) {
 
             FileChooser fc = new FileChooser();
-            fc.setTitle(_resources.getString("select.text"));
 
-            // TODO: extension filter
             if (_compressRadioButton.isSelected()) {
+                //TODO: fix extension filter
+                ExtensionFilter extFilter
+                        = new ExtensionFilter("Archive types", EXTENION_NAMES);
+                fc.setSelectedExtensionFilter(extFilter);
+                fc.setTitle(_resources.getString("browseForFiles.text"));
                 _selectedFiles = new LinkedList<>();
                 _selectedFiles.add(fc.showOpenDialog(_primaryStage));
             } else {
+                fc.setTitle(_resources.getString("browseForArchive.text"));
                 _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
             }
         }
@@ -234,7 +258,40 @@ public class MainViewController extends BaseController {
 
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
-        //TODO
+        if (evt.getSource().equals(_saveAsButton)) {
+
+            FileChooser fc = new FileChooser();
+            if (_compressRadioButton.isSelected()) {
+                ExtensionFilter extFilter
+                        = new ExtensionFilter("Archive types", EXTENION_NAMES);
+                fc.setSelectedExtensionFilter(extFilter);
+                fc.setTitle(_resources.getString("saveAsArchiveTitle.text"));
+            } else {
+                fc.setTitle(_resources.getString("saveAsPathTitle.text"));
+            }
+
+            File file = fc.showSaveDialog(_primaryStage);
+            if (file != null) {
+                _outputPathTextField.setText(file.getAbsolutePath());
+                _archiveName = file.getName();
+            }
+        }
+    }
+
+    @FXML
+    void handleCompressRadioButtonAction(ActionEvent evt) {
+        if (evt.getSource().equals(_compressRadioButton)) {
+            _selectFilesButton.setText(_resources.getString("browseForFiles.text"));
+            _saveAsButton.setText(_resources.getString("saveAsArchive.text"));
+        }
+    }
+
+    @FXML
+    void handleDecompressRadioButtonAction(ActionEvent evt) {
+        if (evt.getSource().equals(_decompressRadioButton)) {
+            _selectFilesButton.setText(_resources.getString("browseForArchive.text"));
+            _saveAsButton.setText(_resources.getString("saveAsFiles.text"));
+        }
     }
 
     @FXML
@@ -359,7 +416,9 @@ public class MainViewController extends BaseController {
             // set up combo box items
             List<String> typeNames = new ArrayList<>(ArchiveType.values().length);
             for (ArchiveType type : ArchiveType.values()) {
-                typeNames.add(type.getFriendlyName());
+                String typeName = type.getDisplayName()
+                        + " (" + type.getExtensionNames()[0] + ")";
+                typeNames.add(typeName);
             }
 
             _archiveTypeComboBox.getItems().addAll(typeNames);

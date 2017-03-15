@@ -120,12 +120,12 @@
                         <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="1">
                             <children>
                                 <Label text="%mode.text" />
-                                <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" selected="true" text="%compress.text">
+                                <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" onAction="#handleCompressRadioButtonAction" selected="true" text="%compress.text">
                                     <toggleGroup>
                                         <ToggleGroup fx:id="_compressionType" />
                                     </toggleGroup>
                                 </RadioButton>
-                                <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" text="%decompress.text" toggleGroup="$_compressionType" />
+                                <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleDecompressRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
                             </children>
                             <GridPane.margin>
                                 <Insets left="15.0" />
@@ -144,15 +144,15 @@
                                 <Insets left="15.0" />
                             </GridPane.margin>
                             <children>
-                                <Button fx:id="_selectFilesButton" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" prefWidth="100.0" text="%select.text" textAlignment="CENTER">
+                                <Button fx:id="_selectFilesButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
                                     <padding>
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>
                                 </Button>
-                        <Button fx:id="_saveAsButton" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAs.text" />
+                        <Button fx:id="_saveAsButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                                 <Label text="%compressAs.text" />
-                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="150.0" promptText="..." />
+                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="180.0" promptText="..." />
                             </children>
                         </HBox>
                     </children>
