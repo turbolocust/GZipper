@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.presentation.util;
 
+import java.io.File;
+import java.util.List;
 import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
@@ -27,7 +29,18 @@ import org.gzipper.java.exceptions.GZipperException;
  */
 public class ArchiveInfoFactory {
 
-    public static ArchiveInfo createArchiveInfo(String type, int level) throws GZipperException {
+    /**
+     *
+     * @param type
+     * @param level
+     * @param archiveName
+     * @param files
+     * @param outputPath
+     * @return
+     * @throws GZipperException
+     */
+    public static ArchiveInfo createArchiveInfo(String type, String archiveName,
+            int level, List<File> files, String outputPath) throws GZipperException {
 
         ArchiveType archiveType = ArchiveType.determineArchiveType(type);
 
@@ -37,10 +50,19 @@ public class ArchiveInfoFactory {
             throw new GZipperException("Faulty compression level specified.");
         }
 
-        return new ArchiveInfo(archiveType, level);
+        return new ArchiveInfo(archiveType, archiveName, level, files, outputPath);
     }
 
-    public static ArchiveInfo createArchiveInfo(String type) throws GZipperException {
+    /**
+     *
+     * @param type
+     * @param archiveName
+     * @param outputPath
+     * @return
+     * @throws GZipperException
+     */
+    public static ArchiveInfo createArchiveInfo(String type, String archiveName,
+            String outputPath) throws GZipperException {
 
         ArchiveType archiveType = ArchiveType.determineArchiveType(type);
 
@@ -48,7 +70,7 @@ public class ArchiveInfoFactory {
             throw new GZipperException("Archive type could not be determined.");
         }
 
-        return new ArchiveInfo(archiveType);
+        return new ArchiveInfo(archiveType, archiveName, 0, null, outputPath);
     }
 
 }

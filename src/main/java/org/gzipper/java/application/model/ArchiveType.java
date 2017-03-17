@@ -91,4 +91,9 @@ public enum ArchiveType {
         return _extensionNames;
     }
 
+    @Override
+    public String toString() {
+        return _displayName + " (" + _extensionNames[0] + ")";
+    }
+
 }

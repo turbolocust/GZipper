@@ -37,15 +37,6 @@ public class ArchiveInfo {
 
     private String _outputPath;
 
-    public ArchiveInfo(ArchiveType archiveType) {
-        _archiveType = archiveType;
-    }
-
-    public ArchiveInfo(ArchiveType archiveType, int level) {
-        _archiveType = archiveType;
-        _level = level;
-    }
-
     public ArchiveInfo(ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) {
         _archiveType = archiveType;

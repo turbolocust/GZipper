@@ -139,7 +139,7 @@
                                 <Insets bottom="4.0" top="2.0" />
                             </padding>
                         </TextField>
-                        <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="2">
+                        <HBox alignment="CENTER_LEFT" spacing="8.0" GridPane.rowIndex="2">
                             <GridPane.margin>
                                 <Insets left="15.0" />
                             </GridPane.margin>
@@ -149,10 +149,10 @@
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>
                                 </Button>
-                        <Button fx:id="_saveAsButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
+                                <Button fx:id="_saveAsButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                                 <Label text="%compressAs.text" />
-                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="180.0" promptText="..." />
+                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="160.0" promptText="..." />
                             </children>
                         </HBox>
                     </children>

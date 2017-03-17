@@ -36,6 +36,11 @@ public class FileUtil {
         return file.exists() && file.isDirectory();
     }
 
+    public static boolean isValidFileName(String path) {
+        File file = new File(path);
+        return !file.exists() && !file.isDirectory();
+    }
+
     public static String generateFileName(String name) {
 
         File file = new File(name);
