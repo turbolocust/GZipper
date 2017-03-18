@@ -348,7 +348,6 @@ public class MainViewController extends BaseController {
                 appendToTextArea(_resources.getString("operationFail.text"));
             }
             finalizeArchivingJob(operation);
-            e.consume();
         });
         task.setOnCancelled(e -> {
             appendToTextArea(_resources.getString("operationCancel.text"));
@@ -374,7 +373,7 @@ public class MainViewController extends BaseController {
      */
     private void finalizeArchivingJob(ArchivingOperation operation) {
         appendToTextArea(_resources.getString("elapsedTime.text")
-                + operation.calculateElapsedTime());
+                + operation.calculateElapsedTime() + " seconds.");
         toggleStartAndAbortButton();
     }
 

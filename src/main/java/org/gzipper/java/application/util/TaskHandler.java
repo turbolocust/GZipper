@@ -18,6 +18,7 @@ package org.gzipper.java.application.util;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javafx.concurrent.Task;
 
 /**
  *
@@ -35,12 +36,13 @@ public class TaskHandler {
         return TaskHandlerHolder.INSTANCE;
     }
 
-    public void execute(Runnable command) {
-        _executor.execute(command);
+    public void execute(Task<?> task) {
+        _executor.execute(task);
     }
 
     private static class TaskHandlerHolder {
 
         private static final TaskHandler INSTANCE = new TaskHandler();
     }
+
 }

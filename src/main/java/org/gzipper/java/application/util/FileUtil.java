@@ -26,7 +26,7 @@ import java.io.File;
 public class FileUtil {
 
     /**
-     * Validates the specified path, which has to be a directory.
+     * Validates the specified path, which has to be the path of a directory.
      *
      * @param path The path as string to be validated.
      * @return True if path exists and is a directory, false otherwise.
@@ -36,23 +36,15 @@ public class FileUtil {
         return file.exists() && file.isDirectory();
     }
 
+    /**
+     * Validates the specified path, which has to be the path of a file.
+     *
+     * @param path The path as string to be validated.
+     * @return True if path exists and is not a directory, false otherwise.
+     */
     public static boolean isValidFileName(String path) {
         File file = new File(path);
         return !file.exists() && !file.isDirectory();
-    }
-
-    public static String generateFileName(String name) {
-
-        File file = new File(name);
-        int suffix = 2; // will be appended to file name if it already exists
-
-        while (file.exists()) {
-            String fileName = file.getName() + " (" + suffix + ")";
-            file = new File(fileName);
-            ++suffix;
-        }
-
-        return file.getAbsolutePath();
     }
 
 }

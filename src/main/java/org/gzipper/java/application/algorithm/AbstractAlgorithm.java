@@ -131,16 +131,18 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     }
 
     @Override
-    public void compress(File[] files, String location, String name) throws IOException, ArchiveException, CompressorException {
+    public void compress(File[] files, String location, String name)
+            throws IOException, ArchiveException, CompressorException {
         // check if location ends with separator, which is required for output stream
         String path = location.endsWith(File.separator) ? location : location + File.separator;
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
-        CompressorOutputStream cos = COMPRESSOR_STREAM_FACTORY.createCompressorOutputStream(_compressionType, bos);
+        CompressorOutputStream cos = COMPRESSOR_STREAM_FACTORY
+                .createCompressorOutputStream(_compressionType, bos);
 
-        try (ArchiveOutputStream outputStream
-                = ARCHIVE_STREAM_FACTORY.createArchiveOutputStream(_archiveType, cos)) {
-            compress(files, name, outputStream);
+        try (ArchiveOutputStream aos = ARCHIVE_STREAM_FACTORY
+                .createArchiveOutputStream(_archiveType, cos)) {
+            compress(files, name, aos);
         }
     }
 

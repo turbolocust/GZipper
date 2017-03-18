@@ -32,14 +32,14 @@ import javafx.stage.Stage;
  * application may not work at all.
  *
  * @author Matthias Fussenegger
- * @version 2017-03-13
+ * @version 2017-03-18
  */
 public class GZipper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
-        loader.setResources(ResourceBundle.getBundle("gzipperMainView", Locale.ENGLISH));
+        loader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView", Locale.ENGLISH));
 
         Parent root = loader.load();
 
@@ -61,4 +61,5 @@ public class GZipper extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    
 }
