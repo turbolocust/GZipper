@@ -26,6 +26,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * EXPERIMENTAL - still in active development. Use with caution as this
@@ -43,11 +44,17 @@ public class GZipper extends Application {
 
         Parent root = loader.load();
 
-        /*associate primary stage with controller*/
+        // associate primary stage with controller
         MainViewController gfc = loader.getController();
         gfc.setPrimaryStage(stage);
 
         Scene scene = new Scene(root);
+
+        // properly shut down application when closing window
+        stage.setOnCloseRequest((WindowEvent evt) -> {
+            evt.consume();
+            System.exit(0);
+        });
 
         stage.setTitle("GZipper");
         stage.getIcons().add(BaseController.getFrameImage());
@@ -61,5 +68,5 @@ public class GZipper extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }

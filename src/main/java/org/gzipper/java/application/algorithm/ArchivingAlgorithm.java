@@ -18,9 +18,12 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
@@ -52,7 +55,8 @@ public interface ArchivingAlgorithm {
      * @throws ArchiveException
      * @throws CompressorException
      */
-    void extract(ArchiveInfo info) throws IOException, ArchiveException, CompressorException;
+    void extract(ArchiveInfo info)
+            throws IOException, ArchiveException, CompressorException;
 
     /**
      * Compresses files using the algorithm of the concrete class with default
@@ -78,6 +82,33 @@ public interface ArchivingAlgorithm {
      * @throws ArchiveException
      * @throws CompressorException
      */
-    void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException;
+    void compress(ArchiveInfo info)
+            throws IOException, ArchiveException, CompressorException;
+
+    /**
+     * Creates a new instance of an {@link ArchiveOutputStream}. This is
+     * required so that specific algorithms can apply individual parameters.
+     *
+     * @param stream The {@link OutputStream} being used when creating a new
+     * {@link ArchiveOutputStream}.
+     * @return New instance of {@link ArchiveOutputStream}.
+     * @throws java.io.IOException
+     * @throws org.apache.commons.compress.archivers.ArchiveException
+     */
+    ArchiveOutputStream makeArchiveOutputStream(
+            OutputStream stream) throws IOException, ArchiveException;
+
+    /**
+     * Creates a new instance of an {@link CompressorOutputStream}. This can be
+     * used so specific algorithms can e.g. skip the compression if required.
+     *
+     * @param stream The {@link OutputStream} being used when creating a new
+     * {@link CompressorOutputStream}.
+     * @return New instance of {@link CompressorOutputStream}.
+     * @throws IOException
+     * @throws CompressorException
+     */
+    CompressorOutputStream makeCompressorOutputStream(
+            OutputStream stream) throws IOException, CompressorException;
 
 }

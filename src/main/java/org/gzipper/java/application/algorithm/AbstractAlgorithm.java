@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -44,29 +45,29 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
 public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
 
     /**
+     * The compression level. Will only be considered if supported by algorithm.
+     */
+    protected int _compressionLevel;
+
+    /**
      * Type of the archive.
      */
-    private final String _archiveType;
+    protected final String _archiveType;
 
     /**
      * Type of compressor stream.
      */
-    private final String _compressionType;
+    protected final String _compressionType;
 
     /**
      * Factory to create archive streams.
      */
-    private static final ArchiveStreamFactory ARCHIVE_STREAM_FACTORY;
+    protected final ArchiveStreamFactory _archiveStreamFactory;
 
     /**
      * Factory to create compressor streams.
      */
-    private static final CompressorStreamFactory COMPRESSOR_STREAM_FACTORY;
-
-    static {
-        ARCHIVE_STREAM_FACTORY = new ArchiveStreamFactory();
-        COMPRESSOR_STREAM_FACTORY = new CompressorStreamFactory();
-    }
+    protected final CompressorStreamFactory _compressorStreamFactory;
 
     /**
      * Creates a new object of the child class for archiving operations.
@@ -77,15 +78,17 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     protected AbstractAlgorithm(String archiveType, String compressionType) {
         _archiveType = archiveType;
         _compressionType = compressionType;
+        _archiveStreamFactory = new ArchiveStreamFactory();
+        _compressorStreamFactory = new CompressorStreamFactory();
     }
 
     @Override
     public void extract(String location, String name) throws IOException, ArchiveException, CompressorException {
 
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(location + name));
-        CompressorInputStream cis = COMPRESSOR_STREAM_FACTORY.createCompressorInputStream(_compressionType, bis);
+        CompressorInputStream cis = _compressorStreamFactory.createCompressorInputStream(_compressionType, bis);
 
-        try (ArchiveInputStream inputStream = ARCHIVE_STREAM_FACTORY.createArchiveInputStream(_archiveType, cis)) {
+        try (ArchiveInputStream inputStream = _archiveStreamFactory.createArchiveInputStream(_archiveType, cis)) {
 
             ArchiveEntry entry = inputStream.getNextEntry();
 
@@ -137,11 +140,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         String path = location.endsWith(File.separator) ? location : location + File.separator;
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
-        CompressorOutputStream cos = COMPRESSOR_STREAM_FACTORY
-                .createCompressorOutputStream(_compressionType, bos);
+        CompressorOutputStream cos =  makeCompressorOutputStream(bos);
 
-        try (ArchiveOutputStream aos = ARCHIVE_STREAM_FACTORY
-                .createArchiveOutputStream(_archiveType, cos)) {
+        try (ArchiveOutputStream aos = makeArchiveOutputStream(cos)) {
             compress(files, name, aos);
         }
     }
@@ -149,6 +150,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     @Override
     public void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
         final File[] files = new File[info.getFiles().size()];
+        _compressionLevel = info.getLevel();
         compress(info.getFiles().toArray(files), info.getOutputPath(), info.getArchiveName());
     }
 
@@ -189,6 +191,18 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 }
             }
         }
+    }
+
+    @Override
+    public ArchiveOutputStream makeArchiveOutputStream(
+            OutputStream stream) throws IOException, ArchiveException {
+        return _archiveStreamFactory.createArchiveOutputStream(_archiveType, stream);
+    }
+
+    @Override
+    public CompressorOutputStream makeCompressorOutputStream(
+            OutputStream stream) throws IOException, CompressorException {
+        return _compressorStreamFactory.createCompressorOutputStream(_compressionType, stream);
     }
 
     /**

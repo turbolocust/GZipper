@@ -18,25 +18,15 @@ package org.gzipper.java.application.algorithm.type;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.gzipper.java.application.algorithm.AbstractAlgorithm;
 
 /**
  * Offers algorithms to compress and decompress TAR+BZIP2 archives.
  *
  * @author Matthias Fussenegger
  */
-public class TarBzip2 extends AbstractAlgorithm {
+public class TarBzip2 extends Tarball {
 
-    private TarBzip2() {
+    public TarBzip2() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
-    }
-
-    public static TarBzip2 getInstance() {
-        return TarBzip2Holder.INSTANCE;
-    }
-
-    private static class TarBzip2Holder {
-
-        private static final TarBzip2 INSTANCE = new TarBzip2();
     }
 }
