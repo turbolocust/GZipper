@@ -437,8 +437,10 @@ public class MainViewController extends BaseController {
 
         public abstract boolean validateOutputPath();
 
-        public abstract ArchivingOperation initOperation(String archiveType)
-                throws GZipperException;
+        public abstract void applyExtensionFilters(FileChooser chooser);
+
+        public abstract ArchivingOperation initOperation(
+                String archiveType) throws GZipperException;
 
         public void performOperation(ArchivingOperation operation) {
             if (operation != null) {
@@ -448,15 +450,6 @@ public class MainViewController extends BaseController {
             }
         }
 
-        public void applyExtensionFilters(FileChooser chooser) {
-            if (chooser != null) {
-                for (ArchiveType type : ArchiveType.values()) {
-                    ExtensionFilter extFilter = new ExtensionFilter(
-                            type.getDisplayName(), type.getExtensionNames());
-                    chooser.getExtensionFilters().add(extFilter);
-                }
-            }
-        }
     }
 
     private class CompressStrategy extends ArchivingStrategy {
@@ -485,6 +478,21 @@ public class MainViewController extends BaseController {
             return new ArchivingOperation(info, true);
         }
 
+        @Override
+        public void applyExtensionFilters(FileChooser chooser) {
+            if (chooser != null) {
+                final ArchiveType selectedType = _archiveTypeComboBox
+                        .getSelectionModel()
+                        .getSelectedItem();
+                for (ArchiveType type : ArchiveType.values()) {
+                    if (type.equals(selectedType)) {
+                        ExtensionFilter extFilter = new ExtensionFilter(
+                                type.getDisplayName(), type.getExtensionNames());
+                        chooser.getExtensionFilters().add(extFilter);
+                    }
+                }
+            }
+        }
     }
 
     private class DecompressStrategy extends ArchivingStrategy {
@@ -511,6 +519,17 @@ public class MainViewController extends BaseController {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _selectedFile.getParent());
             return new ArchivingOperation(info, false);
+        }
+
+        @Override
+        public void applyExtensionFilters(FileChooser chooser) {
+            if (chooser != null) {
+                for (ArchiveType type : ArchiveType.values()) {
+                    ExtensionFilter extFilter = new ExtensionFilter(
+                            type.getDisplayName(), type.getExtensionNames());
+                    chooser.getExtensionFilters().add(extFilter);
+                }
+            }
         }
     }
 

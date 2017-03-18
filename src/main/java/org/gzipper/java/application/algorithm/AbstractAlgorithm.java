@@ -30,7 +30,6 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
@@ -86,9 +85,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     public void extract(String location, String name) throws IOException, ArchiveException, CompressorException {
 
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(location + name));
-        CompressorInputStream cis = _compressorStreamFactory.createCompressorInputStream(_compressionType, bis);
-
-        try (ArchiveInputStream inputStream = _archiveStreamFactory.createArchiveInputStream(_archiveType, cis)) {
+        try (ArchiveInputStream inputStream = _archiveStreamFactory.createArchiveInputStream(_archiveType, bis)) {
 
             ArchiveEntry entry = inputStream.getNextEntry();
 
@@ -140,9 +137,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         String path = location.endsWith(File.separator) ? location : location + File.separator;
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
-        CompressorOutputStream cos =  makeCompressorOutputStream(bos);
-
-        try (ArchiveOutputStream aos = makeArchiveOutputStream(cos)) {
+        try (ArchiveOutputStream aos = makeArchiveOutputStream(bos)) {
             compress(files, name, aos);
         }
     }
