@@ -51,7 +51,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Button fx:id="_startButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleStartButtonAction" prefHeight="30.0" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                        <Button fx:id="_startButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleStartButtonAction" prefHeight="30.0" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
                                 <Insets />
                             </GridPane.margin>
@@ -144,7 +144,7 @@
                                 <Insets left="15.0" />
                             </GridPane.margin>
                             <children>
-                                <Button fx:id="_selectFilesButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
+                                <Button fx:id="_selectFilesButton" minWidth="140.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
                                     <padding>
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>

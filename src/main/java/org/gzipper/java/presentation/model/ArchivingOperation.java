@@ -52,7 +52,7 @@ public class ArchivingOperation {
 
         boolean success = false;
         try {
-            if (isCompress()) {
+            if (_compress) {
                 algorithm.compress(_archiveInfo);
             } else {
                 algorithm.extract(_archiveInfo);

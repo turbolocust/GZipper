@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -107,66 +105,66 @@ public class MainViewController extends BaseController {
      * The compression level. Initialized with default compression level.
      */
     private int _compressionLevel = Deflater.DEFAULT_COMPRESSION;
-    
+
     @FXML
     private MenuItem _noCompressionMenuItem;
-    
+
     @FXML
     private MenuItem _bestSpeedCompressionMenuItem;
-    
+
     @FXML
     private MenuItem _defaultCompressionMenuItem;
-    
+
     @FXML
     private MenuItem _bestCompressionMenuItem;
-    
+
     @FXML
     private MenuItem _closeMenuItem;
-    
+
     @FXML
     private MenuItem _deleteMenuItem;
-    
+
     @FXML
     private RadioButton _compressRadioButton;
-    
+
     @FXML
     private RadioButton _decompressRadioButton;
-    
+
     @FXML
     private TextArea _textArea;
-    
+
     @FXML
     private CheckMenuItem _enableLoggingCheckMenuItem;
-    
+
     @FXML
     private TextField _outputPathTextField;
-    
+
     @FXML
     private ComboBox<ArchiveType> _archiveTypeComboBox;
-    
+
     @FXML
     private Button _startButton;
-    
+
     @FXML
     private Button _abortButton;
-    
+
     @FXML
     private Button _selectFilesButton;
-    
+
     @FXML
     private Button _saveAsButton;
-    
+
     public MainViewController() {
         _archiveName = DEFAULT_ARCHIVE_NAME;
         Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                 "Default archive name set to: {0}", _archiveName);
     }
-    
+
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
         Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
-        
+
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
             Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
@@ -175,7 +173,7 @@ public class MainViewController extends BaseController {
                     "compressionLevelChange.text") + selectedItem.getText());
         }
     }
-    
+
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
@@ -183,7 +181,7 @@ public class MainViewController extends BaseController {
             System.exit(0);
         }
     }
-    
+
     @FXML
     void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
@@ -196,7 +194,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-    
+
     @FXML
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
@@ -210,18 +208,18 @@ public class MainViewController extends BaseController {
             }
         }
     }
-    
+
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
             _activeTask.cancel(true);
         }
     }
-    
+
     @FXML
     void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
-            
+
             FileChooser fc = new FileChooser();
             if (_compressRadioButton.isSelected()) {
                 fc.setTitle(_resources.getString("browseForFiles.text"));
@@ -229,25 +227,32 @@ public class MainViewController extends BaseController {
                 fc.setTitle(_resources.getString("browseForArchive.text"));
                 _strategy.applyExtensionFilters(fc);
             }
-            
+
             _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
-            
+
+            String message;
             if (_selectedFiles != null) {
                 _startButton.setDisable(false);
+                final int selectedFiles = _selectedFiles.size();
+                message = _resources.getString("filesSelected.text");
+                message = message.replace("{0}", Integer.toString(selectedFiles));
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                        "A total of {0} file(s) have been selected.", _selectedFiles.size());
+                        "A total of {0} file(s) have been selected.", selectedFiles);
             } else {
                 _startButton.setDisable(true);
-                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                        "No files have been selected.");
+                message = _resources.getString("noFilesSelected.text");
+                Logger.getLogger(GZipper.class.getName()).log(
+                        Level.INFO, "No files have been selected.");
             }
+
+            appendToTextArea(message);
         }
     }
-    
+
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
-            
+
             File file;
             if (_compressRadioButton.isSelected()) {
                 FileChooser fc = new FileChooser();
@@ -259,7 +264,7 @@ public class MainViewController extends BaseController {
                 dc.setTitle(_resources.getString("saveAsPathTitle.text"));
                 file = dc.showDialog(_primaryStage);
             }
-            
+
             if (file != null) {
                 if (!file.isDirectory()) {
                     _archiveName = file.getName();
@@ -269,7 +274,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-    
+
     @FXML
     void handleCompressRadioButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_compressRadioButton)) {
@@ -278,7 +283,7 @@ public class MainViewController extends BaseController {
             _saveAsButton.setText(_resources.getString("saveAsArchive.text"));
         }
     }
-    
+
     @FXML
     void handleDecompressRadioButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_decompressRadioButton)) {
@@ -287,7 +292,7 @@ public class MainViewController extends BaseController {
             _saveAsButton.setText(_resources.getString("saveAsFiles.text"));
         }
     }
-    
+
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
@@ -326,7 +331,7 @@ public class MainViewController extends BaseController {
     private void appendToTextArea(String text) {
         _textArea.appendText(text + "\n");
     }
-    
+
     private Task<Boolean> initArchivingJob(ArchivingOperation operation) {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
@@ -334,9 +339,14 @@ public class MainViewController extends BaseController {
                 return operation.performOperation();
             }
         };
-        
+
         task.setOnSucceeded(e -> {
-            appendToTextArea(_resources.getString("operationSuccess.text"));
+            boolean success = (boolean) e.getSource().getValue();
+            if (success) {
+                appendToTextArea(_resources.getString("operationSuccess.text"));
+            } else {
+                appendToTextArea(_resources.getString("operationFail.text"));
+            }
             finalizeArchivingJob(operation);
             e.consume();
         });
@@ -350,7 +360,7 @@ public class MainViewController extends BaseController {
             appendToTextArea(e.getSource().getException().getMessage());
             finalizeArchivingJob(operation);
         });
-        
+
         return task;
     }
 
@@ -367,11 +377,11 @@ public class MainViewController extends BaseController {
                 + operation.calculateElapsedTime());
         toggleStartAndAbortButton();
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            
+
             final String decPath = AppUtil.getDecodedRootPath(GZipper.class);
             OperatingSystem os; // to determine the users operating system
 
@@ -387,7 +397,7 @@ public class MainViewController extends BaseController {
             os = System.getProperty("os.name").startsWith("Windows")
                     ? new Windows()
                     : new Unix();
-            
+
             _settings = new Settings(settingsFile, os);
 
             // set recently used path from settings if valid
@@ -412,33 +422,34 @@ public class MainViewController extends BaseController {
             final ArchiveType[] archiveTypes = ArchiveType.values();
             _archiveTypeComboBox.getItems().addAll(archiveTypes);
             _archiveTypeComboBox.setValue(archiveTypes[0]);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         _resources = resources;
         _strategy = new CompressStrategy();
         _frameImage = new Image("/images/icon_32.png");
-        
+
         _textArea.setText("run:\n" + _resources.getString("changeOutputPath.text") + "\n");
     }
-    
+
     private abstract class ArchivingStrategy {
-        
-        abstract boolean validateOutputPath();
-        
-        abstract ArchivingOperation initOperation(String archiveType) throws GZipperException;
-        
-        void performOperation(ArchivingOperation operation) {
+
+        public abstract boolean validateOutputPath();
+
+        public abstract ArchivingOperation initOperation(String archiveType)
+                throws GZipperException;
+
+        public void performOperation(ArchivingOperation operation) {
             if (operation != null) {
                 _activeTask = initArchivingJob(operation);
                 toggleStartAndAbortButton();
                 TaskHandler.getInstance().execute(_activeTask);
             }
         }
-        
-        void applyExtensionFilters(FileChooser chooser) {
+
+        public void applyExtensionFilters(FileChooser chooser) {
             if (chooser != null) {
                 for (ArchiveType type : ArchiveType.values()) {
                     ExtensionFilter extFilter = new ExtensionFilter(
@@ -448,16 +459,16 @@ public class MainViewController extends BaseController {
             }
         }
     }
-    
+
     private class CompressStrategy extends ArchivingStrategy {
-        
+
         @Override
-        boolean validateOutputPath() {
+        public boolean validateOutputPath() {
             return FileUtil.isValidFileName(_outputPathTextField.getText());
         }
-        
+
         @Override
-        void performOperation(ArchivingOperation operation) {
+        public void performOperation(ArchivingOperation operation) {
             if (_selectedFiles != null) {
                 super.performOperation(operation);
             } else {
@@ -466,26 +477,26 @@ public class MainViewController extends BaseController {
                 appendToTextArea(_resources.getString("noFilesSelectedWarning.text"));
             }
         }
-        
+
         @Override
-        ArchivingOperation initOperation(String archiveType) throws GZipperException {
+        public ArchivingOperation initOperation(String archiveType) throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _compressionLevel,
-                    _selectedFiles, _selectedFile.getAbsolutePath());
+                    _selectedFiles, _selectedFile.getParent());
             return new ArchivingOperation(info, true);
         }
-        
+
     }
-    
+
     private class DecompressStrategy extends ArchivingStrategy {
-        
+
         @Override
-        boolean validateOutputPath() {
+        public boolean validateOutputPath() {
             return FileUtil.isValidDirectory(_outputPathTextField.getText());
         }
-        
+
         @Override
-        void performOperation(ArchivingOperation operation) {
+        public void performOperation(ArchivingOperation operation) {
             if (_selectedFile != null && _selectedFile.isDirectory()) {
                 super.performOperation(operation);
             } else {
@@ -495,12 +506,13 @@ public class MainViewController extends BaseController {
                 _outputPathTextField.requestFocus();
             }
         }
-        
+
         @Override
-        ArchivingOperation initOperation(String archiveType) throws GZipperException {
+        public ArchivingOperation initOperation(String archiveType) throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
-                    archiveType, _archiveName, _selectedFile.getAbsolutePath());
+                    archiveType, _archiveName, _selectedFile.getParent());
             return new ArchivingOperation(info, false);
         }
     }
+
 }
