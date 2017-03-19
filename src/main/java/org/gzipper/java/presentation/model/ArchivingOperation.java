@@ -84,4 +84,13 @@ public class ArchivingOperation {
         return _compress;
     }
 
+    /**
+     * Returns the aggregated instance of {@link ArchiveInfo}.
+     *
+     * @return the aggregated instance of {@link ArchiveInfo}.
+     */
+    public ArchiveInfo getArchiveInfo() {
+        return _archiveInfo;
+    }
+
 }

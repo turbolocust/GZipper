@@ -45,6 +45,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -304,6 +305,18 @@ public class MainViewController extends BaseController {
         }
     }
 
+    @FXML
+    void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
+        if (evt.getSource().equals(_outputPathTextField)) {
+            String fileName = _outputPathTextField.getText();
+            if (FileUtil.containsIllegalChars(fileName)) {
+                File file = new File(fileName);
+                _selectedFile = file;
+                _archiveName = file.getName();
+            }
+        }
+    }
+
     /**
      * Toggles both, the start and the abort button.
      */
@@ -344,8 +357,9 @@ public class MainViewController extends BaseController {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
                 appendToTextArea(_resources.getString("operationSuccess.text"));
-            } else {
+            } else { // operation failed
                 appendToTextArea(_resources.getString("operationFail.text"));
+                appendToTextArea(_resources.getString("missingAccessRights.text"));
             }
             finalizeArchivingJob(operation);
         });
@@ -356,7 +370,8 @@ public class MainViewController extends BaseController {
         });
         task.setOnFailed(e -> {
             appendToTextArea(_resources.getString("operationFail.text"));
-            appendToTextArea(e.getSource().getException().getMessage());
+            Logger.getLogger(GZipper.class.getName()).log(
+                    Level.SEVERE, null, e.getSource().getException());
             finalizeArchivingJob(operation);
         });
 
@@ -397,7 +412,8 @@ public class MainViewController extends BaseController {
                     ? new Windows()
                     : new Unix();
 
-            _settings = new Settings(settingsFile, os);
+            _settings = Settings.getInstance();
+            _settings.init(settingsFile, os, resources);
 
             // set recently used path from settings if valid
             String recentPath = _settings.getProperty("recentPath");
@@ -406,6 +422,7 @@ public class MainViewController extends BaseController {
             } else {
                 _outputPathTextField.setText(os.getDefaultUserDirectory());
             }
+            _selectedFile = new File(_outputPathTextField.getText());
 
             // set up properties for menu items regarding compression level
             _noCompressionMenuItem.getProperties().put(
@@ -446,6 +463,12 @@ public class MainViewController extends BaseController {
             if (operation != null) {
                 _activeTask = initArchivingJob(operation);
                 toggleStartAndAbortButton();
+                ArchiveInfo info = operation.getArchiveInfo();
+                appendToTextArea(_resources.getString("outputPath.text")
+                        + info.getOutputPath());
+                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                        _resources.getString("operationStarted.text"),
+                        new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
                 TaskHandler.getInstance().execute(_activeTask);
             }
         }

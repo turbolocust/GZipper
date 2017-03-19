@@ -23,6 +23,8 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
 
@@ -38,10 +40,18 @@ public class Zip extends AbstractAlgorithm {
     }
 
     @Override
-    public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) throws IOException, ArchiveException {
+    public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
+            throws IOException, ArchiveException {
         ZipArchiveOutputStream zaos = new ZipArchiveOutputStream(stream);
         zaos.setLevel(_compressionLevel);
         zaos.setUseZip64(Zip64Mode.AsNeeded);
         return zaos;
     }
+
+    @Override
+    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+            throws IOException, CompressorException {
+        return null; // as no compressor stream is required
+    }
+
 }

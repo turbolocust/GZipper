@@ -16,21 +16,36 @@
  */
 package org.gzipper.java.application.model;
 
+import org.apache.commons.compress.compressors.gzip.GzipParameters;
+
 /**
  *
  * @author Matthias Fussenegger
  */
 public enum OS {
 
-    WINDOWS("Windows"), UNIX("Unix");
+    UNIX("Unix", 3), WINDOWS("Windows", 11);
 
+    /**
+     * The name of the operating system.
+     */
     private final String _name;
 
-    OS(String name) {
+    /**
+     * The defined value as of {@link GzipParameters}.
+     */
+    private final int _value;
+
+    OS(String name, int value) {
         _name = name;
+        _value = value;
     }
 
     public String getName() {
         return _name;
+    }
+
+    public int getValue() {
+        return _value;
     }
 }

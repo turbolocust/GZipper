@@ -22,8 +22,13 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
+import org.gzipper.java.application.util.Settings;
 
 /**
  *
@@ -49,4 +54,19 @@ public class Tarball extends AbstractAlgorithm {
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         return taos;
     }
+
+    @Override
+    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+            throws IOException, CompressorException {
+        // configure additional parameters for compressor stream
+        GzipParameters params = new GzipParameters();
+        final Settings settings = Settings.getInstance();
+        int value = settings.getOperatingSystem().getCurrentSystem().getValue();
+        params.setOperatingSystem(value);
+        params.setCompressionLevel(_compressionLevel);
+        // apply additional parameters
+        GzipCompressorOutputStream gcos = new GzipCompressorOutputStream(stream, params);
+        return gcos;
+    }
+
 }

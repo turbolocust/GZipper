@@ -37,9 +37,9 @@ public interface ArchivingAlgorithm {
      * Extracts an archive using the algorithm of the concrete class and stores
      * the files of the archive to the specified path.
      *
-     * @param path The absolute path of the archive to extract.
-     * @param name The filename of the archive to extract.
-     * @throws java.io.IOException
+     * @param path the absolute path of the archive to extract.
+     * @param name the filename of the archive to extract.
+     * @throws java.io.IOException if an I/O error occurs.
      * @throws org.apache.commons.compress.archivers.ArchiveException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
@@ -51,7 +51,7 @@ public interface ArchivingAlgorithm {
      * the files of the archive to the path specified in {@link ArchiveInfo}.
      *
      * @param info POJO that holds information required for extraction.
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      * @throws ArchiveException
      * @throws CompressorException
      */
@@ -62,10 +62,10 @@ public interface ArchivingAlgorithm {
      * Compresses files using the algorithm of the concrete class with default
      * settings and stores an archive to the specified path.
      *
-     * @param files The files selected from the file chooser.
-     * @param location Where to store the archive.
-     * @param name The name of the archive.
-     * @throws java.io.IOException
+     * @param files the files selected from the file chooser.
+     * @param location defines where to store the archive.
+     * @param name the name of the archive.
+     * @throws java.io.IOException if an I/O error occurs.
      * @throws org.apache.commons.compress.archivers.ArchiveException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
@@ -78,7 +78,7 @@ public interface ArchivingAlgorithm {
      * {@link ArchiveInfo}.
      *
      * @param info POJO that holds information required for compression.
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      * @throws ArchiveException
      * @throws CompressorException
      */
@@ -89,10 +89,10 @@ public interface ArchivingAlgorithm {
      * Creates a new instance of an {@link ArchiveOutputStream}. This is
      * required so that specific algorithms can apply individual parameters.
      *
-     * @param stream The {@link OutputStream} being used when creating a new
+     * @param stream the {@link OutputStream} being used when creating a new
      * {@link ArchiveOutputStream}.
-     * @return New instance of {@link ArchiveOutputStream}.
-     * @throws java.io.IOException
+     * @return new instance of {@link ArchiveOutputStream}.
+     * @throws java.io.IOException if an I/O error occurs.
      * @throws org.apache.commons.compress.archivers.ArchiveException
      */
     ArchiveOutputStream makeArchiveOutputStream(
@@ -102,10 +102,10 @@ public interface ArchivingAlgorithm {
      * Creates a new instance of an {@link CompressorOutputStream}. This can be
      * used so specific algorithms can e.g. skip the compression if required.
      *
-     * @param stream The {@link OutputStream} being used when creating a new
+     * @param stream the {@link OutputStream} being used when creating a new
      * {@link CompressorOutputStream}.
-     * @return New instance of {@link CompressorOutputStream}.
-     * @throws IOException
+     * @return new instance of {@link CompressorOutputStream}.
+     * @throws IOException if an I/O error occurs.
      * @throws CompressorException
      */
     CompressorOutputStream makeCompressorOutputStream(

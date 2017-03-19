@@ -47,4 +47,16 @@ public class FileUtil {
         return !file.exists() && !file.isDirectory();
     }
 
+    /**
+     * Checks whether the file name contains illegal characters.
+     *
+     * @param fileName the name to be checked for illegal characters.
+     * @return true if file name contains illegal characters, false otherwise.
+     */
+    public static boolean containsIllegalChars(String fileName) {
+        return fileName.contains("<") || fileName.contains(">") || fileName.contains("/")
+                || fileName.contains("\\") || fileName.contains("|") || fileName.contains(":")
+                || fileName.contains("*") || fileName.contains("\"") || fileName.contains("?");
+    }
+
 }

@@ -33,7 +33,7 @@ import javafx.stage.WindowEvent;
  * application may not work at all.
  *
  * @author Matthias Fussenegger
- * @version 2017-03-18
+ * @version 2017-03-19
  */
 public class GZipper extends Application {
 

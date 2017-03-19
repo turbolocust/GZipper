@@ -18,8 +18,6 @@ package org.gzipper.java.presentation.control;
 
 import java.util.ResourceBundle;
 
-import org.gzipper.java.application.util.Settings;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -32,6 +30,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.gzipper.java.application.util.Settings;
 
 /**
  *
@@ -40,10 +39,6 @@ import javafx.stage.Stage;
 public abstract class BaseController implements Initializable {
 
     protected static Settings _settings;
-
-    public static Settings getSettings() {
-        return _settings;
-    }
 
     protected static Image _frameImage;
 
@@ -104,4 +99,5 @@ public abstract class BaseController implements Initializable {
             aboutWindow.show();
         }
     }
+
 }

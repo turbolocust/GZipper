@@ -21,8 +21,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gzipper.java.application.model.OperatingSystem;
+import org.gzipper.java.presentation.GZipper;
 
 /**
  *
@@ -30,22 +34,29 @@ import org.gzipper.java.application.model.OperatingSystem;
  */
 public class Settings {
 
-    private final OperatingSystem _os;
+    private Properties _properties;
 
     private final Properties _defaults;
 
-    private final Properties _properties;
+    private ResourceBundle _resourceBundle;
 
-    public Settings(String location, OperatingSystem os) throws IOException {
+    private OperatingSystem _operatingSystem;
 
+    private Settings() {
+        _defaults = initDefaults();
+    }
+
+    public void init(String location, OperatingSystem os, ResourceBundle bundle) {
         File f = new File(location);
 
-        _os = os; // to receive environment variables
-        _defaults = initDefaults();
+        _resourceBundle = bundle;
+        _operatingSystem = os; // to receive environment variables
         _properties = new Properties(_defaults);
 
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f))) {
             _properties.load(bis);
+        } catch (IOException ex) {
+            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -53,8 +64,8 @@ public class Settings {
 
         final Properties defaults = new Properties();
 
-		defaults.setProperty("loggingEnabled", "false");
-		defaults.setProperty("recentPath", _os.getDefaultUserDirectory());
+        defaults.setProperty("loggingEnabled", "false");
+        defaults.setProperty("recentPath", "");
 
         return defaults;
     }
@@ -65,6 +76,23 @@ public class Settings {
 
     public String getProperty(String key) {
         return _properties.getProperty(key);
+    }
+
+    public OperatingSystem getOperatingSystem() {
+        return _operatingSystem;
+    }
+
+    public ResourceBundle getResourceBundle() {
+        return _resourceBundle;
+    }
+
+    public static Settings getInstance() {
+        return SettingsHolder.INSTANCE;
+    }
+
+    private static class SettingsHolder {
+
+        private static Settings INSTANCE = new Settings();
     }
 
 }

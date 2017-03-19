@@ -23,6 +23,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -33,6 +36,8 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.util.Settings;
+import org.gzipper.java.presentation.GZipper;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -42,6 +47,12 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
  * @author Matthias Fussenegger
  */
 public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
+
+    /**
+     * Reference to the {@link ResourceBundle} received by {@link Settings} for
+     * easier logging.
+     */
+    private static ResourceBundle _resources;
 
     /**
      * The compression level. Will only be considered if supported by algorithm.
@@ -71,14 +82,15 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     /**
      * Creates a new object of the child class for archiving operations.
      *
-     * @param archiveType The type of the archive
-     * @param compressionType The type of the compressor stream
+     * @param archiveType the type of the archive.
+     * @param compressionType the type of the compressor stream.
      */
     protected AbstractAlgorithm(String archiveType, String compressionType) {
         _archiveType = archiveType;
         _compressionType = compressionType;
         _archiveStreamFactory = new ArchiveStreamFactory();
         _compressorStreamFactory = new CompressorStreamFactory();
+        _resources = Settings.getInstance().getResourceBundle();
     }
 
     @Override
@@ -98,11 +110,13 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
 
             while (entry != null) {
                 String entryName = entry.getName();
+
+                Logger.getLogger(GZipper.class.getName()).log(Level.INFO, "{0}{1}",
+                        new Object[]{_resources.getString("extracting.text"), entryName});
+
                 // check if entry contains a directory
                 if (entryName.contains(File.separator)) {
-
                     File newFile = new File(folder.getAbsolutePath() + File.separator + entryName);
-
                     if (!newFile.getParentFile().exists()) {
                         newFile.getParentFile().mkdirs(); // also creates parent directories
                     }
@@ -120,6 +134,8 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                 }
 
+                Logger.getLogger(GZipper.class.getName()).log(Level.INFO, "{0}{1}",
+                        new Object[]{_resources.getString("extracted.text"), entryName});
                 entry = inputStream.getNextEntry();
             }
         }
@@ -137,8 +153,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         String path = location.endsWith(File.separator) ? location : location + File.separator;
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
-        try (ArchiveOutputStream aos = makeArchiveOutputStream(bos)) {
-            compress(files, name, aos);
+
+        CompressorOutputStream cos = makeCompressorOutputStream(bos);
+        try (ArchiveOutputStream aos = cos != null
+                ? makeArchiveOutputStream(cos)
+                : makeArchiveOutputStream(bos)) {
+            compress(files, "", aos);
         }
     }
 
@@ -150,12 +170,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     }
 
     /**
-     * Internal method for compression and recursive call.
+     * Private method for compression and recursive call.
      *
-     * @param files The files to compress
-     * @param base The base path to store files to
-     * @param outputStream The output stream to use
-     * @throws IOException
+     * @param files the files to compress.
+     * @param base the base path to store files to.
+     * @param outputStream the output stream to use.
+     * @throws IOException if an I/O error occurs.
      */
     private void compress(File[] files, String base, ArchiveOutputStream outputStream) throws IOException {
 
@@ -169,6 +189,10 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 String entryName = base + newFile.getName();
                 // start compressing the file
                 if (newFile.isFile()) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                            "{0}{1}", new Object[]{
+                                _resources.getString("compressing.text"),
+                                newFile.getName()});
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
@@ -180,6 +204,10 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         }
                         outputStream.closeArchiveEntry();
                     }
+                    Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                            "{0}{1}", new Object[]{
+                                _resources.getString("compressed.text"),
+                                newFile.getName()});
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
                     compress(children, entryName + File.separator, outputStream);
@@ -203,13 +231,14 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     /**
      * Retrieves files from a specific directory; mandatory for compression.
      *
-     * @param path The path that contains the files to be compressed
-     * @return And array of files from the specified path
-     * @throws IOException If an error occurred
+     * @param path the path that contains the files to be compressed.
+     * @return an array of files from the specified path.
+     * @throws IOException if an I/O error occurs.
      */
     private File[] getFiles(String path) throws IOException {
         final File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
     }
+
 }

@@ -50,6 +50,19 @@ public class ArchiveInfoFactory {
             throw new GZipperException("Faulty compression level specified.");
         }
 
+        boolean hasExtension = false;
+        String[] extNames = archiveType.getExtensionNames();
+        for (String extName : extNames) {
+            if (archiveName.endsWith(extName.substring(1))) {
+                hasExtension = true;
+            }
+        }
+
+        if (!hasExtension) {
+            // add extension to archive name if missing
+            archiveName = archiveName + extNames[0].substring(1); // ignore the star
+        }
+
         return new ArchiveInfo(archiveType, archiveName, level, files, outputPath);
     }
 

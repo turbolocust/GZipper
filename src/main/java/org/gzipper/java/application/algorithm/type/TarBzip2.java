@@ -29,4 +29,5 @@ public class TarBzip2 extends Tarball {
     public TarBzip2() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
     }
+    
 }
