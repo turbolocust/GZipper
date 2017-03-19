@@ -16,8 +16,13 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * Offers algorithms to compress and decompress TAR+BZIP2 archives.
@@ -29,5 +34,11 @@ public class TarBzip2 extends Tarball {
     public TarBzip2() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
     }
-    
+
+    @Override
+    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+            throws IOException, CompressorException {
+        return new BZip2CompressorOutputStream(stream);
+    }
+
 }
