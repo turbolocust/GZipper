@@ -16,10 +16,14 @@
  */
 package org.gzipper.java.presentation;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import org.gzipper.java.presentation.control.BaseController;
 import org.gzipper.java.presentation.control.MainViewController;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -27,18 +31,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.gzipper.java.application.model.OperatingSystem;
+import org.gzipper.java.application.model.Unix;
+import org.gzipper.java.application.model.Windows;
+import org.gzipper.java.application.util.AppUtil;
+import org.gzipper.java.application.util.Settings;
 
 /**
- * EXPERIMENTAL - still in active development. Use with caution as this
- * application may not work at all.
+ * EXPERIMENTAL - still in active development.
  *
  * @author Matthias Fussenegger
- * @version 2017-03-19
+ * @version 2017-03-20
  */
 public class GZipper extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+
+        initApplication();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
         loader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView", Locale.ENGLISH));
 
@@ -49,6 +60,7 @@ public class GZipper extends Application {
         gfc.setPrimaryStage(stage);
 
         Scene scene = new Scene(root);
+        BaseController.getStages().add(stage);
 
         // properly shut down application when closing window
         stage.setOnCloseRequest((WindowEvent evt) -> {
@@ -60,6 +72,30 @@ public class GZipper extends Application {
         stage.getIcons().add(BaseController.getFrameImage());
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void initApplication() {
+        try {
+            final String decPath = AppUtil.getDecodedRootPath(getClass());
+
+            String settingsFile;
+            try { // locate settings file
+                settingsFile = AppUtil.getResource(GZipper.class, "/settings.properties");
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                settingsFile = decPath + "settings.properties";
+            }
+
+            // set operating system and instantiate settings file
+            OperatingSystem os = System.getProperty("os.name").startsWith("Windows")
+                    ? new Windows()
+                    : new Unix();
+
+            Settings.getInstance().init(settingsFile, os);
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

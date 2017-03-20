@@ -30,14 +30,15 @@ import org.gzipper.java.exceptions.GZipperException;
 public class ArchiveInfoFactory {
 
     /**
+     * Creates a new {@link ArchiveInfo} for compression operation.
      *
-     * @param type
-     * @param level
-     * @param archiveName
-     * @param files
-     * @param outputPath
-     * @return
-     * @throws GZipperException
+     * @param type the type of the archive as string.
+     * @param level the compression level of the archive.
+     * @param archiveName the name of the archive to create.
+     * @param files the files to be compressed.
+     * @param outputPath the path where to save the archive.
+     * @return {@link ArchiveInfo} that may be used for an operation.
+     * @throws GZipperException if archive type could not be determined.
      */
     public static ArchiveInfo createArchiveInfo(String type, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
@@ -67,12 +68,13 @@ public class ArchiveInfoFactory {
     }
 
     /**
+     * Creates a new {@link ArchiveInfo} for decompression operation.
      *
-     * @param type
-     * @param archiveName
-     * @param outputPath
-     * @return
-     * @throws GZipperException
+     * @param type the type of the archive as string.
+     * @param archiveName the name of the archive to extract.
+     * @param outputPath the path where to extract the archive.
+     * @return {@link ArchiveInfo} that may be used for an operation.
+     * @throws GZipperException if archive type could not be determined.
      */
     public static ArchiveInfo createArchiveInfo(String type, String archiveName,
             String outputPath) throws GZipperException {

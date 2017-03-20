@@ -16,8 +16,8 @@
  */
 package org.gzipper.java.presentation.control;
 
-import java.util.ResourceBundle;
-
+import java.util.HashSet;
+import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,7 +30,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.gzipper.java.application.util.Settings;
+import javafx.stage.WindowEvent;
+import org.gzipper.java.i18n.I18N;
 
 /**
  *
@@ -38,21 +39,22 @@ import org.gzipper.java.application.util.Settings;
  */
 public abstract class BaseController implements Initializable {
 
-    protected static Settings _settings;
+    /**
+     * A set with all the stages currently open.
+     */
+    protected static Set<Stage> _stages = new HashSet<>();
 
+    public static Set<Stage> getStages() {
+        return _stages;
+    }
+
+    /**
+     * The frame image used for each scene.
+     */
     protected static Image _frameImage;
 
     public static Image getFrameImage() {
         return _frameImage;
-    }
-
-    /**
-     * Resource bundle that contains locale-sensitive strings.
-     */
-    protected static ResourceBundle _resources;
-
-    public static ResourceBundle getResourceBundle() {
-        return _resources;
     }
 
     /**
@@ -69,15 +71,19 @@ public abstract class BaseController implements Initializable {
 
     @FXML
     protected void handleAboutMenuItemAction(ActionEvent evt) {
+        //TODO: move to AboutViewController.java
         if (evt.getSource().equals(_aboutMenuItem)) {
             Stage aboutWindow = new Stage();
+            aboutWindow.setOnCloseRequest((WindowEvent e) -> {
+                e.consume();
+                _stages.remove(aboutWindow);
+            });
             aboutWindow.getIcons().add(_frameImage);
             GridPane gridPane = new GridPane();
             Button button = new Button("Close");
             button.setMaxSize(Double.MAX_VALUE, 30);
             WebView webView = new WebView();
-            // TODO: replace with internationalized string
-            webView.getEngine().loadContent(_resources.getString("aboutWindow.text"));
+            webView.getEngine().loadContent(I18N.getString("aboutWindow.text"));
             webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             webView.setContextMenuEnabled(false);
             gridPane.add(webView, 0, 0);
@@ -96,8 +102,8 @@ public abstract class BaseController implements Initializable {
                     aboutWindow.close();
                 }
             });
+            _stages.add(aboutWindow);
             aboutWindow.show();
         }
     }
-
 }

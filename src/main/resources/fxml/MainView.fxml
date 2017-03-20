@@ -103,7 +103,8 @@
                                             </items>
                                         </Menu>
                                         <SeparatorMenuItem mnemonicParsing="false" />
-                                        <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" disable="true" mnemonicParsing="false" text="%enableLoggingMenuItem.text" />
+                                        <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" onAction="#handleEnableLoggingCheckMenuItemAction" disable="true" mnemonicParsing="false" text="%enableLoggingMenuItem.text" />
+                                        <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" onAction="#handleEnableDarkThemeCheckMenuItemAction" mnemonicParsing="false" text="%enableDarkThemeMenuItem.text" />
                                     </items>
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="%helpMenu.text">

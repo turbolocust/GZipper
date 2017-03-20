@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +35,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
-import org.gzipper.java.application.util.Settings;
+import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.GZipper;
 
 /**
@@ -47,12 +46,6 @@ import org.gzipper.java.presentation.GZipper;
  * @author Matthias Fussenegger
  */
 public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
-
-    /**
-     * Reference to the {@link ResourceBundle} received by {@link Settings} for
-     * easier logging.
-     */
-    private static ResourceBundle _resources;
 
     /**
      * The compression level. Will only be considered if supported by algorithm.
@@ -90,7 +83,6 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         _compressionType = compressionType;
         _archiveStreamFactory = new ArchiveStreamFactory();
         _compressorStreamFactory = new CompressorStreamFactory();
-        _resources = Settings.getInstance().getResourceBundle();
     }
 
     @Override
@@ -112,7 +104,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 String entryName = entry.getName();
 
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO, "{0}{1}",
-                        new Object[]{_resources.getString("extracting.text"), entryName});
+                        new Object[]{I18N.getString("extracting.text"), entryName});
 
                 // check if entry contains a directory
                 if (entryName.contains(File.separator)) {
@@ -135,7 +127,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 }
 
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO, "{0}{1}",
-                        new Object[]{_resources.getString("extracted.text"), entryName});
+                        new Object[]{I18N.getString("extracted.text"), entryName});
                 entry = inputStream.getNextEntry();
             }
         }
@@ -191,7 +183,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 if (newFile.isFile()) {
                     Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                             "{0}{1}", new Object[]{
-                                _resources.getString("compressing.text"),
+                                I18N.getString("compressing.text"),
                                 newFile.getName()});
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
@@ -206,7 +198,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                     Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                             "{0}{1}", new Object[]{
-                                _resources.getString("compressed.text"),
+                                I18N.getString("compressed.text"),
                                 newFile.getName()});
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());

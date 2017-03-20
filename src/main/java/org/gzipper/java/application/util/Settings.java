@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,18 +37,22 @@ public class Settings {
 
     private final Properties _defaults;
 
-    private ResourceBundle _resourceBundle;
-
     private OperatingSystem _operatingSystem;
 
     private Settings() {
         _defaults = initDefaults();
     }
 
-    public void init(String location, OperatingSystem os, ResourceBundle bundle) {
+    /**
+     * Initializes this singleton class. This should only be called once after a
+     * call of the {@link #getInstance()} method.
+     *
+     * @param location the location of the properties file.
+     * @param os the current operating system.
+     */
+    public void init(String location, OperatingSystem os) {
         File f = new File(location);
 
-        _resourceBundle = bundle;
         _operatingSystem = os; // to receive environment variables
         _properties = new Properties(_defaults);
 
@@ -74,6 +77,11 @@ public class Settings {
         return _properties.setProperty(key, value);
     }
 
+    public Object setProperty(String key, boolean value) {
+        final String propertyValue = value ? "true" : "false";
+        return _properties.setProperty(key, propertyValue);
+    }
+
     public String getProperty(String key) {
         return _properties.getProperty(key);
     }
@@ -82,14 +90,18 @@ public class Settings {
         return _operatingSystem;
     }
 
-    public ResourceBundle getResourceBundle() {
-        return _resourceBundle;
-    }
-
+    /**
+     * Returns the singleton instance of this class.
+     *
+     * @return the singleton instance of this class.
+     */
     public static Settings getInstance() {
         return SettingsHolder.INSTANCE;
     }
 
+    /**
+     * Holder class for singleton instance.
+     */
     private static class SettingsHolder {
 
         private static Settings INSTANCE = new Settings();
