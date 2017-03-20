@@ -70,10 +70,10 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
                         <MenuBar>
@@ -103,8 +103,8 @@
                                             </items>
                                         </Menu>
                                         <SeparatorMenuItem mnemonicParsing="false" />
-                                        <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" onAction="#handleEnableLoggingCheckMenuItemAction" disable="true" mnemonicParsing="false" text="%enableLoggingMenuItem.text" />
-                                        <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" onAction="#handleEnableDarkThemeCheckMenuItemAction" mnemonicParsing="false" text="%enableDarkThemeMenuItem.text" />
+                                        <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" disable="true" mnemonicParsing="false" onAction="#handleEnableLoggingCheckMenuItemAction" text="%enableLoggingMenuItem.text" />
+                                        <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />
                                     </items>
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="%helpMenu.text">
@@ -129,7 +129,7 @@
                                 <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleDecompressRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
                             </children>
                             <GridPane.margin>
-                                <Insets left="15.0" />
+                                <Insets left="16.0" />
                             </GridPane.margin>
                         </HBox>
                         <TextField fx:id="_outputPathTextField" onKeyTyped="#onOutputPathTextFieldKeyTyped" promptText="%outputPath.text" GridPane.rowIndex="3">
@@ -142,7 +142,7 @@
                         </TextField>
                         <HBox alignment="CENTER_LEFT" spacing="8.0" GridPane.rowIndex="2">
                             <GridPane.margin>
-                                <Insets left="15.0" />
+                                <Insets left="16.0" />
                             </GridPane.margin>
                             <children>
                                 <Button fx:id="_selectFilesButton" minWidth="140.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">

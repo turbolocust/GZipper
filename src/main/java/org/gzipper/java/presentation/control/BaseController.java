@@ -16,22 +16,24 @@
  */
 package org.gzipper.java.presentation.control;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.AlertDialog;
+import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.style.CSS;
 
 /**
  *
@@ -71,39 +73,30 @@ public abstract class BaseController implements Initializable {
 
     @FXML
     protected void handleAboutMenuItemAction(ActionEvent evt) {
-        //TODO: move to AboutViewController.java
         if (evt.getSource().equals(_aboutMenuItem)) {
-            Stage aboutWindow = new Stage();
-            aboutWindow.setOnCloseRequest((WindowEvent e) -> {
-                e.consume();
-                _stages.remove(aboutWindow);
-            });
-            aboutWindow.getIcons().add(_frameImage);
-            GridPane gridPane = new GridPane();
-            Button button = new Button("Close");
-            button.setMaxSize(Double.MAX_VALUE, 30);
-            WebView webView = new WebView();
-            webView.getEngine().loadContent(I18N.getString("aboutWindow.text"));
-            webView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            webView.setContextMenuEnabled(false);
-            gridPane.add(webView, 0, 0);
-            gridPane.add(button, 0, 1);
-            aboutWindow.setTitle("About");
-            aboutWindow.initOwner(_primaryStage);
-            aboutWindow.setScene(new Scene(gridPane, 600, 500));
-            aboutWindow.setResizable(false);
-            webView.setOnKeyPressed((KeyEvent event) -> {
-                if (event.getCode().equals(KeyCode.ESCAPE)) {
-                    aboutWindow.close();
-                }
-            });
-            button.setOnAction((ActionEvent e) -> {
-                if (e.getSource().equals(button)) {
-                    aboutWindow.close();
-                }
-            });
-            _stages.add(aboutWindow);
-            aboutWindow.show();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AboutView.fxml"));
+            AboutViewController controller = new AboutViewController();
+
+            fxmlLoader.setResources(I18N.getBundle());
+            fxmlLoader.setController(controller);
+
+            Stage aboutView = new Stage();
+            aboutView.initModality(Modality.WINDOW_MODAL);
+            controller.setPrimaryStage(aboutView);
+
+            try {
+                Scene scene = new Scene(fxmlLoader.load());
+                scene.getStylesheets().add(getClass().getResource(
+                        CSS.STYLESHEET_DARK_THEME).toExternalForm());
+                aboutView.getIcons().add(_frameImage);
+                aboutView.setTitle(I18N.getString("aboutTitle.text"));
+                aboutView.setScene(scene);
+                aboutView.showAndWait();
+            } catch (IOException ex) {
+                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                AlertDialog.showErrorDialog(I18N.getString("error.text"),
+                        I18N.getString("errorOpeningWindow.text"));
+            }
         }
     }
 }

@@ -54,6 +54,7 @@ import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.model.ArchivingOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
+import org.gzipper.java.style.CSS;
 
 /**
  *
@@ -434,7 +435,7 @@ public class MainViewController extends BaseController {
      */
     private void loadAlternativeTheme(boolean enableTheme) {
         final String sheetLocation = GZipper.class.getResource(
-                "/css/DarkTheme.css").toExternalForm();
+                CSS.STYLESHEET_DARK_THEME).toExternalForm();
         _stages.forEach((stage) -> {
             if (enableTheme) {
                 stage.getScene().getStylesheets().add(sheetLocation);

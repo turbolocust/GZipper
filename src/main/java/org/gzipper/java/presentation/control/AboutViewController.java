@@ -16,8 +16,20 @@
  */
 package org.gzipper.java.presentation.control;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
+import javafx.scene.web.WebView;
+import org.gzipper.java.application.util.AppUtil;
+import org.gzipper.java.presentation.GZipper;
 
 /**
  *
@@ -25,14 +37,47 @@ import java.util.ResourceBundle;
  */
 public class AboutViewController extends BaseController {
 
-    private String _appName = "GZipper";
-    private String _appVersion = "0.1 ALPHA";
-    private String _appBuildDate = "03/20/2017";
-    private String _appCopyright = "Matthias Fussenegger";
+    private final String _appName = "GZipper";
+    private final String _appVersion = "0.1 ALPHA";
+    private final String _appBuildDate = "03/20/2017";
+    private final String _appCopyright = "Matthias Fussenegger";
+
+    @FXML
+    private WebView _webView;
+
+    @FXML
+    private TextFlow _textFlow;
+
+    @FXML
+    private Button _closeButton;
+
+    @FXML
+    void handleCloseButtonAction(ActionEvent evt) {
+        if (evt.getSource().equals(_closeButton)) {
+            _primaryStage.close();
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+        _webView.setContextMenuEnabled(false);
 
+        try {
+            final String decPath = AppUtil.getDecodedRootPath(getClass());
+            _webView.getEngine().loadContent("<img src=\"file://" + decPath
+                    + "images/icon_256.png\" alt=\"images/icon_256.png\"");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        final Text appName = new Text(_appName + "\n");
+        final Text appVersion = new Text("Version" + ": " + _appVersion + "\n");
+        final Text appBuildDate = new Text(
+                resources.getString("buildDate.text") + ": " + _appBuildDate + "\n");
+        final Text appCopyright = new Text(
+                resources.getString("author.text") + ": " + _appCopyright + "\n");
+
+        _textFlow.setTextAlignment(TextAlignment.CENTER);
+        _textFlow.getChildren().addAll(appName, appVersion, appBuildDate, appCopyright);
+    }
 }
