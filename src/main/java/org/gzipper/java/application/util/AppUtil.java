@@ -42,9 +42,9 @@ public class AppUtil {
      * be stored in the system's temporary folder with the file extension
      * <b>.tmp</b>. The file will be deleted on JVM termination.
      *
-     * @param clazz The class of which to receive the resource path.
-     * @param name The name of the resource to receive.
-     * @return The resource path of the specified class.
+     * @param clazz the class of which to receive the resource path.
+     * @param name the name of the resource to receive.
+     * @return the resource path of the specified class.
      * @throws URISyntaxException
      */
     public static String getResource(Class<?> clazz, String name) throws URISyntaxException {
@@ -85,8 +85,8 @@ public class AppUtil {
     /**
      * Returns the decoded root path of the application's JAR-file.
      *
-     * @param clazz The class of which to receive the root path.
-     * @return The decoded root path of the JAR-file.
+     * @param clazz the class of which to receive the root path.
+     * @return the decoded root path of the JAR-file.
      * @throws UnsupportedEncodingException
      */
     public static String getDecodedRootPath(Class<?> clazz) throws UnsupportedEncodingException {
@@ -112,8 +112,8 @@ public class AppUtil {
     /**
      * Determines the cut length to get the application directory.
      *
-     * @param f The file to get cut length for.
-     * @return The cut length, that is the name of the executable or the folder.
+     * @param f the file to get cut length for.
+     * @return the cut length, that is the name of the executable or the folder.
      */
     private static int determineCutLength(File f) {
 

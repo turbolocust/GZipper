@@ -17,6 +17,11 @@
 package org.gzipper.java.application.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Used to validate files, e.g. file paths.
@@ -28,8 +33,8 @@ public class FileUtil {
     /**
      * Validates the specified path, which has to be the path of a directory.
      *
-     * @param path The path as string to be validated.
-     * @return True if path exists and is a directory, false otherwise.
+     * @param path the path as string to be validated.
+     * @return true if path exists and is a directory, false otherwise.
      */
     public static boolean isValidDirectory(String path) {
         File file = new File(path);
@@ -39,12 +44,12 @@ public class FileUtil {
     /**
      * Validates the specified path, which has to be the path of a file.
      *
-     * @param path The path as string to be validated.
-     * @return True if path exists and is not a directory, false otherwise.
+     * @param path the path as string to be validated.
+     * @return true if path exists and is not a directory, false otherwise.
      */
     public static boolean isValidFileName(String path) {
         File file = new File(path);
-        return !file.exists() && !file.isDirectory();
+        return file.isAbsolute() && !file.isDirectory();
     }
 
     /**
@@ -59,4 +64,20 @@ public class FileUtil {
                 || fileName.contains("*") || fileName.contains("\"") || fileName.contains("?");
     }
 
+    /**
+     * Copies a file from the specified source to destination. If no copy
+     * options are specified, the file at the destination will not be replaced
+     * in case it already exists.
+     *
+     * @param src the source path.
+     * @param dst the destination path.
+     * @param options optional copy options.
+     * @throws IOException if an I/O error occurs.
+     */
+    public static void copy(Path src, Path dst, CopyOption... options) throws IOException {
+        if (options == null) {
+            options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
+        }
+        Files.copy(src, dst, options);
+    }
 }
