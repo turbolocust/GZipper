@@ -1,16 +1,24 @@
 # GZipper
 
-<b>Motivation:</b><br>
+<b>Features:</b><br />
 
-This JAVA program builds on a seminary work and as my main archiving program does not support creating GZIP/TAR archives, I thought this would be a great opportunity to enhance my skills.<br>
-<br>
-<b>How it works:</b><br>
+* Compress and extract the following archive types:
+  - ZIP
+  - Tarball (GZIP)
+  - Tarball (BZIP2)
+* Compression levels can be adjusted.
+* Supports a dark theme (CSS style).
+  - More styles may be added in the future.
+* Languages which are supported:
+  - English
+  - German
+  
+<b>The application has been tested on these platforms:</b>
+ - Windows
+ - Unix-based systems
 
-Select files/folders to put them into an archive (tar.gz). By default, the archive will be created in the same folder where the JAR-file is located. Custom paths for output file(s) are also supported. If there is already an archive with the default or same name, a second file (and so on...) will be created. This ensures that no old file will be overwritten. Extraction works the same, you select an archive and it will be extracted into a subfolder of the specified directory.<br>
+<br /><br />
+<b>This application requires at least Java 1.8.0_40 (Java 8 Update 40)</b>
 
-This app also supports compressing and extracting archives using the ZIP (.zip) algorithm. This needs to be enabled via the options menu. Furthermore, this application is compatible with unix-based systems.
-<br><br>
-<b>This application requires Java 1.8 (Java 8)</b>
-
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui.PNG" alt="main frame"/>
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_options.PNG" alt="options frame"/>
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX.PNG" alt="main frame with default theme enabled"/><br />
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_DARK.PNG" alt="main frame with dark theme enabled"/>
