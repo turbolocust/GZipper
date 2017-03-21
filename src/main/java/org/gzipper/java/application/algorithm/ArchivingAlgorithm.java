@@ -37,13 +37,13 @@ public interface ArchivingAlgorithm {
      * Extracts an archive using the algorithm of the concrete class and stores
      * the files of the archive to the specified path.
      *
-     * @param path the absolute path of the archive to extract.
+     * @param location the location where to extract the archive.
      * @param name the filename of the archive to extract.
      * @throws java.io.IOException if an I/O error occurs.
      * @throws org.apache.commons.compress.archivers.ArchiveException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
-    void extract(String path, String name)
+    void extract(String location, String name)
             throws IOException, ArchiveException, CompressorException;
 
     /**

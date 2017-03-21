@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
 import javafx.concurrent.Task;
 
@@ -52,6 +53,7 @@ import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.model.ArchivingOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 import org.gzipper.java.style.CSS;
@@ -61,6 +63,11 @@ import org.gzipper.java.style.CSS;
  * @author Matthias Fussenegger
  */
 public class MainViewController extends BaseController {
+
+    /**
+     * The logger this class uses to log messages.
+     */
+    private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
 
     /**
      * Key constant used to access the properties map for menu items.
@@ -155,7 +162,13 @@ public class MainViewController extends BaseController {
     @FXML
     private Button _saveAsButton;
 
-    public MainViewController() {
+    /**
+     * Constructs a new {@link MainViewController}.
+     *
+     * @param theme the theme to load on initialization.
+     */
+    public MainViewController(CSS.Theme theme) {
+        super(theme);
         _archiveName = DEFAULT_ARCHIVE_NAME;
         Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                 "Default archive name set to: {0}", _archiveName);
@@ -170,8 +183,8 @@ public class MainViewController extends BaseController {
             _compressionLevel = (int) compressionStrength;
             Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                     "Compression level set to: {0}", _compressionLevel);
-            appendToTextArea(I18N.getString(
-                    "compressionLevelChange.text") + selectedItem.getText());
+            LOGGER.log(Level.INFO, "{0}{1}", new Object[]{I18N.getString(
+                "compressionLevelChange.text"), selectedItem.getText()});
         }
     }
 
@@ -212,11 +225,11 @@ public class MainViewController extends BaseController {
                     ArchivingOperation operation = _strategy.initOperation(archiveType);
                     _strategy.performOperation(operation);
                 } else {
-                    appendToTextArea(I18N.getString("invalidOutputPath.text"));
+                    LOGGER.log(Level.WARNING, I18N.getString("invalidOutputPath.text"));
                 }
             } catch (GZipperException ex) {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
-                appendToTextArea(ex.getMessage());
+                LOGGER.log(Level.SEVERE, ex.getMessage());
             }
         }
     }
@@ -256,7 +269,7 @@ public class MainViewController extends BaseController {
                 Logger.getLogger(GZipper.class.getName()).log(
                         Level.INFO, "No files have been selected.");
             }
-            appendToTextArea(message);
+            LOGGER.log(Level.INFO, message);
         }
     }
 
@@ -334,7 +347,7 @@ public class MainViewController extends BaseController {
     void handleEnableDarkThemeCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableDarkThemeCheckMenuItem)) {
             boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
-            loadAlternativeTheme(enableTheme);
+            loadAlternativeTheme(enableTheme, CSS.Theme.DARK_THEME);
             Settings.getInstance().setProperty("darkThemeEnabled", enableTheme);
         }
     }
@@ -349,7 +362,6 @@ public class MainViewController extends BaseController {
         } else {
             _startButton.setDisable(true);
         }
-
         // toggle abort button
         if (_abortButton.isDisabled()) {
             _abortButton.setDisable(false);
@@ -373,14 +385,13 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Appends text to the text area and inserts a new line after it.
+     * Initializes the archiving job by creating the required {@link Task}.
      *
-     * @param text The text to be appended.
+     * @param operation the {@link ArchivingOperation} that will eventually be
+     * performed by the task when executed.
+     * @return a {@link Task} that can be executed to perform the specified
+     * archiving operation.
      */
-    private void appendToTextArea(String text) {
-        _textArea.appendText(text + "\n");
-    }
-
     private Task<Boolean> initArchivingJob(ArchivingOperation operation) {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
@@ -389,23 +400,26 @@ public class MainViewController extends BaseController {
             }
         };
 
+        // show success message and finalize archiving job when task has succeeded
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
-                appendToTextArea(I18N.getString("operationSuccess.text"));
+                LOGGER.log(Level.INFO, I18N.getString("operationSuccess.text"));
             } else { // operation failed
-                appendToTextArea(I18N.getString("operationFail.text"));
-                appendToTextArea(I18N.getString("missingAccessRights.text"));
+                LOGGER.log(Level.SEVERE, I18N.getString("operationFail.text"));
+                LOGGER.log(Level.WARNING, I18N.getString("missingAccessRights.text"));
             }
             finalizeArchivingJob(operation);
         });
+        // show message that task has been cancelled and finalize archiving job
         task.setOnCancelled(e -> {
-            appendToTextArea(I18N.getString("operationCancel.text"));
+            LOGGER.log(Level.INFO, I18N.getString("operationCancel.text"));
             finalizeArchivingJob(operation);
             e.consume();
         });
+        // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
-            appendToTextArea(I18N.getString("operationFail.text"));
+            LOGGER.log(Level.SEVERE, I18N.getString("operationFail.text"));
             Logger.getLogger(GZipper.class.getName()).log(
                     Level.SEVERE, null, e.getSource().getException());
             finalizeArchivingJob(operation);
@@ -423,8 +437,9 @@ public class MainViewController extends BaseController {
      * @param operation {@link ArchivingOperation} that holds elapsed time.
      */
     private void finalizeArchivingJob(ArchivingOperation operation) {
-        appendToTextArea(I18N.getString("elapsedTime.text")
-                + operation.calculateElapsedTime() + " seconds.");
+        LOGGER.log(Level.INFO, "{0}{1} seconds.",
+                new Object[]{I18N.getString("elapsedTime.text"),
+                    operation.calculateElapsedTime()});
         toggleStartAndAbortButton();
     }
 
@@ -432,10 +447,12 @@ public class MainViewController extends BaseController {
      * Loads the alternative theme.
      *
      * @param enableTheme true to enable, false to disable alternative theme.
+     * @param theme the theme to load.
      */
-    private void loadAlternativeTheme(boolean enableTheme) {
+    private void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
         final String sheetLocation = GZipper.class.getResource(
                 CSS.STYLESHEET_DARK_THEME).toExternalForm();
+        _theme = CSS.Theme.DARK_THEME;
         _stages.forEach((stage) -> {
             if (enableTheme) {
                 stage.getScene().getStylesheets().add(sheetLocation);
@@ -445,13 +462,25 @@ public class MainViewController extends BaseController {
         });
     }
 
+    /**
+     * Initializes the logger that will append text to {@link #_textArea}.
+     */
+    private void initLogger() {
+        Logger logger = Logger.getLogger(MainViewController.class.getName());
+        TextAreaHandler handler = new TextAreaHandler(_textArea);
+        handler.setFormatter(new SimpleFormatter());
+        logger.addHandler(handler);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         final Settings settings = Settings.getInstance();
         OperatingSystem os = settings.getOperatingSystem();
 
+        initLogger();
+
         // set recently used path from settings if valid
-        String recentPath = settings.getProperty("recentPath");
+        final String recentPath = settings.getProperty("recentPath");
         if (FileUtil.isValidDirectory(recentPath)) {
             _outputPathTextField.setText(recentPath);
         } else {
@@ -459,11 +488,9 @@ public class MainViewController extends BaseController {
         }
         _selectedFile = new File(_outputPathTextField.getText());
 
-        // load dark theme if enabled ins previous application launch
-        String enableDarkTheme = settings.getProperty("darkThemeEnabled");
-        if (enableDarkTheme.equalsIgnoreCase("true")) {
+        // set dark theme as enabled if done so on previous application launch
+        if (_theme == CSS.Theme.DARK_THEME) {
             _enableDarkThemeCheckMenuItem.setSelected(true);
-            loadAlternativeTheme(true);
         }
 
         // set up properties for menu items regarding compression level
@@ -481,11 +508,20 @@ public class MainViewController extends BaseController {
         _archiveTypeComboBox.getItems().addAll(archiveTypes);
         _archiveTypeComboBox.setValue(archiveTypes[0]);
 
+        // set menu item for logging as selected if logging has been enabled before
+        final String loggingEnabled = settings.getProperty("loggingEnabled");
+        _enableLoggingCheckMenuItem.setSelected(loggingEnabled.equalsIgnoreCase("true"));
+
+        // set up strategy, frame image and the default text for the text area
         _strategy = new CompressStrategy();
         _frameImage = new Image("/images/icon_32.png");
         _textArea.setText("run:\n" + I18N.getString("changeOutputPath.text") + "\n");
     }
 
+    /**
+     * Inner class that represents the currently active strategy. This can
+     * either be the {@link CompressStrategy} or {@link DecompressStrategy}.
+     */
     private abstract class ArchivingStrategy {
 
         public abstract boolean validateOutputPath();
@@ -500,8 +536,9 @@ public class MainViewController extends BaseController {
                 _activeTask = initArchivingJob(operation);
                 toggleStartAndAbortButton();
                 ArchiveInfo info = operation.getArchiveInfo();
-                appendToTextArea(I18N.getString("outputPath.text")
-                        + info.getOutputPath());
+                LOGGER.log(Level.INFO, "{0}{1}",
+                        new Object[]{I18N.getString("outputPath.text"),
+                            info.getOutputPath()});
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                         I18N.getString("operationStarted.text"),
                         new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
@@ -510,6 +547,9 @@ public class MainViewController extends BaseController {
         }
     }
 
+    /**
+     * Strategy that will be used if user has activated the compression mode.
+     */
     private class CompressStrategy extends ArchivingStrategy {
 
         @Override
@@ -524,7 +564,7 @@ public class MainViewController extends BaseController {
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
                         "Operation cannot be started as no files have been specified.");
-                appendToTextArea(I18N.getString("noFilesSelectedWarning.text"));
+                LOGGER.log(Level.INFO, I18N.getString("noFilesSelectedWarning.text"));
             }
         }
 
@@ -553,6 +593,9 @@ public class MainViewController extends BaseController {
         }
     }
 
+    /**
+     * Strategy that will be used if user has activated the decompression mode.
+     */
     private class DecompressStrategy extends ArchivingStrategy {
 
         @Override
@@ -567,7 +610,7 @@ public class MainViewController extends BaseController {
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
                         "Operation cannot be started as an invalid path has been specified.");
-                appendToTextArea(I18N.getString("outputPathWarning.text"));
+                LOGGER.log(Level.WARNING, I18N.getString("outputPathWarning.text"));
                 _outputPathTextField.requestFocus();
             }
         }
@@ -575,7 +618,8 @@ public class MainViewController extends BaseController {
         @Override
         public ArchivingOperation initOperation(String archiveType) throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
-                    archiveType, _archiveName, _selectedFile.getParent());
+                    archiveType, _selectedFiles.get(0).getAbsolutePath(),
+                    _selectedFile + File.separator);
             return new ArchivingOperation(info, false);
         }
 

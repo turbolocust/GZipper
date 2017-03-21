@@ -17,8 +17,10 @@
 package org.gzipper.java.application.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -33,7 +35,9 @@ import org.gzipper.java.presentation.GZipper;
  */
 public class Settings {
 
-    private Properties _properties;
+    private File _propsFile;
+
+    private Properties _props;
 
     private final Properties _defaults;
 
@@ -47,17 +51,18 @@ public class Settings {
      * Initializes this singleton class. This should only be called once after a
      * call of the {@link #getInstance()} method.
      *
-     * @param location the location of the properties file.
+     * @param props the properties file to initialize this class with.
      * @param os the current operating system.
      */
-    public void init(String location, OperatingSystem os) {
-        File f = new File(location);
+    public void init(File props, OperatingSystem os) {
+
+        _propsFile = props;
 
         _operatingSystem = os; // to receive environment variables
-        _properties = new Properties(_defaults);
+        _props = new Properties(_defaults);
 
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f))) {
-            _properties.load(bis);
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(props))) {
+            _props.load(bis);
         } catch (IOException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -73,21 +78,30 @@ public class Settings {
         return defaults;
     }
 
-    public Object setProperty(String key, String value) {
-        return _properties.setProperty(key, value);
+    public synchronized Object setProperty(String key, String value) {
+        return _props.setProperty(key, value);
     }
 
-    public Object setProperty(String key, boolean value) {
+    public synchronized Object setProperty(String key, boolean value) {
         final String propertyValue = value ? "true" : "false";
-        return _properties.setProperty(key, propertyValue);
+        return _props.setProperty(key, propertyValue);
     }
 
     public String getProperty(String key) {
-        return _properties.getProperty(key);
+        return _props.getProperty(key);
     }
 
     public OperatingSystem getOperatingSystem() {
         return _operatingSystem;
+    }
+
+    public void storeAway() throws IOException {
+        _props.store(new BufferedOutputStream(new FileOutputStream(_propsFile)), "");
+    }
+
+    public void restoreDefaults() {
+        _props.clear();
+        _props.putAll(_defaults);
     }
 
     /**

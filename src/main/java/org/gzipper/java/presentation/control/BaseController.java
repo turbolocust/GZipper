@@ -68,6 +68,15 @@ public abstract class BaseController implements Initializable {
         _primaryStage = primaryStage;
     }
 
+    /**
+     * The currently active theme.
+     */
+    protected CSS.Theme _theme = CSS.Theme.MODENA;
+
+    public BaseController(CSS.Theme theme) {
+        _theme = theme;
+    }
+
     @FXML
     protected MenuItem _aboutMenuItem;
 
@@ -75,19 +84,21 @@ public abstract class BaseController implements Initializable {
     protected void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AboutView.fxml"));
-            AboutViewController controller = new AboutViewController();
+            AboutViewController controller = new AboutViewController(_theme);
 
             fxmlLoader.setResources(I18N.getBundle());
             fxmlLoader.setController(controller);
 
-            Stage aboutView = new Stage();
+            final Stage aboutView = new Stage();
             aboutView.initModality(Modality.WINDOW_MODAL);
             controller.setPrimaryStage(aboutView);
 
             try {
                 Scene scene = new Scene(fxmlLoader.load());
-                scene.getStylesheets().add(getClass().getResource(
-                        CSS.STYLESHEET_DARK_THEME).toExternalForm());
+                if (_theme == CSS.Theme.DARK_THEME) {
+                    scene.getStylesheets().add(getClass().getResource(
+                            CSS.STYLESHEET_DARK_THEME).toExternalForm());
+                }
                 aboutView.getIcons().add(_frameImage);
                 aboutView.setTitle(I18N.getString("aboutTitle.text"));
                 aboutView.setScene(scene);

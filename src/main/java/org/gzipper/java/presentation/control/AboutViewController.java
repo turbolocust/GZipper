@@ -30,6 +30,7 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
 import org.gzipper.java.application.util.AppUtil;
 import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.style.CSS;
 
 /**
  *
@@ -50,6 +51,10 @@ public class AboutViewController extends BaseController {
 
     @FXML
     private Button _closeButton;
+
+    public AboutViewController(CSS.Theme theme) {
+        super(theme);
+    }
 
     @FXML
     void handleCloseButtonAction(ActionEvent evt) {

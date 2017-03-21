@@ -27,4 +27,16 @@ public class CSS {
      */
     public static final String STYLESHEET_DARK_THEME = "/css/DarkTheme.css";
 
+    /**
+     * Holds static members only.
+     */
+    private CSS() {
+    }
+
+    /**
+     * Enumeration that consists of all existing visual themes.
+     */
+    public enum Theme {
+        MODENA, DARK_THEME;
+    }
 }

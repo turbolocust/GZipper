@@ -43,7 +43,7 @@ public enum ArchiveType {
         _extensionNames = extensionNames;
     }
 
-    public static ArchiveType determineArchiveType(String name) {
+    public static synchronized ArchiveType determineArchiveType(String name) {
 
         ArchiveType archiveType = null;
         for (ArchiveType type : values()) {

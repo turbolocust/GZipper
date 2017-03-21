@@ -38,4 +38,10 @@ public class I18N {
         }
         return _bundle;
     }
+
+    /**
+     * Holds static members only.
+     */
+    private I18N() {
+    }
 }
