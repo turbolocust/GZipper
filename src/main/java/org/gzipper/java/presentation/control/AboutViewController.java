@@ -16,6 +16,7 @@
  */
 package org.gzipper.java.presentation.control;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -40,7 +41,7 @@ public class AboutViewController extends BaseController {
 
     private final String _appName = "GZipper";
     private final String _appVersion = "0.1 ALPHA";
-    private final String _appBuildDate = "03/20/2017";
+    private final String _appBuildDate = "03/22/2017";
     private final String _appCopyright = "Matthias Fussenegger";
 
     @FXML
@@ -69,8 +70,10 @@ public class AboutViewController extends BaseController {
 
         try {
             final String decPath = AppUtil.getDecodedRootPath(getClass());
-            _webView.getEngine().loadContent("<img src=\"file://" + decPath
-                    + "images/icon_256.png\" alt=\"images/icon_256.png\"");
+            final File img = new File(decPath + "images" + File.separator + "icon_256.png");
+            final String imgTag = "<div style=\"width: 50%; margin-left: auto; margin-right: auto;\">"
+                    + "<img src=\"" + img.toURI() + "\" alt=\"images/icon_256.png\"></div>";
+            _webView.getEngine().loadContent(imgTag);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
         }
