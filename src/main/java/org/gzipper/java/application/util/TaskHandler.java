@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,22 +26,41 @@ import javafx.concurrent.Task;
  */
 public class TaskHandler {
 
+    /**
+     * The executor which executes tasks.
+     */
     private final Executor _executor;
 
     private TaskHandler() {
         _executor = Executors.newCachedThreadPool();
     }
 
+    /**
+     * Returns the singleton instance of this class.
+     *
+     * @return the singleton instance of this class.
+     */
     public static TaskHandler getInstance() {
         return TaskHandlerHolder.INSTANCE;
     }
 
+    /**
+     * Executes the specified task.
+     *
+     * @param task the task to be executed.
+     */
     public void execute(Task<?> task) {
         _executor.execute(task);
     }
 
+    /**
+     * Holder class for singleton instance.
+     */
     private static class TaskHandlerHolder {
 
+        /**
+         * The actual singleton instance of the outer class.
+         */
         private static final TaskHandler INSTANCE = new TaskHandler();
     }
 

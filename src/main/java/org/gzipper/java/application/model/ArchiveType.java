@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,5 +90,4 @@ public enum ArchiveType {
     public String toString() {
         return _displayName + " (" + _extensionNames[0] + ")";
     }
-
 }

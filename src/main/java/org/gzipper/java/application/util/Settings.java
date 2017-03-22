@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,24 @@ import org.gzipper.java.presentation.GZipper;
  */
 public class Settings {
 
+    /**
+     * The actual properties file. Required to store away changed properties.
+     */
     private File _propsFile;
 
+    /**
+     * The properties read from the {@link #_propsFile};
+     */
     private Properties _props;
 
+    /**
+     * The default properties values for restoration.
+     */
     private final Properties _defaults;
 
+    /**
+     * The operating system the JVM runs on.
+     */
     private OperatingSystem _operatingSystem;
 
     private Settings() {
@@ -68,37 +80,76 @@ public class Settings {
         }
     }
 
+    /**
+     * Initializes the default properties values.
+     *
+     * @return the default properties.
+     */
     private Properties initDefaults() {
 
         final Properties defaults = new Properties();
 
         defaults.setProperty("loggingEnabled", "false");
         defaults.setProperty("recentPath", "");
+        defaults.setProperty("darkThemeEnabled", "false");
 
         return defaults;
     }
 
+    /**
+     * Sets a new property to {@link #_props}.
+     *
+     * @param key the key of the property.
+     * @param value the value of the property as string.
+     * @return the previous value of the specified key.
+     */
     public synchronized Object setProperty(String key, String value) {
         return _props.setProperty(key, value);
     }
 
+    /**
+     * Sets a new property to {@link #_props}.
+     *
+     * @param key the key of the property.
+     * @param value the value of the property as boolean.
+     * @return the previous value of the specified key.
+     */
     public synchronized Object setProperty(String key, boolean value) {
         final String propertyValue = value ? "true" : "false";
         return _props.setProperty(key, propertyValue);
     }
 
+    /**
+     * Returns the property with the specified key if it exists.
+     *
+     * @param key the key of the property.
+     * @return the value of the property as string.
+     */
     public String getProperty(String key) {
         return _props.getProperty(key);
     }
 
+    /**
+     * Returns the operating system the JVM runs on.
+     *
+     * @return the operating system the JVM runs on.
+     */
     public OperatingSystem getOperatingSystem() {
         return _operatingSystem;
     }
 
+    /**
+     * Saves all the properties to {@link #_propsFile};
+     *
+     * @throws IOException if an I/O error occurs.
+     */
     public void storeAway() throws IOException {
         _props.store(new BufferedOutputStream(new FileOutputStream(_propsFile)), "");
     }
 
+    /**
+     * Restores the default properties.
+     */
     public void restoreDefaults() {
         _props.clear();
         _props.putAll(_defaults);

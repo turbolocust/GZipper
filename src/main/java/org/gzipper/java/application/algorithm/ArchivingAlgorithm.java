@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +40,10 @@ public interface ArchivingAlgorithm {
      * @param location the location where to extract the archive.
      * @param name the filename of the archive to extract.
      * @throws java.io.IOException if an I/O error occurs.
-     * @throws org.apache.commons.compress.archivers.ArchiveException
-     * @throws org.apache.commons.compress.compressors.CompressorException
+     * @throws org.apache.commons.compress.archivers.ArchiveException if an
+     * error related to the archiver occurs.
+     * @throws org.apache.commons.compress.compressors.CompressorException if an
+     * error related to the compressor occurs.
      */
     void extract(String location, String name)
             throws IOException, ArchiveException, CompressorException;
@@ -52,8 +54,8 @@ public interface ArchivingAlgorithm {
      *
      * @param info POJO that holds information required for extraction.
      * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException
-     * @throws CompressorException
+     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws CompressorException if an error related to the compressor occurs.
      */
     void extract(ArchiveInfo info)
             throws IOException, ArchiveException, CompressorException;
@@ -67,7 +69,8 @@ public interface ArchivingAlgorithm {
      * @param name the name of the archive.
      * @throws java.io.IOException if an I/O error occurs.
      * @throws org.apache.commons.compress.archivers.ArchiveException
-     * @throws org.apache.commons.compress.compressors.CompressorException
+     * @throws org.apache.commons.compress.compressors.CompressorException if an
+     * error related to the compressor occurs.
      */
     void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException;
@@ -79,8 +82,8 @@ public interface ArchivingAlgorithm {
      *
      * @param info POJO that holds information required for compression.
      * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException
-     * @throws CompressorException
+     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws CompressorException if an error related to the compressor occurs.
      */
     void compress(ArchiveInfo info)
             throws IOException, ArchiveException, CompressorException;
@@ -93,7 +96,8 @@ public interface ArchivingAlgorithm {
      * {@link ArchiveOutputStream}.
      * @return new instance of {@link ArchiveOutputStream}.
      * @throws java.io.IOException if an I/O error occurs.
-     * @throws org.apache.commons.compress.archivers.ArchiveException
+     * @throws org.apache.commons.compress.archivers.ArchiveException if an
+     * error related to the archiver occurs.
      */
     ArchiveOutputStream makeArchiveOutputStream(
             OutputStream stream) throws IOException, ArchiveException;
@@ -106,7 +110,7 @@ public interface ArchivingAlgorithm {
      * {@link CompressorOutputStream}.
      * @return new instance of {@link CompressorOutputStream}.
      * @throws IOException if an I/O error occurs.
-     * @throws CompressorException
+     * @throws CompressorException if an error related to the compressor occurs.
      */
     CompressorOutputStream makeCompressorOutputStream(
             OutputStream stream) throws IOException, CompressorException;

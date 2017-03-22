@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,7 +69,7 @@ public class ArchivingOperation {
     /**
      * Calculates the elapsed time in seconds.
      *
-     * @return The elapsed time in seconds.
+     * @return the elapsed time in seconds.
      */
     public double calculateElapsedTime() {
         return ((double) _elapsedTime / 1E9);
@@ -78,7 +78,7 @@ public class ArchivingOperation {
     /**
      * Checks whether this operation is for compression or decompression.
      *
-     * @return True for compression, false for decompression.
+     * @return true for compression, false for decompression.
      */
     public boolean isCompress() {
         return _compress;
@@ -92,5 +92,4 @@ public class ArchivingOperation {
     public ArchiveInfo getArchiveInfo() {
         return _archiveInfo;
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import org.gzipper.java.style.CSS;
 /**
  *
  * @author Matthias Fussenegger
- * @version 2017-03-21
+ * @version 2017-03-22
  */
 public class GZipper extends Application {
 
@@ -148,7 +148,7 @@ public class GZipper extends Application {
     }
 
     /**
-     * @param args The command line arguments
+     * @param args the command line arguments
      */
     public static void main(String[] args) {
         // adjust output of the simple formatter
@@ -170,5 +170,4 @@ public class GZipper extends Application {
 
         launch(args); // actually launch the UI
     }
-
 }

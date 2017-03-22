@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ public class GZipperException extends Exception {
     /**
      * Delegates error message to its super class {@link Exception}.
      *
-     * @param errorMessage The specified error message
+     * @param errorMessage the specified error message.
      */
     public GZipperException(String errorMessage) {
         super(errorMessage);
@@ -44,7 +44,7 @@ public class GZipperException extends Exception {
     /**
      * Delegates exception cause to its super class {@link Exception}.
      *
-     * @param cause The cause of this exception
+     * @param cause the cause of this exception.
      */
     public GZipperException(Throwable cause) {
         super(cause);
@@ -53,8 +53,8 @@ public class GZipperException extends Exception {
     /**
      * Delegates error message and cause to its super class {@link Exception}.
      *
-     * @param errorMessage The specified error message
-     * @param cause The cause of this exception
+     * @param errorMessage the specified error message.
+     * @param cause the cause of this exception.
      */
     public GZipperException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);

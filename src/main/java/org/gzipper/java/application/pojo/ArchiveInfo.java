@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,14 +27,29 @@ import org.gzipper.java.application.model.ArchiveType;
  */
 public class ArchiveInfo {
 
+    /**
+     * The type of the archive.
+     */
     private final ArchiveType _archiveType;
 
+    /**
+     * The compression level of the archive.
+     */
     private int _level;
 
+    /**
+     * The files to be compressed.
+     */
     private List<File> _files;
 
+    /**
+     * The full name of the archive.
+     */
     private String _archiveName;
 
+    /**
+     * The output path either for the archive or the decompressed files.
+     */
     private String _outputPath;
 
     public ArchiveInfo(ArchiveType archiveType, String archiveName,

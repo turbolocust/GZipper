@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Matthias Fussenegger
+ * Copyright (C) 2017 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ public class AlertDialog {
     /**
      * Brings up a confirmation dialog titled "Please confirm".
      *
-     * @param header The header text of the dialog
-     * @param content The content text of the dialog
-     * @return An {@link Optional} to indicate which button has been pressed
+     * @param header the header text of the dialog
+     * @param content the content text of the dialog
+     * @return an {@link Optional} to indicate which button has been pressed
      */
     public static Optional<ButtonType> showConfirmationDialog(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content, ButtonType.YES, ButtonType.NO);
@@ -51,9 +51,9 @@ public class AlertDialog {
     /**
      * Brings up a warning dialog titled "Warning".
      *
-     * @param header The header text of the dialog
-     * @param content The content text of the dialog
-     * @return An {@link Optional} to indicate which button has been pressed
+     * @param header the header text of the dialog
+     * @param content the content text of the dialog
+     * @return an {@link Optional} to indicate which button has been pressed
      */
     public static Optional<ButtonType> showWarningDialog(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING, content);
@@ -65,9 +65,9 @@ public class AlertDialog {
     /**
      * Brings up an error dialog titled "Error".
      *
-     * @param header The header text of the dialog
-     * @param content The content text of the dialog
-     * @return An {@link Optional} to indicate which button has been pressed
+     * @param header the header text of the dialog
+     * @param content the content text of the dialog
+     * @return an {@link Optional} to indicate which button has been pressed
      */
     public static Optional<ButtonType> showErrorDialog(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR, content);
@@ -75,5 +75,4 @@ public class AlertDialog {
         alert.setHeaderText(header);
         return alert.showAndWait();
     }
-
 }
