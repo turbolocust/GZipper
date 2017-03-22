@@ -34,9 +34,22 @@ public class I18N {
     public static synchronized ResourceBundle getBundle() {
         if (_bundle == null) {
             final String base = "i18n/gzipperMainView";
-            _bundle = ResourceBundle.getBundle(base, Locale.ENGLISH);
+            final Locale locale = determineLocale();
+            _bundle = locale != null
+                    ? ResourceBundle.getBundle(base, locale)
+                    : ResourceBundle.getBundle(base);
         }
         return _bundle;
+    }
+
+    private static Locale determineLocale() {
+        String userLang = System.getProperty("user.language");
+        for (Locale locale : Locale.getAvailableLocales()) {
+            if (locale.getLanguage().equals(userLang)) {
+                return locale;
+            }
+        }
+        return null;
     }
 
     /**
