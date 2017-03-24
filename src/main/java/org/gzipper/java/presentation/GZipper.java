@@ -46,7 +46,6 @@ import org.gzipper.java.style.CSS;
 /**
  *
  * @author Matthias Fussenegger
- * @version 2017-03-22
  */
 public class GZipper extends Application {
 
