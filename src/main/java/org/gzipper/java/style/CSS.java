@@ -17,6 +17,7 @@
 package org.gzipper.java.style;
 
 /**
+ * Class that allows global access to CSS related information.
  *
  * @author Matthias Fussenegger
  */
@@ -37,6 +38,25 @@ public class CSS {
      * Enumeration that consists of all existing visual themes.
      */
     public enum Theme {
-        MODENA, DARK_THEME;
+        
+        MODENA(""), DARK_THEME("/css/DarkTheme.css");
+
+        /**
+         * The physical location of the associated style sheet.
+         */
+        private final String _location;
+
+        Theme(String location) {
+            _location = location;
+        }
+
+        /**
+         * Returns the physical location of the associated style sheet.
+         *
+         * @return the physical location of the associated style sheet.
+         */
+        public String getLocation() {
+            return _location;
+        }
     }
 }

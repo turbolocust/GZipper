@@ -36,6 +36,7 @@ import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.style.CSS;
 
 /**
+ * The base controller each other controller should derive from.
  *
  * @author Matthias Fussenegger
  */
@@ -73,6 +74,11 @@ public abstract class BaseController implements Initializable {
      */
     protected CSS.Theme _theme = CSS.Theme.MODENA;
 
+    /**
+     * Constructs a new controller with the specified CSS theme.
+     *
+     * @param theme the {@link CSS} theme to apply.
+     */
     public BaseController(CSS.Theme theme) {
         _theme = theme;
     }

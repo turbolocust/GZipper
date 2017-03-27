@@ -17,21 +17,42 @@
 package org.gzipper.java.application.model;
 
 /**
+ * Abstract class that represents an operating system. This class basically acts
+ * as a wrapper for an {@link OS} enumeration while offering additional
+ * functionalities that may be required for archiving operations.
  *
  * @author Matthias Fussenegger
  */
 public abstract class OperatingSystem {
 
+    /**
+     * The aggregated enumeration which represents the operating system.
+     */
     protected final OS _operatingSystem;
 
+    /**
+     * Constructs a new instance of this class using the specified enumeration.
+     *
+     * @param operatingSystem
+     */
     protected OperatingSystem(OS operatingSystem) {
         this._operatingSystem = operatingSystem;
     }
 
+    /**
+     * Returns the default user directory of the system.
+     *
+     * @return the default user directory as string.
+     */
     public String getDefaultUserDirectory() {
         return System.getProperty("user.home");
     }
 
+    /**
+     * Returns the enumeration for the current operating system.
+     *
+     * @return the enumeration for the current operating system.
+     */
     public OS getCurrentSystem() {
         return _operatingSystem;
     }

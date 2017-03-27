@@ -18,10 +18,11 @@ package org.gzipper.java.application.pojo;
 
 import java.io.File;
 import java.util.List;
+import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
 
 /**
- * POJO class that hold information required for archiving operations.
+ * Object that holds information required for archiving operations.
  *
  * @author Matthias Fussenegger
  */
@@ -61,40 +62,85 @@ public class ArchiveInfo {
         _outputPath = outputPath;
     }
 
+    /**
+     * Returns the aggregated {@link ArchiveType}.
+     *
+     * @return the aggregated {@link ArchiveType}.
+     */
     public ArchiveType getArchiveType() {
         return _archiveType;
     }
 
+    /**
+     * Returns the level for the compression as of {@link Deflater}.
+     *
+     * @return the level for compression as of {@link Deflater}.
+     */
     public int getLevel() {
         return _level;
     }
 
+    /**
+     * Sets the level for the compression as of {@link Deflater}.
+     *
+     * @param level the level for the compression as of {@link Deflater}.
+     */
     public void setLevel(int level) {
         _level = level;
     }
 
+    /**
+     * Returns a list of files to be compressed.
+     *
+     * @return a list of files to be compressed.
+     */
     public List<File> getFiles() {
         return _files;
     }
 
+    /**
+     * Sets the files to be compressed.
+     *
+     * @param files the files to be compressed.
+     */
     public void setFiles(List<File> files) {
         _files = files;
     }
 
+    /**
+     * Returns the name of the archive to be decompressed.
+     *
+     * @return the name of the archive to be decompressed.
+     */
     public String getArchiveName() {
         return _archiveName;
     }
 
+    /**
+     * Sets the name of the archive to be decompressed.
+     *
+     * @param archiveName the name of the archive to be decompressed.
+     */
     public void setArchiveName(String archiveName) {
         _archiveName = archiveName;
     }
 
+    /**
+     * Returns the output path for either the archive or the decompressed files.
+     *
+     * @return the output path for either the archive or the decompressed files.
+     */
     public String getOutputPath() {
         return _outputPath;
     }
 
+    /**
+     * Sets the output path for either the archive or the decompressed files.
+     *
+     * @param outputPath the output path for either the archive or the
+     * decompressed files.
+     */
     public void setOutputPath(String outputPath) {
         _outputPath = outputPath;
     }
-
 }

@@ -32,16 +32,29 @@ import org.gzipper.java.application.util.Settings;
 
 /**
  *
- * Offers algorithms to compress and decompress TAR+GZ archives.
+ * Represents the TAR+GZ archive type.
  *
  * @author Matthias Fussenegger
  */
 public class Tarball extends AbstractAlgorithm {
 
+    /**
+     * Constructs a new instance of this class using the TAR constant of
+     * {@link ArchiveStreamFactory} and the GZIP constant of
+     * {@link CompressorStreamFactory}.
+     */
     public Tarball() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);
     }
 
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param archiveType the archive type, which has to be a constant of
+     * {@link ArchiveStreamFactory}.
+     * @param compressionType the compression type, which has to be a constant
+     * of {@link CompressorStreamFactory}.
+     */
     public Tarball(String archiveType, String compressionType) {
         super(archiveType, compressionType);
     }

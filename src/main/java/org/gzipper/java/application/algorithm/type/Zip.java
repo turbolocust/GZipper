@@ -29,12 +29,17 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
 
 /**
- * Offers algorithms to compress and decompress ZIP archives.
+ * Represents the ZIP archive type.
  *
  * @author Matthias Fussenegger
  */
 public class Zip extends AbstractAlgorithm {
 
+    /**
+     * Constructs a new instance of this class using the ZIP constant of
+     * {@link ArchiveStreamFactory} and the DEFLATE constant of
+     * {@link CompressorStreamFactory}.
+     */
     public Zip() {
         super(ArchiveStreamFactory.ZIP, CompressorStreamFactory.DEFLATE);
     }

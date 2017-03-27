@@ -19,6 +19,7 @@ package org.gzipper.java.application.model;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
 
 /**
+ * Enumeration for operating systems.
  *
  * @author Matthias Fussenegger
  */
@@ -41,10 +42,20 @@ public enum OS {
         _value = value;
     }
 
+    /**
+     * Returns the name of the operating system.
+     *
+     * @return the name of the operating system.
+     */
     public String getName() {
         return _name;
     }
 
+    /**
+     * Returns the value that is defined as of {@link GzipParameters}.
+     *
+     * @return the value that is defined as of {@link GzipParameters}.
+     */
     public int getValue() {
         return _value;
     }

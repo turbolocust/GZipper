@@ -59,6 +59,7 @@ import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 import org.gzipper.java.style.CSS;
 
 /**
+ * Controller for the FXML named "MainView.fxml".
  *
  * @author Matthias Fussenegger
  */
@@ -163,9 +164,9 @@ public class MainViewController extends BaseController {
     private Button _saveAsButton;
 
     /**
-     * Constructs a new {@link MainViewController}.
+     * Constructs a new controller with the specified CSS theme.
      *
-     * @param theme the theme to load on initialization.
+     * @param theme the {@link CSS} theme to apply.
      */
     public MainViewController(CSS.Theme theme) {
         super(theme);
@@ -444,15 +445,15 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Loads the alternative theme.
+     * Loads an alternative theme.
      *
      * @param enableTheme true to enable, false to disable alternative theme.
      * @param theme the theme to load.
      */
     private void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
         final String sheetLocation = GZipper.class.getResource(
-                CSS.STYLESHEET_DARK_THEME).toExternalForm();
-        _theme = CSS.Theme.DARK_THEME;
+                theme.getLocation()).toExternalForm();
+        _theme = theme;
         _stages.forEach((stage) -> {
             if (enableTheme) {
                 stage.getScene().getStylesheets().add(sheetLocation);

@@ -25,12 +25,17 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
- * Offers algorithms to compress and decompress TAR+BZIP2 archives.
+ * Represents the TAR+BZIP2 archive type.
  *
  * @author Matthias Fussenegger
  */
 public class TarBzip2 extends Tarball {
 
+    /**
+     * Constructs a new instance of this class using the TAR constant of
+     * {@link ArchiveStreamFactory} and the BZIP2 constant of
+     * {@link CompressorStreamFactory}.
+     */
     public TarBzip2() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2);
     }

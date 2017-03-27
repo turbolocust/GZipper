@@ -21,6 +21,10 @@ import java.util.logging.StreamHandler;
 import javafx.scene.control.TextArea;
 
 /**
+ * Handles the logging of information to text areas. An instance of this class
+ * requires the aggregation of an {@link TextArea} and derives from
+ * {@link StreamHandler}. This makes logging of information using the Java
+ * logging API much easier as this instance can be used as a handler for logs.
  *
  * @author Matthias Fussenegger
  */
@@ -49,5 +53,4 @@ public class TextAreaHandler extends StreamHandler {
             _textArea.appendText(getFormatter().format(record));
         }
     }
-
 }

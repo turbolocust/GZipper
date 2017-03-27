@@ -24,6 +24,7 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 
 /**
+ * Factory class that offers static methods for creating {@link ArchiveInfo}.
  *
  * @author Matthias Fussenegger
  */
@@ -60,8 +61,8 @@ public class ArchiveInfoFactory {
         }
 
         if (!hasExtension) {
-            // add extension to archive name if missing
-            archiveName = archiveName + extNames[0].substring(1); // ignore the star
+            // add extension to archive name if missing and ignore the star character
+            archiveName = archiveName + extNames[0].substring(1);
         }
 
         return new ArchiveInfo(archiveType, archiveName, level, files, outputPath);

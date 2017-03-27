@@ -30,6 +30,8 @@ import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.presentation.GZipper;
 
 /**
+ * Singleton that provides convenience when working with {@link Properties} and
+ * represents the settings file that can be used globally.
  *
  * @author Matthias Fussenegger
  */
@@ -171,5 +173,4 @@ public class Settings {
 
         private static Settings INSTANCE = new Settings();
     }
-
 }

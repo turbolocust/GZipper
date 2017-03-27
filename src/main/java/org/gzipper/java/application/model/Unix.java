@@ -17,11 +17,15 @@
 package org.gzipper.java.application.model;
 
 /**
+ * Object that represents a Unix-like operating system.
  *
  * @author Matthias Fussenegger
  */
 public class Unix extends OperatingSystem {
 
+    /**
+     * Constructs a new instance of this class.
+     */
     public Unix() {
         super(OS.UNIX);
     }

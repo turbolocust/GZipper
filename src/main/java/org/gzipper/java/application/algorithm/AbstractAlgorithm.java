@@ -40,8 +40,8 @@ import org.gzipper.java.presentation.control.MainViewController;
 
 /**
  * Abstract class that offers generally used attributes and methods for
- * archiving algorithms. Any class that contains an archiving algorithm will
- * extend this class.
+ * archiving algorithms. Any class that represents an archiving algorithm will
+ * derive from this class.
  *
  * @author Matthias Fussenegger
  */
@@ -78,7 +78,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     protected final CompressorStreamFactory _compressorStreamFactory;
 
     /**
-     * Creates a new object of the child class for archiving operations.
+     * Creates a new instance for archiving operations.
      *
      * @param archiveType the type of the archive.
      * @param compressionType the type of the compressor stream.

@@ -27,7 +27,7 @@ import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
- * Implementing class offers methods for compressing and extracting archives.
+ * Any implementing class offers methods to compress and extract archives.
  *
  * @author Matthias Fussenegger
  */

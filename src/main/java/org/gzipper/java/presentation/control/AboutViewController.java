@@ -27,6 +27,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -35,14 +37,30 @@ import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.style.CSS;
 
 /**
+ * Controller for the FXML named "AboutView.fxml".
  *
  * @author Matthias Fussenegger
  */
 public class AboutViewController extends BaseController {
 
+    /**
+     * The name of this application.
+     */
     private final String _appName = "GZipper";
+
+    /**
+     * The version of this application.
+     */
     private final String _appVersion = "0.1 ALPHA";
-    private final String _appBuildDate = "03/24/2017";
+
+    /**
+     * The build date of this application.
+     */
+    private final String _appBuildDate = "03/27/2017";
+
+    /**
+     * The author of this application.
+     */
     private final String _appCopyright = "Matthias Fussenegger";
 
     @FXML
@@ -54,6 +72,11 @@ public class AboutViewController extends BaseController {
     @FXML
     private Button _closeButton;
 
+    /**
+     * Constructs a new controller with the specified CSS theme.
+     *
+     * @param theme the {@link CSS} theme to apply.
+     */
     public AboutViewController(CSS.Theme theme) {
         super(theme);
     }
@@ -82,12 +105,21 @@ public class AboutViewController extends BaseController {
 
         final Text appName = new Text(_appName + "\n");
         final Text appVersion = new Text("Version" + ": " + _appVersion + "\n");
+        final Text appLicense = new Text(resources.getString("license.text") + "\n");
         final Text appBuildDate = new Text(
-                resources.getString("buildDate.text") + ": " + _appBuildDate + "\n");
+                resources.getString("buildDate.text")
+                + ": "
+                + _appBuildDate + "\n");
         final Text appCopyright = new Text(
-                resources.getString("author.text") + ": " + _appCopyright + "\n");
+                resources.getString("author.text")
+                + ": "
+                + _appCopyright + "\n\r");
+
+        // apply different font to app name
+        appName.setFont(Font.font("System", FontWeight.BOLD, 16));
 
         _textFlow.setTextAlignment(TextAlignment.CENTER);
-        _textFlow.getChildren().addAll(appName, appVersion, appBuildDate, appCopyright);
+        _textFlow.getChildren().addAll(appName, appVersion,
+                appBuildDate, appCopyright, appLicense);
     }
 }

@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Used to validate files, e.g. file paths.
+ * Utility class used to validate files, e.g. file paths or names.
  *
  * @author Matthias Fussenegger
  */

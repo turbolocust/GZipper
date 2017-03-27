@@ -17,11 +17,15 @@
 package org.gzipper.java.application.model;
 
 /**
+ * Object that represents the Microsoft Windows operating system.
  *
  * @author Matthias Fussenegger
  */
 public class Windows extends OperatingSystem {
 
+    /**
+     * Constructs a new instance of this class.
+     */
     public Windows() {
         super(OS.WINDOWS);
     }

@@ -32,6 +32,8 @@ import java.util.logging.Logger;
 import org.gzipper.java.presentation.GZipper;
 
 /**
+ * Utility class that provides static methods for e.g. receiving resources from
+ * the resource path of a class.
  *
  * @author Matthias Fussenegger
  */

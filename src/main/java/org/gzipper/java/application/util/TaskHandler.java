@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import javafx.concurrent.Task;
 
 /**
+ * Singleton used to execute tasks using an {@link Executor}.
  *
  * @author Matthias Fussenegger
  */
@@ -63,5 +64,4 @@ public class TaskHandler {
          */
         private static final TaskHandler INSTANCE = new TaskHandler();
     }
-
 }

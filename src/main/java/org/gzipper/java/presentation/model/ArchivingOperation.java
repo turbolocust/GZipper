@@ -27,22 +27,43 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.presentation.GZipper;
 
 /**
+ * Object that represents an archiving operation.
  *
  * @author Matthias Fussenegger
  */
 public class ArchivingOperation {
 
+    /**
+     * The aggregated {@link ArchiveInfo}.
+     */
     private final ArchiveInfo _archiveInfo;
 
+    /**
+     * True if operation is being used for compression, false otherwise.
+     */
     private final boolean _compress;
 
+    /**
+     * The elapsed time of the operation which will be stored after its end.
+     */
     private long _elapsedTime;
 
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param info the {@link ArchiveInfo} to be aggregated.
+     * @param compress true for compression, false for decompression.
+     */
     public ArchivingOperation(ArchiveInfo info, boolean compress) {
         _archiveInfo = info;
         _compress = compress;
     }
 
+    /**
+     * Performs this operation.
+     *
+     * @return true on success, false otherwise.
+     */
     public boolean performOperation() {
 
         ArchiveType archiveType = _archiveInfo.getArchiveType();
