@@ -18,6 +18,7 @@ package org.gzipper.java.presentation.control;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -44,6 +45,16 @@ import org.gzipper.java.style.CSS;
 public class AboutViewController extends BaseController {
 
     /**
+     * The name of the image to be displayed in the about view.
+     */
+    private final static String IMG_NAME = "images/icon_256.png";
+
+    /**
+     * The image file as a static reference in case it has already been loaded.
+     */
+    private static File _imageFile;
+
+    /**
      * The name of this application.
      */
     private final String _appName = "GZipper";
@@ -56,7 +67,7 @@ public class AboutViewController extends BaseController {
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "03/27/2017";
+    private final String _appBuildDate = "03/28/2017";
 
     /**
      * The author of this application.
@@ -91,17 +102,26 @@ public class AboutViewController extends BaseController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        try {
-            // load image from directory and display it in image view
-            final String decPath = AppUtil.getDecodedRootPath(getClass());
-            File imgFile = new File(decPath + "images" + File.separator + "icon_256.png");
-
-            Image img = new Image(imgFile.toURI().toString());
-            _imageView.setImage(img);
-
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+        if (_imageFile == null || !_imageFile.exists()) {
+            String imgRes = null;
+            try {
+                // load image from JAR and display it in image view
+                imgRes = AppUtil.getResource(GZipper.class, "/" + IMG_NAME);
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    imgRes = AppUtil.getDecodedRootPath(getClass()) + IMG_NAME;
+                } catch (UnsupportedEncodingException ex1) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            } finally {
+                if (imgRes != null) {
+                    _imageFile = new File(imgRes);
+                }
+            }
         }
+
+        _imageView.setImage(new Image(_imageFile.toURI().toString()));
 
         final Text appName = new Text(_appName + "\n");
         final Text appVersion = new Text("Version" + ": " + _appVersion + "\n");
