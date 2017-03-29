@@ -54,7 +54,7 @@ import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
-import org.gzipper.java.presentation.model.ArchivingOperation;
+import org.gzipper.java.presentation.model.ArchiveOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 import org.gzipper.java.style.CSS;
 
@@ -223,7 +223,7 @@ public class MainViewController extends BaseController {
                         }
                     }
                     String archiveType = _archiveTypeComboBox.getValue().getName();
-                    ArchivingOperation operation = _strategy.initOperation(archiveType);
+                    ArchiveOperation operation = _strategy.initOperation(archiveType);
                     _strategy.performOperation(operation);
                 } else {
                     LOGGER.log(Level.WARNING, I18N.getString("invalidOutputPath.text"));
@@ -388,12 +388,12 @@ public class MainViewController extends BaseController {
     /**
      * Initializes the archiving job by creating the required {@link Task}.
      *
-     * @param operation the {@link ArchivingOperation} that will eventually be
+     * @param operation the {@link ArchiveOperation} that will eventually be
      * performed by the task when executed.
      * @return a {@link Task} that can be executed to perform the specified
      * archiving operation.
      */
-    private Task<Boolean> initArchivingJob(ArchivingOperation operation) {
+    private Task<Boolean> initArchivingJob(ArchiveOperation operation) {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
@@ -431,13 +431,13 @@ public class MainViewController extends BaseController {
 
     /**
      * Calculates the total duration in seconds of the specified
-     * {@link ArchivingOperation} and appends it via
+     * {@link ArchiveOperation} and appends it via
      * {@link #appendToTextArea(java.lang.String)}. Also toggles
      * {@link #_startButton} and {@link #_abortButton}.
      *
-     * @param operation {@link ArchivingOperation} that holds elapsed time.
+     * @param operation {@link ArchiveOperation} that holds elapsed time.
      */
-    private void finalizeArchivingJob(ArchivingOperation operation) {
+    private void finalizeArchivingJob(ArchiveOperation operation) {
         LOGGER.log(Level.INFO, "{0}{1} seconds.",
                 new Object[]{I18N.getString("elapsedTime.text"),
                     operation.calculateElapsedTime()});
@@ -529,10 +529,10 @@ public class MainViewController extends BaseController {
 
         public abstract void applyExtensionFilters(FileChooser chooser);
 
-        public abstract ArchivingOperation initOperation(
+        public abstract ArchiveOperation initOperation(
                 String archiveType) throws GZipperException;
 
-        public void performOperation(ArchivingOperation operation) {
+        public void performOperation(ArchiveOperation operation) {
             if (operation != null) {
                 _activeTask = initArchivingJob(operation);
                 toggleStartAndAbortButton();
@@ -559,7 +559,7 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public void performOperation(ArchivingOperation operation) {
+        public void performOperation(ArchiveOperation operation) {
             if (_selectedFiles != null) {
                 super.performOperation(operation);
             } else {
@@ -570,11 +570,11 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchivingOperation initOperation(String archiveType) throws GZipperException {
+        public ArchiveOperation initOperation(String archiveType) throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _compressionLevel,
                     _selectedFiles, _selectedFile.getParent());
-            return new ArchivingOperation(info, true);
+            return new ArchiveOperation(info, true);
         }
 
         @Override
@@ -605,7 +605,7 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public void performOperation(ArchivingOperation operation) {
+        public void performOperation(ArchiveOperation operation) {
             if (_selectedFile != null) {
                 super.performOperation(operation);
             } else {
@@ -617,11 +617,11 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchivingOperation initOperation(String archiveType) throws GZipperException {
+        public ArchiveOperation initOperation(String archiveType) throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _selectedFiles.get(0).getAbsolutePath(),
                     _selectedFile + File.separator);
-            return new ArchivingOperation(info, false);
+            return new ArchiveOperation(info, false);
         }
 
         @Override
