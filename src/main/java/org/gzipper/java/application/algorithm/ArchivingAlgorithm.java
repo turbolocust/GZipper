@@ -24,6 +24,7 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
@@ -31,7 +32,7 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
  *
  * @author Matthias Fussenegger
  */
-public interface ArchivingAlgorithm {
+public interface ArchivingAlgorithm extends Interruptable {
 
     /**
      * Extracts an archive using the algorithm of the concrete class and stores

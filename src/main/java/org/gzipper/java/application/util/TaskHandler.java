@@ -16,9 +16,11 @@
  */
 package org.gzipper.java.application.util;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javafx.concurrent.Task;
+import java.util.concurrent.Future;
 
 /**
  * Singleton used to execute tasks using an {@link Executor}.
@@ -28,10 +30,13 @@ import javafx.concurrent.Task;
 public class TaskHandler {
 
     /**
-     * The executor which executes tasks.
+     * The executor service which executes tasks.
      */
-    private final Executor _executor;
+    private final ExecutorService _executor;
 
+    /**
+     * Initializes the executor service with a new cached thread pool.
+     */
     private TaskHandler() {
         _executor = Executors.newCachedThreadPool();
     }
@@ -49,9 +54,21 @@ public class TaskHandler {
      * Executes the specified task.
      *
      * @param task the task to be executed.
+     * @return a {@link Future} which can be used to manipulate the task.
      */
-    public void execute(Task<?> task) {
-        _executor.execute(task);
+    public Future<?> submit(Runnable task) {
+        return _executor.submit(task);
+    }
+
+    /**
+     * Executes the specified task.
+     *
+     * @param <T> the type of the task's result.
+     * @param task the task to be executed.
+     * @return a {@link Future} which can be used to manipulate the task.
+     */
+    public <T> Future<T> submit(Callable<T> task) {
+        return _executor.submit(task);
     }
 
     /**

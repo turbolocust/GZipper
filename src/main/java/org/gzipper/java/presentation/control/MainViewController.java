@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -54,7 +55,7 @@ import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
-import org.gzipper.java.presentation.model.ArchiveOperation;
+import org.gzipper.java.presentation.util.ArchiveOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 import org.gzipper.java.style.CSS;
 
@@ -87,9 +88,9 @@ public class MainViewController extends BaseController {
     private ArchivingStrategy _strategy;
 
     /**
-     * The currently active task. Multiple tasks may be supported in the future.
+     * The {@link Future} object of the currently active task.
      */
-    private Task<Boolean> _activeTask;
+    private Future<?> _activeTask;
 
     /**
      * The file or directory that has been selected by the user.
@@ -238,7 +239,13 @@ public class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            _activeTask.cancel(true);
+            if (_activeTask != null && !_activeTask.isCancelled()) {
+                final boolean cancelled = _activeTask.cancel(true);
+                if (!cancelled) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
+                            "Task cancellation failed for {0}", _activeTask.toString());
+                }
+            }
         }
     }
 
@@ -262,13 +269,9 @@ public class MainViewController extends BaseController {
                 final int selectedFiles = _selectedFiles.size();
                 message = I18N.getString("filesSelected.text");
                 message = message.replace("{0}", Integer.toString(selectedFiles));
-                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                        "A total of {0} file(s) have been selected.", selectedFiles);
             } else {
                 _startButton.setDisable(true);
                 message = I18N.getString("noFilesSelected.text");
-                Logger.getLogger(GZipper.class.getName()).log(
-                        Level.INFO, "No files have been selected.");
             }
             LOGGER.log(Level.INFO, message);
         }
@@ -293,6 +296,8 @@ public class MainViewController extends BaseController {
             if (file != null) {
                 updateSelectedFile(file);
                 _outputPathTextField.setText(file.getAbsolutePath());
+                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                        "Output directory set to: {0}", file.getAbsolutePath());
             }
         }
     }
@@ -386,7 +391,12 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Initializes the archiving job by creating the required {@link Task}.
+     * Initializes the archiving job by creating the required {@link Task}. This
+     * task will not perform the algorithmic operations for archives but instead
+     * constantly check for interruption to properly detect the abort of an
+     * operation. For the algorithmic operations a new task will be created and
+     * submitted to the task handler. If an operation has been aborted, e.g.
+     * through user interaction, the operation will be interrupted.
      *
      * @param operation the {@link ArchiveOperation} that will eventually be
      * performed by the task when executed.
@@ -397,10 +407,29 @@ public class MainViewController extends BaseController {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
-                return operation.performOperation();
+
+                final TaskHandler handler = TaskHandler.getInstance();
+                Future<Boolean> futureTask = handler.submit(operation);
+
+                while (!futureTask.isDone()) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException ex) {
+                        // if exception is caught, task has been interrupted
+                        LOGGER.log(Level.INFO, I18N.getString("interrupt.text"));
+                        Logger.getLogger(GZipper.class.getName()).log(
+                                Level.WARNING, "Operation has been interrupted.", ex);
+                        operation.interrupt();
+                        boolean cancelled = futureTask.cancel(true);
+
+                        if (cancelled) {
+                            LOGGER.log(Level.INFO, I18N.getString("operationCancel.text"));
+                        }
+                    }
+                }
+                return futureTask.get();
             }
         };
-
         // show success message and finalize archiving job when task has succeeded
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
@@ -412,17 +441,11 @@ public class MainViewController extends BaseController {
             }
             finalizeArchivingJob(operation);
         });
-        // show message that task has been cancelled and finalize archiving job
-        task.setOnCancelled(e -> {
-            LOGGER.log(Level.INFO, I18N.getString("operationCancel.text"));
-            finalizeArchivingJob(operation);
-            e.consume();
-        });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
-            LOGGER.log(Level.SEVERE, I18N.getString("operationFail.text"));
+            LOGGER.log(Level.INFO, I18N.getString("operationFail.text"));
             Logger.getLogger(GZipper.class.getName()).log(
-                    Level.SEVERE, null, e.getSource().getException());
+                    Level.WARNING, null, e.getSource().getException());
             finalizeArchivingJob(operation);
         });
 
@@ -534,8 +557,7 @@ public class MainViewController extends BaseController {
 
         public void performOperation(ArchiveOperation operation) {
             if (operation != null) {
-                _activeTask = initArchivingJob(operation);
-                toggleStartAndAbortButton();
+                Task<Boolean> task = initArchivingJob(operation);
                 ArchiveInfo info = operation.getArchiveInfo();
                 LOGGER.log(Level.INFO, "{0}{1}",
                         new Object[]{I18N.getString("outputPath.text"),
@@ -543,7 +565,8 @@ public class MainViewController extends BaseController {
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                         I18N.getString("operationStarted.text"),
                         new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
-                TaskHandler.getInstance().execute(_activeTask);
+                _activeTask = TaskHandler.getInstance().submit(task);
+                toggleStartAndAbortButton();
             }
         }
     }

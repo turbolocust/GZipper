@@ -53,6 +53,11 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
 
     /**
+     * True if this algorithm is performing an operation, false otherwise.
+     */
+    private volatile boolean _interrupt = false;
+
+    /**
      * The compression level. Will only be considered if supported by algorithm.
      */
     protected int _compressionLevel;
@@ -107,7 +112,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 folder.mkdir();
             }
 
-            while (entry != null) {
+            while (!_interrupt && entry != null) {
                 String entryName = entry.getName();
 
                 LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
@@ -128,7 +133,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         new FileOutputStream(newFilePath))) {
                     byte[] buffer = new byte[4096];
                     int readBytes;
-                    while ((readBytes = inputStream.read(buffer)) != -1) {
+                    while (!_interrupt && (readBytes = inputStream.read(buffer)) != -1) {
                         buf.write(buffer, 0, readBytes);
                     }
                 }
@@ -182,7 +187,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         int readBytes;
 
         if (files.length > 0) {
-            for (int i = 0; i < files.length; ++i) {
+            for (int i = 0; !_interrupt && i < files.length; ++i) {
                 // create next file and define entry name based on folder level
                 File newFile = files[i];
                 String entryName = base + newFile.getName();
@@ -198,7 +203,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         ArchiveEntry entry = outputStream.createArchiveEntry(newFile, entryName);
                         outputStream.putArchiveEntry(entry);
                         // write bytes to file
-                        while ((readBytes = buf.read(buffer)) != -1) {
+                        while (!_interrupt && (readBytes = buf.read(buffer)) != -1) {
                             outputStream.write(buffer, 0, readBytes);
                         }
                         outputStream.closeArchiveEntry();
@@ -215,18 +220,6 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         }
     }
 
-    @Override
-    public ArchiveOutputStream makeArchiveOutputStream(
-            OutputStream stream) throws IOException, ArchiveException {
-        return _archiveStreamFactory.createArchiveOutputStream(_archiveType, stream);
-    }
-
-    @Override
-    public CompressorOutputStream makeCompressorOutputStream(
-            OutputStream stream) throws IOException, CompressorException {
-        return _compressorStreamFactory.createCompressorOutputStream(_compressionType, stream);
-    }
-
     /**
      * Retrieves files from a specific directory; mandatory for compression.
      *
@@ -240,4 +233,20 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         return files;
     }
 
+    @Override
+    public ArchiveOutputStream makeArchiveOutputStream(
+            OutputStream stream) throws IOException, ArchiveException {
+        return _archiveStreamFactory.createArchiveOutputStream(_archiveType, stream);
+    }
+
+    @Override
+    public CompressorOutputStream makeCompressorOutputStream(
+            OutputStream stream) throws IOException, CompressorException {
+        return _compressorStreamFactory.createCompressorOutputStream(_compressionType, stream);
+    }
+
+    @Override
+    public void interrupt() {
+        _interrupt = true;
+    }
 }
