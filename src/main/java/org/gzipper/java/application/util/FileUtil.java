@@ -32,13 +32,24 @@ import java.nio.file.StandardCopyOption;
 public class FileUtil {
 
     /**
+     * Validates the specified path, which has to be a file or directory.
+     *
+     * @param path the path as string to be validated.
+     * @return true if path exists, false otherwise.
+     */
+    public static boolean isValidFile(String path) {
+        final File file = new File(path);
+        return file.exists();
+    }
+
+    /**
      * Validates the specified path, which has to be the path of a directory.
      *
      * @param path the path as string to be validated.
      * @return true if path exists and is a directory, false otherwise.
      */
     public static boolean isValidDirectory(String path) {
-        File file = new File(path);
+        final File file = new File(path);
         return file.exists() && file.isDirectory();
     }
 
@@ -49,7 +60,7 @@ public class FileUtil {
      * @return true if path exists and is not a directory, false otherwise.
      */
     public static boolean isValidFileName(String path) {
-        File file = new File(path);
+        final File file = new File(path);
         return file.isAbsolute() && !file.isDirectory();
     }
 
@@ -82,7 +93,9 @@ public class FileUtil {
             return null;
         }
         // check if location ends with separator and add it if missing
-        String absolutePath = path.endsWith(File.separator) ? path : path + File.separator;
+        String absolutePath = path.endsWith(File.separator)
+                ? path
+                : path + File.separator;
         return absolutePath + file;
     }
 

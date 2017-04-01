@@ -95,7 +95,7 @@ public class AboutViewController extends BaseController {
     @FXML
     void handleCloseButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeButton)) {
-            _primaryStage.close();
+            close();
         }
     }
 

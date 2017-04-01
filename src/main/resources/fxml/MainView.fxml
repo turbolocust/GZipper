@@ -89,11 +89,7 @@
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="%editMenu.text">
                                     <items>
-                                        <MenuItem fx:id="_deleteMenuItem" mnemonicParsing="false" onAction="#handleDeleteMenuItemAction" text="%deleteMenuItem.text">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                                            </accelerator>
-                                        </MenuItem>
+                                        <MenuItem fx:id="_deleteMenuItem" mnemonicParsing="false" onAction="#handleDeleteMenuItemAction" text="%deleteMenuItem.text" />
                                         <Menu mnemonicParsing="false" text="%compressionLevelMenuItem.text">
                                             <items>
                                                 <MenuItem fx:id="_noCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%noCompression.text" />
@@ -107,6 +103,14 @@
                                         <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />
                                     </items>
                                 </Menu>
+                        <Menu mnemonicParsing="false" text="Tools">
+                          <items>
+                            <MenuItem fx:id="_dropAddressesMenuItem" mnemonicParsing="false" onAction="#handleDropAddressesMenuItemAction" text="AddressDropper">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                 </accelerator></MenuItem>
+                          </items>
+                        </Menu>
                                 <Menu mnemonicParsing="false" text="%helpMenu.text">
                                     <items>
                                         <MenuItem fx:id="_aboutMenuItem" mnemonicParsing="false" onAction="#handleAboutMenuItemAction" text="%aboutMenuItem.text" />

@@ -16,23 +16,14 @@
  */
 package org.gzipper.java.presentation.control;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.style.CSS;
 
 /**
@@ -83,37 +74,20 @@ public abstract class BaseController implements Initializable {
         _theme = theme;
     }
 
+    /**
+     * Closes the primary stage of this controller.
+     */
+    protected void close() {
+        _primaryStage.close();
+    }
+
     @FXML
     protected MenuItem _aboutMenuItem;
 
     @FXML
     protected void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AboutView.fxml"));
-            AboutViewController controller = new AboutViewController(_theme);
-
-            fxmlLoader.setResources(I18N.getBundle());
-            fxmlLoader.setController(controller);
-
-            final Stage aboutView = new Stage();
-            aboutView.initModality(Modality.WINDOW_MODAL);
-            controller.setPrimaryStage(aboutView);
-
-            try {
-                Scene scene = new Scene(fxmlLoader.load());
-                if (_theme == CSS.Theme.DARK_THEME) {
-                    scene.getStylesheets().add(getClass().getResource(
-                            CSS.STYLESHEET_DARK_THEME).toExternalForm());
-                }
-                aboutView.getIcons().add(_frameImage);
-                aboutView.setTitle(I18N.getString("aboutTitle.text"));
-                aboutView.setScene(scene);
-                aboutView.showAndWait();
-            } catch (IOException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
-                AlertDialog.showErrorDialog(I18N.getString("error.text"),
-                        I18N.getString("errorOpeningWindow.text"));
-            }
+            ViewControllers.showAboutView(_theme);
         }
     }
 }

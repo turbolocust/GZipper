@@ -19,6 +19,7 @@ package org.gzipper.java.presentation.control;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -133,6 +134,9 @@ public class MainViewController extends BaseController {
     private MenuItem _deleteMenuItem;
 
     @FXML
+    private MenuItem _dropAddressesMenuItem;
+
+    @FXML
     private RadioButton _compressRadioButton;
 
     @FXML
@@ -194,7 +198,7 @@ public class MainViewController extends BaseController {
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
-            _primaryStage.close();
+            close();
             System.exit(0);
         }
     }
@@ -208,6 +212,24 @@ public class MainViewController extends BaseController {
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
+            }
+        }
+    }
+
+    @FXML
+    void handleDropAddressesMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_dropAddressesMenuItem)) {
+            List<String> files = ViewControllers
+                    .showDropView(_theme).getAddresses();
+            if (files != null && !files.isEmpty()) {
+                _selectedFiles = new ArrayList<>(files.size());
+                files.forEach((filePath) -> {
+                    _selectedFiles.add(new File(filePath));
+                    LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{I18N.getString(
+                        "fileSelected.text"), filePath});
+                });
+            } else {
+                LOGGER.log(Level.INFO, I18N.getString("noFilesSelected.text"));
             }
         }
     }
