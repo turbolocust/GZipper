@@ -21,10 +21,11 @@ import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Utility class used to validate files, e.g. file paths or names.
+ * Convenience class for different kinds of file operations.
  *
  * @author Matthias Fussenegger
  */
@@ -65,6 +66,27 @@ public class FileUtil {
     }
 
     /**
+     * Concatenates a file path and file name. Before doing so, a check will be
+     * performed whether the path ends with an separator. If the separator is
+     * missing it will be added. As a result, a valid absolute path will be
+     * returned, although it is not guaranteed that this file exists.
+     *
+     * @param path location of a folder.
+     * @param file the file name.
+     * @return {@code null} if either any of the parameters is {@code null} or
+     * empty. Otherwise the concatenated absolute path is returned.
+     */
+    public static String combinePathAndFileName(String path, String file) {
+        // check if parameters are not null and not empty
+        if (path == null || file == null || path.isEmpty() || file.isEmpty()) {
+            return null;
+        }
+        // check if location ends with separator and add it if missing
+        String absolutePath = path.endsWith(File.separator) ? path : path + File.separator;
+        return absolutePath + file;
+    }
+
+    /**
      * Copies a file from the specified source to destination. If no copy
      * options are specified, the file at the destination will not be replaced
      * in case it already exists.
@@ -72,12 +94,24 @@ public class FileUtil {
      * @param src the source path.
      * @param dst the destination path.
      * @param options optional copy options.
+     * @return the path to the target file.
      * @throws IOException if an I/O error occurs.
      */
-    public static void copy(Path src, Path dst, CopyOption... options) throws IOException {
+    public static Path copy(String src, String dst, CopyOption... options) throws IOException {
         if (options == null) {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
         }
-        Files.copy(src, dst, options);
+        return Files.copy(Paths.get(src), Paths.get(dst), options);
+    }
+
+    /**
+     * Deletes a file from the specified source location if it exists.
+     *
+     * @param src the source file.
+     * @return true if file was deleted, false if it did not exist.
+     * @throws IOException if an I/O error occurs.
+     */
+    public static boolean delete(String src) throws IOException {
+        return Files.deleteIfExists(Paths.get(src));
     }
 }

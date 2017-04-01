@@ -35,6 +35,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.control.MainViewController;
 
@@ -153,10 +154,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     @Override
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
-        // check if location ends with separator, which is required for output stream
-        String path = location.endsWith(File.separator) ? location : location + File.separator;
 
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path + name));
+        final String fullName = FileUtil.combinePathAndFileName(location, name);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullName));
 
         CompressorOutputStream cos = makeCompressorOutputStream(bos);
         try (ArchiveOutputStream aos = cos != null

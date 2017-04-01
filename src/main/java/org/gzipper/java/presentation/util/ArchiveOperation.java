@@ -126,6 +126,15 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
         return success;
     }
 
+    /**
+     * Checks whether this operation is for compression or decompression.
+     *
+     * @return true if operation is for compression, false for decompression.
+     */
+    public boolean isCompress() {
+        return _compress;
+    }
+
     @Override
     public void interrupt() {
         _algorithm.interrupt();

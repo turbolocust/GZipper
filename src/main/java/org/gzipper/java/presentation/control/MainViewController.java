@@ -17,6 +17,7 @@
 package org.gzipper.java.presentation.control;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -413,7 +414,7 @@ public class MainViewController extends BaseController {
 
                 while (!futureTask.isDone()) {
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(10); // check for interruption
                     } catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
                         LOGGER.log(Level.INFO, I18N.getString("interrupt.text"));
@@ -444,8 +445,29 @@ public class MainViewController extends BaseController {
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
             LOGGER.log(Level.INFO, I18N.getString("operationFail.text"));
-            Logger.getLogger(GZipper.class.getName()).log(
-                    Level.WARNING, null, e.getSource().getException());
+            final Throwable throwable = e.getSource().getException();
+            if (throwable != null) {
+                Logger.getLogger(GZipper.class.getName()).log(Level.WARNING, null, throwable);
+            }
+            // delete corrupt archive on operation fail
+            if (operation.isCompress()) {
+                ArchiveInfo info = operation.getArchiveInfo();
+                final String archive = FileUtil.combinePathAndFileName(
+                        info.getOutputPath(), info.getArchiveName());
+                try {
+                    if (FileUtil.delete(archive)) {
+                        Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
+                                "Archive file deleted: {0}", archive);
+                    } else {
+                        Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
+                                "Archive could not be deleted as it no longer exists.");
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
+                            "I/O error occurred while trying to delete "
+                            + "corrupt archive on operation fail.", ex);
+                }
+            }
             finalizeArchivingJob(operation);
         });
 

@@ -109,7 +109,7 @@ public class GZipper extends Application {
             if (!settings.exists()) {
                 try { // copy settings file to application folder if missing
                     String resource = AppUtil.getResource(GZipper.class, "/settings.properties");
-                    FileUtil.copy(Paths.get(resource), Paths.get(decPath + "settings.properties"));
+                    FileUtil.copy(resource, decPath + "settings.properties");
                 } catch (URISyntaxException | IOException ex) {
                     Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
                 }
