@@ -38,7 +38,7 @@ public class CSS {
      * Enumeration that consists of all existing visual themes.
      */
     public enum Theme {
-        
+
         MODENA(""), DARK_THEME("/css/DarkTheme.css");
 
         /**
@@ -57,6 +57,15 @@ public class CSS {
          */
         public String getLocation() {
             return _location;
+        }
+
+        /**
+         * Returns the default theme of the application.
+         *
+         * @return the default theme.
+         */
+        public static Theme getDefault() {
+            return MODENA;
         }
     }
 }

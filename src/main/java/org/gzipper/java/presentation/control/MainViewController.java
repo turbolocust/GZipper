@@ -520,7 +520,7 @@ public class MainViewController extends BaseController {
     private void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
         final String sheetLocation = GZipper.class.getResource(
                 theme.getLocation()).toExternalForm();
-        _theme = theme;
+        _theme = enableTheme ? theme : CSS.Theme.getDefault();
         _stages.forEach((stage) -> {
             if (enableTheme) {
                 stage.getScene().getStylesheets().add(sheetLocation);
