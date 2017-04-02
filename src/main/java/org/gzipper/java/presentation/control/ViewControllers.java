@@ -95,7 +95,7 @@ public class ViewControllers {
 
         try {
             dropView.getIcons().add(_frameImage);
-            dropView.setTitle("AddressDropper");
+            dropView.setTitle("Address Dropper");
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {

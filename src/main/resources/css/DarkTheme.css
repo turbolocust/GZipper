@@ -7,7 +7,7 @@
     -fx-control-inner-background:  rgb(50, 50, 50); 
 }
 
-/* Color for bold text in AddressDropper */
+/* Color for bold text in Address Dropper */
 #dropViewText {
     -fx-fill: #FFFFFF;
 }
