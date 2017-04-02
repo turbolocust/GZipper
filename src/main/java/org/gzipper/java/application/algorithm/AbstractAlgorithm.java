@@ -138,10 +138,11 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         buf.write(buffer, 0, readBytes);
                     }
                 }
-
-                LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                    entryName, " ", I18N.getString("extracted.text")});
-                entry = inputStream.getNextEntry();
+                if (!_interrupt) {
+                    LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
+                        entryName, " ", I18N.getString("extracted.text")});
+                    entry = inputStream.getNextEntry();
+                }
             }
         }
     }
@@ -208,10 +209,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         }
                         outputStream.closeArchiveEntry();
                     }
-                    LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                        newFile.getName(),
-                        " ",
-                        I18N.getString("compressed.text")});
+                    if (!_interrupt) {
+                        LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
+                            newFile.getName(),
+                            " ",
+                            I18N.getString("compressed.text")});
+                    }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
                     compress(children, entryName + File.separator, outputStream);

@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Singleton used to execute tasks using an {@link Executor}.
+ * Handler used to execute tasks using an {@link Executor}.
  *
  * @author Matthias Fussenegger
  */
@@ -32,22 +32,16 @@ public class TaskHandler {
     /**
      * The executor service which executes tasks.
      */
-    private final ExecutorService _executor;
+    private static final ExecutorService EXECUTOR_SERVICE;
 
-    /**
-     * Initializes the executor service with a new cached thread pool.
-     */
-    private TaskHandler() {
-        _executor = Executors.newCachedThreadPool();
+    static {
+        EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     }
 
     /**
-     * Returns the singleton instance of this class.
-     *
-     * @return the singleton instance of this class.
+     * Holds static members only.
      */
-    public static TaskHandler getInstance() {
-        return TaskHandlerHolder.INSTANCE;
+    private TaskHandler() {
     }
 
     /**
@@ -56,8 +50,8 @@ public class TaskHandler {
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public Future<?> submit(Runnable task) {
-        return _executor.submit(task);
+    public static synchronized Future<?> submit(Runnable task) {
+        return EXECUTOR_SERVICE.submit(task);
     }
 
     /**
@@ -67,18 +61,7 @@ public class TaskHandler {
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public <T> Future<T> submit(Callable<T> task) {
-        return _executor.submit(task);
-    }
-
-    /**
-     * Holder class for singleton instance.
-     */
-    private static class TaskHandlerHolder {
-
-        /**
-         * The actual singleton instance of the outer class.
-         */
-        private static final TaskHandler INSTANCE = new TaskHandler();
+    public static synchronized <T> Future<T> submit(Callable<T> task) {
+        return EXECUTOR_SERVICE.submit(task);
     }
 }

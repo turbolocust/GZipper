@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
@@ -84,15 +87,16 @@ public class MainViewController extends BaseController {
     private static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
 
     /**
+     * Map consisting of {@link Future} objects representing the currently
+     * active tasks.
+     */
+    private final Map<String, Future<?>> _activeTasks;
+
+    /**
      * The currently active strategy for archiving operations. This can either
      * be a {@link CompressStrategy} or {@link DecompressStrategy}.
      */
     private ArchivingStrategy _strategy;
-
-    /**
-     * The {@link Future} object of the currently active task.
-     */
-    private Future<?> _activeTask;
 
     /**
      * The output file or directory that has been selected by the user.
@@ -177,6 +181,7 @@ public class MainViewController extends BaseController {
     public MainViewController(CSS.Theme theme) {
         super(theme);
         _archiveName = DEFAULT_ARCHIVE_NAME;
+        _activeTasks = Collections.synchronizedMap(new HashMap<>());
         Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                 "Default archive name set to: {0}", _archiveName);
     }
@@ -252,7 +257,7 @@ public class MainViewController extends BaseController {
                         Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                                 "Operation started using the following archive info: {0}",
                                 operation.getArchiveInfo().toString());
-                        //_strategy.performOperation(operation);
+                        _strategy.performOperation(operation);
                     }
                 } else {
                     LOGGER.log(Level.WARNING, I18N.getString("invalidOutputPath.text"));
@@ -267,12 +272,13 @@ public class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            if (_activeTask != null && !_activeTask.isCancelled()) {
-                final boolean cancelled = _activeTask.cancel(true);
-                if (!cancelled) {
+            if (_activeTasks != null && !_activeTasks.isEmpty()) {
+                _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
+                        .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
+                    // log warning message when cancellation of task has failed
                     Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
-                            "Task cancellation failed for {0}", _activeTask.toString());
-                }
+                            "Task cancellation failed for {0}", task.toString());
+                });
             }
         }
     }
@@ -377,7 +383,7 @@ public class MainViewController extends BaseController {
     @FXML
     void handleEnableLoggingCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
-            boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
+            final boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
             Settings.getInstance().setProperty("loggingEnabled", enableLogging);
         }
     }
@@ -441,8 +447,7 @@ public class MainViewController extends BaseController {
             @Override
             protected Boolean call() throws Exception {
 
-                final TaskHandler handler = TaskHandler.getInstance();
-                Future<Boolean> futureTask = handler.submit(operation);
+                Future<Boolean> futureTask = TaskHandler.submit(operation);
 
                 while (!futureTask.isDone()) {
                     try {
@@ -472,7 +477,7 @@ public class MainViewController extends BaseController {
                 LOGGER.log(Level.SEVERE, I18N.getString("operationFail.text"));
                 LOGGER.log(Level.WARNING, I18N.getString("missingAccessRights.text"));
             }
-            finalizeArchivingJob(operation);
+            finalizeArchivingJob(operation, task);
         });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
@@ -500,7 +505,7 @@ public class MainViewController extends BaseController {
                             + "corrupt archive after fail of operation.", ex);
                 }
             }
-            finalizeArchivingJob(operation);
+            finalizeArchivingJob(operation, task);
         });
 
         return task;
@@ -508,16 +513,17 @@ public class MainViewController extends BaseController {
 
     /**
      * Calculates the total duration in seconds of the specified
-     * {@link ArchiveOperation} and appends it via
-     * {@link #appendToTextArea(java.lang.String)}. Also toggles
+     * {@link ArchiveOperation} and logs it to {@link #_textArea}. Also toggles
      * {@link #_startButton} and {@link #_abortButton}.
      *
      * @param operation {@link ArchiveOperation} that holds elapsed time.
+     * @param task the task that will be removed from {@link #_activeTasks}.
      */
-    private void finalizeArchivingJob(ArchiveOperation operation) {
+    private void finalizeArchivingJob(ArchiveOperation operation, Task<?> task) {
         LOGGER.log(Level.INFO, "{0}{1} seconds.",
                 new Object[]{I18N.getString("elapsedTime.text"),
                     operation.calculateElapsedTime()});
+        _activeTasks.remove(task.toString());
         toggleStartAndAbortButton();
     }
 
@@ -645,7 +651,7 @@ public class MainViewController extends BaseController {
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                         I18N.getString("operationStarted.text"),
                         new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
-                _activeTask = TaskHandler.getInstance().submit(task);
+                _activeTasks.put(task.toString(), TaskHandler.submit(task));
                 toggleStartAndAbortButton();
             }
         }
