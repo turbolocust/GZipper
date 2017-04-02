@@ -145,14 +145,14 @@
                                 <Insets left="16.0" />
                             </GridPane.margin>
                             <children>
-                                <Button fx:id="_selectFilesButton" minWidth="140.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
+                                <Button fx:id="_selectFilesButton" minWidth="150.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
                                     <padding>
                                         <Insets bottom="5.0" top="5.0" />
                                     </padding>
                                 </Button>
-                                <Button fx:id="_saveAsButton" minWidth="128.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
+                                <Button fx:id="_saveAsButton" minWidth="132.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                <Label text="%compressAs.text" />
+                                <Label text="%archiveType.text" />
                                 <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" prefWidth="160.0" promptText="..." />
                             </children>
                         </HBox>

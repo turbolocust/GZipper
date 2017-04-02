@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     </columnConstraints>
@@ -21,7 +21,7 @@
     </rowConstraints>
     <children>
         <TextArea fx:id="_textArea" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-        <AnchorPane style="-fx-background-color: #FFFFFF;" GridPane.rowIndex="2">
+        <AnchorPane GridPane.rowIndex="2">
             <children>
             <HBox alignment="CENTER_LEFT" spacing="16.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="8.0">
                <children>
@@ -31,10 +31,10 @@
             </HBox>
             </children>
         </AnchorPane>
-        <Text fx:id="_titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="%dropViewDescription.text">
-            <GridPane.margin>
-                <Insets left="8.0" />
-            </GridPane.margin>
+        <Text id="dropViewText" fx:id="_titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="%dropViewDescription.text">
+         <GridPane.margin>
+            <Insets left="8.0" />
+         </GridPane.margin>
         </Text>
     </children>
 </GridPane>

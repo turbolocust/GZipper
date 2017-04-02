@@ -143,4 +143,14 @@ public class ArchiveInfo {
     public void setOutputPath(String outputPath) {
         _outputPath = outputPath;
     }
+
+    @Override
+    public String toString() {
+        return "ArchiveInfo{"
+                + "Archive type=" + _archiveType
+                + ", Compression level=" + _level
+                + ", Files=" + _files
+                + ", Archive name=" + _archiveName
+                + ", Output path=" + _outputPath + '}';
+    }
 }

@@ -95,9 +95,9 @@ public class MainViewController extends BaseController {
     private Future<?> _activeTask;
 
     /**
-     * The file or directory that has been selected by the user.
+     * The output file or directory that has been selected by the user.
      */
-    private File _selectedFile;
+    private File _outputFile;
 
     /**
      * A list consisting of the files that have been selected by the user. These
@@ -240,15 +240,20 @@ public class MainViewController extends BaseController {
             try {
                 if (_strategy.validateOutputPath()) {
                     String outputPath = _outputPathTextField.getText();
-                    if (!_selectedFile.getAbsolutePath().equals(outputPath)) {
-                        _selectedFile = new File(outputPath);
-                        if (!_selectedFile.isDirectory()) {
-                            _archiveName = _selectedFile.getName();
+                    if (!_outputFile.getAbsolutePath().equals(outputPath)) {
+                        _outputFile = new File(outputPath);
+                        if (!_outputFile.isDirectory()) {
+                            _archiveName = _outputFile.getName();
                         }
                     }
                     String archiveType = _archiveTypeComboBox.getValue().getName();
-                    ArchiveOperation operation = _strategy.initOperation(archiveType);
-                    _strategy.performOperation(operation);
+                    ArchiveOperation[] operations = _strategy.initOperation(archiveType);
+                    for (ArchiveOperation operation : operations) {
+                        Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
+                                "Operation started using the following archive info: {0}",
+                                operation.getArchiveInfo().toString());
+                        //_strategy.performOperation(operation);
+                    }
                 } else {
                     LOGGER.log(Level.WARNING, I18N.getString("invalidOutputPath.text"));
                 }
@@ -292,6 +297,11 @@ public class MainViewController extends BaseController {
                 final int selectedFiles = _selectedFiles.size();
                 message = I18N.getString("filesSelected.text");
                 message = message.replace("{0}", Integer.toString(selectedFiles));
+                // log the path of each selected file
+                _selectedFiles.forEach((file) -> {
+                    LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{
+                        I18N.getString("fileSelected.text"), file.getAbsolutePath()});
+                });
             } else {
                 _startButton.setDisable(true);
                 message = I18N.getString("noFilesSelected.text");
@@ -409,7 +419,7 @@ public class MainViewController extends BaseController {
             if (!file.isDirectory()) {
                 _archiveName = file.getName();
             }
-            _selectedFile = file;
+            _outputFile = file;
         }
     }
 
@@ -487,7 +497,7 @@ public class MainViewController extends BaseController {
                 } catch (IOException ex) {
                     Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
                             "I/O error occurred while trying to delete "
-                            + "corrupt archive on operation fail.", ex);
+                            + "corrupt archive after fail of operation.", ex);
                 }
             }
             finalizeArchivingJob(operation);
@@ -554,7 +564,7 @@ public class MainViewController extends BaseController {
         } else {
             _outputPathTextField.setText(os.getDefaultUserDirectory());
         }
-        _selectedFile = new File(_outputPathTextField.getText());
+        _outputFile = new File(_outputPathTextField.getText());
 
         // set dark theme as enabled if done so on previous application launch
         if (_theme == CSS.Theme.DARK_THEME) {
@@ -592,13 +602,39 @@ public class MainViewController extends BaseController {
      */
     private abstract class ArchivingStrategy {
 
+        /**
+         * Validates the output path for the concrete strategy.
+         *
+         * @return true if output path is valid, false otherwise.
+         */
         public abstract boolean validateOutputPath();
 
+        /**
+         * Applies the required extension filters for the concrete strategy to
+         * the specified {@link FileChooser}.
+         *
+         * @param chooser the {@link FileChooser} to which the extension filters
+         * will be applied to.
+         */
         public abstract void applyExtensionFilters(FileChooser chooser);
 
-        public abstract ArchiveOperation initOperation(
+        /**
+         * Initializes the archiving operation.
+         *
+         * @param archiveType the type of the archive, see {@link ArchiveType}.
+         * @return an array consisting of {@link ArchiveOperation} objects.
+         * @throws GZipperException if the archive type could not have been
+         * determined.
+         */
+        public abstract ArchiveOperation[] initOperation(
                 String archiveType) throws GZipperException;
 
+        /**
+         * Performs the specified {@link ArchiveOperation} using the concrete
+         * strategy.
+         *
+         * @param operation the {@link ArchiveOperation} to be performed.
+         */
         public void performOperation(ArchiveOperation operation) {
             if (operation != null) {
                 Task<Boolean> task = initArchivingJob(operation);
@@ -637,11 +673,12 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation initOperation(String archiveType) throws GZipperException {
+        public ArchiveOperation[] initOperation(String archiveType)
+                throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _compressionLevel,
-                    _selectedFiles, _selectedFile.getParent());
-            return new ArchiveOperation(info, true);
+                    _selectedFiles, _outputFile.getParent());
+            return new ArchiveOperation[]{new ArchiveOperation(info, true)};
         }
 
         @Override
@@ -673,7 +710,7 @@ public class MainViewController extends BaseController {
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_selectedFile != null) {
+            if (_outputFile != null) {
                 super.performOperation(operation);
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
@@ -684,11 +721,20 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation initOperation(String archiveType) throws GZipperException {
-            ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
-                    archiveType, _selectedFiles.get(0).getAbsolutePath(),
-                    _selectedFile + File.separator);
-            return new ArchiveOperation(info, false);
+        public ArchiveOperation[] initOperation(String archiveType)
+                throws GZipperException {
+            // array consisting of operations for each selected archive
+            ArchiveOperation[] operations
+                    = new ArchiveOperation[_selectedFiles.size()];
+            // create new operation for each archive to be extracted
+            for (int i = 0; i < _selectedFiles.size(); ++i) {
+                final File file = _selectedFiles.get(i);
+                ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
+                        archiveType, file.getAbsolutePath(),
+                        _outputFile + File.separator);
+                operations[i] = new ArchiveOperation(info, false);
+            }
+            return operations;
         }
 
         @Override

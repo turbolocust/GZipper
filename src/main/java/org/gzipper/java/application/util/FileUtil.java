@@ -110,7 +110,8 @@ public class FileUtil {
      * @return the path to the target file.
      * @throws IOException if an I/O error occurs.
      */
-    public static Path copy(String src, String dst, CopyOption... options) throws IOException {
+    public static synchronized Path copy(String src, String dst,
+            CopyOption... options) throws IOException {
         if (options == null) {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
         }
@@ -124,7 +125,7 @@ public class FileUtil {
      * @return true if file was deleted, false if it did not exist.
      * @throws IOException if an I/O error occurs.
      */
-    public static boolean delete(String src) throws IOException {
+    public static synchronized boolean delete(String src) throws IOException {
         return Files.deleteIfExists(Paths.get(src));
     }
 }
