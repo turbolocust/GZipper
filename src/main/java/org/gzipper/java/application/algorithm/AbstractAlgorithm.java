@@ -37,6 +37,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.presentation.control.MainViewController;
 
 /**
@@ -119,24 +120,28 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
                     I18N.getString("extracting.text"), " ", entryName});
 
+                final File newFile = new File(
+                        folder.getAbsolutePath() + File.separator + entryName);
                 // check if entry contains a directory
                 if (entryName.contains(File.separator)) {
-                    File newFile = new File(folder.getAbsolutePath() + File.separator + entryName);
                     if (!newFile.getParentFile().exists()) {
                         newFile.getParentFile().mkdirs(); // also creates parent directories
                     }
                 }
 
-                final String newFilePath = folder.getAbsolutePath() + File.separator + entryName;
-
                 // create new output stream and write bytes to file
                 try (BufferedOutputStream buf = new BufferedOutputStream(
-                        new FileOutputStream(newFilePath))) {
+                        new FileOutputStream(newFile))) {
                     byte[] buffer = new byte[4096];
                     int readBytes;
                     while (!_interrupt && (readBytes = inputStream.read(buffer)) != -1) {
                         buf.write(buffer, 0, readBytes);
                     }
+                } catch (IOException ex) {
+                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
+                            "Output stream for file to extract could not be opened. ", ex);
+                    LOGGER.log(Level.SEVERE, "{0}\n{1}", new Object[]{
+                        I18N.getString("errorWritingFile.text"), newFile.getPath()});
                 }
                 if (!_interrupt) {
                     LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
@@ -195,9 +200,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 // start compressing the file
                 if (newFile.isFile()) {
                     LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                        I18N.getString("compressing.text"),
-                        " ",
-                        newFile.getName()});
+                        I18N.getString("compressing.text"), " ", newFile.getName()});
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
@@ -208,12 +211,15 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                             outputStream.write(buffer, 0, readBytes);
                         }
                         outputStream.closeArchiveEntry();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
+                                "Input stream for file to compress could not be opened. ", ex);
+                        LOGGER.log(Level.SEVERE, "{0}\n{1}", new Object[]{
+                            I18N.getString("errorReadingFile.text"), newFile.getPath()});
                     }
                     if (!_interrupt) {
                         LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                            newFile.getName(),
-                            " ",
-                            I18N.getString("compressed.text")});
+                            newFile.getName(), " ", I18N.getString("compressed.text")});
                     }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
