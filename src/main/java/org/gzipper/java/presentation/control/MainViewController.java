@@ -228,12 +228,14 @@ public class MainViewController extends BaseController {
                     .showDropView(_theme).getAddresses();
             if (files != null && !files.isEmpty()) {
                 _selectedFiles = new ArrayList<>(files.size());
+                _startButton.setDisable(false);
                 files.forEach((filePath) -> {
                     _selectedFiles.add(new File(filePath));
                     LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{I18N.getString(
                         "fileSelected.text"), filePath});
                 });
             } else {
+                _startButton.setDisable(true);
                 LOGGER.log(Level.INFO, I18N.getString("noFilesSelected.text"));
             }
         }
@@ -244,13 +246,14 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_startButton)) {
             try {
                 if (_strategy.validateOutputPath()) {
-                    String outputPath = _outputPathTextField.getText();
+                    final String outputPath = _outputPathTextField.getText();
                     if (!_outputFile.getAbsolutePath().equals(outputPath)) {
                         _outputFile = new File(outputPath);
                         if (!_outputFile.isDirectory()) {
                             _archiveName = _outputFile.getName();
                         }
                     }
+                    Settings.getInstance().setProperty("recentPath", outputPath);
                     String archiveType = _archiveTypeComboBox.getValue().getName();
                     ArchiveOperation[] operations = _strategy.initOperation(archiveType);
                     for (ArchiveOperation operation : operations) {

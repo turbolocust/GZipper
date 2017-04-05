@@ -33,7 +33,7 @@
         <configuration>
           <archive>
             <manifest>
-              <addClasspath>false</addClasspath>
+              <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
               <mainClass>org.gzipper.java.presentation.GZipper</mainClass>
             </manifest>

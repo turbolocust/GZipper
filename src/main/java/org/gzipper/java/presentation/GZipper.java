@@ -20,12 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import org.gzipper.java.presentation.control.BaseController;
 import org.gzipper.java.presentation.control.MainViewController;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -161,6 +161,10 @@ public class GZipper extends Application {
             public void run() {
                 try {
                     Settings.getInstance().storeAway();
+                    Logger logger = Logger.getLogger(GZipper.class.getName());
+                    for (Handler handler : logger.getHandlers()) {
+                        handler.close();
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
                 }
