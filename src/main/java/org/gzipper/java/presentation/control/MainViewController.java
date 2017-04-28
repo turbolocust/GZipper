@@ -43,6 +43,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -172,6 +173,9 @@ public class MainViewController extends BaseController {
 
     @FXML
     private Button _saveAsButton;
+
+    @FXML
+    private ProgressIndicator _progressIndicator;
 
     /**
      * Constructs a new controller with the specified CSS theme.
@@ -527,6 +531,7 @@ public class MainViewController extends BaseController {
                 new Object[]{I18N.getString("elapsedTime.text"),
                     operation.calculateElapsedTime()});
         _activeTasks.remove(task.toString());
+        _progressIndicator.setVisible(false);
         toggleStartAndAbortButton();
     }
 
@@ -654,6 +659,7 @@ public class MainViewController extends BaseController {
                 Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                         I18N.getString("operationStarted.text"),
                         new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
+                _progressIndicator.setVisible(true);
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
                 toggleStartAndAbortButton();
             }
