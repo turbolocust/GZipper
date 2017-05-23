@@ -25,6 +25,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -39,7 +42,7 @@ import org.gzipper.java.style.CSS;
 public class DropViewController extends BaseController {
 
     /**
-     * A list consisting of the parsed addresses.
+     * A list consisting of the parsed file addresses.
      */
     private final List<String> _addresses;
 
@@ -89,6 +92,33 @@ public class DropViewController extends BaseController {
             }
             close();
         }
+    }
+
+    @FXML
+    void handleTextAreaOnDragOver(DragEvent evt) {
+        if (evt.getGestureSource() != _textArea
+                && evt.getDragboard().hasFiles()) {
+            evt.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        }
+        evt.consume();
+    }
+
+    @FXML
+    void handleTextAreaOnDragDropped(DragEvent evt) {
+        Dragboard dragboard = evt.getDragboard();
+        boolean success = false;
+        if (dragboard.hasFiles()) {
+            if (!_textArea.getText().isEmpty()) {
+                _textArea.clear();
+            }
+            // add each dropped file's path to list and text area
+            dragboard.getFiles().forEach((file) -> {
+                _textArea.appendText(file.getAbsolutePath() + "\n");
+            });
+            success = true;
+        }
+        evt.setDropCompleted(success);
+        evt.consume();
     }
 
     /**

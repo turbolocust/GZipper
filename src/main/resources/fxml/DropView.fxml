@@ -20,7 +20,7 @@
         <RowConstraints minHeight="16.0" prefHeight="40.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <children>
-        <TextArea fx:id="_textArea" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+        <TextArea fx:id="_textArea" onDragDropped="#handleTextAreaOnDragDropped" onDragOver="#handleTextAreaOnDragOver" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
         <AnchorPane GridPane.rowIndex="2">
             <children>
             <HBox alignment="CENTER_LEFT" spacing="16.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="8.0">
