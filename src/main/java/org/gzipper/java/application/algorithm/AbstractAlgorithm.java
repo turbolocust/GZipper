@@ -115,7 +115,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
             }
 
             while (!_interrupt && entry != null) {
-                String entryName = entry.getName();
+                final String entryName = entry.getName();
 
                 LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
                     I18N.getString("extracting.text"), " ", entryName});
@@ -195,7 +195,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         if (files.length > 0) {
             for (int i = 0; !_interrupt && i < files.length; ++i) {
                 // create next file and define entry name based on folder level
-                File newFile = files[i];
+                final File newFile = files[i];
                 String entryName = base + newFile.getName();
                 // start compressing the file
                 if (newFile.isFile()) {

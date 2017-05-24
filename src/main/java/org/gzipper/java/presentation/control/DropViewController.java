@@ -111,7 +111,7 @@ public class DropViewController extends BaseController {
             if (!_textArea.getText().isEmpty()) {
                 _textArea.clear();
             }
-            // add each dropped file's path to list and text area
+            // add each dropped file's path to text area
             dragboard.getFiles().forEach((file) -> {
                 _textArea.appendText(file.getAbsolutePath() + "\n");
             });
