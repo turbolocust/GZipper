@@ -17,9 +17,7 @@
 package org.gzipper.java.application.model;
 
 import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
-import org.gzipper.java.application.algorithm.type.TarBzip2;
-import org.gzipper.java.application.algorithm.type.Tarball;
-import org.gzipper.java.application.algorithm.type.Zip;
+import org.gzipper.java.application.algorithm.type.*;
 
 /**
  * Enumeration for archive types.
@@ -29,6 +27,7 @@ import org.gzipper.java.application.algorithm.type.Zip;
 public enum ArchiveType {
 
     ZIP("Zip", "ZIP", new String[]{"*.zip"}),
+    JAR("Jar", "JAR", new String[]{"*.jar"}),
     TAR_GZ("TarGz", "TAR+GZ", new String[]{"*.tar.gz", "*.tgz"}),
     TAR_BZ("TarBz2", "TAR+BZ2", new String[]{"*.tar.bz2", "*.tbz2"});
 
@@ -86,6 +85,9 @@ public enum ArchiveType {
         switch (this) {
             case ZIP:
                 algorithm = new Zip();
+                break;
+            case JAR:
+                algorithm = new Jar();
                 break;
             case TAR_GZ:
                 algorithm = new Tarball();

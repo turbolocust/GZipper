@@ -4,6 +4,7 @@
 
 * Compress and extract the following archive types:
   - ZIP
+  - JAR
   - Tarball (GZIP)
   - Tarball (BZIP2)
 * Compression levels can be adjusted.
