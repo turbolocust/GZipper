@@ -380,9 +380,9 @@ public class MainViewController extends BaseController {
     @FXML
     void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
-            String fileName = _outputPathTextField.getText();
-            if (!FileUtil.containsIllegalChars(fileName)) {
-                updateSelectedFile(new File(fileName));
+            String filename = _outputPathTextField.getText();
+            if (!FileUtil.containsIllegalChars(filename)) {
+                updateSelectedFile(new File(filename));
             }
         }
     }
@@ -496,7 +496,7 @@ public class MainViewController extends BaseController {
             // delete corrupt archive on operation fail
             if (operation.isCompress()) {
                 ArchiveInfo info = operation.getArchiveInfo();
-                final String archive = FileUtil.combinePathAndFileName(
+                final String archive = FileUtil.combinePathAndFilename(
                         info.getOutputPath(), info.getArchiveName());
                 try {
                     if (FileUtil.delete(archive)) {
@@ -673,12 +673,26 @@ public class MainViewController extends BaseController {
 
         @Override
         public boolean validateOutputPath() {
-            return FileUtil.isValidFileName(_outputPathTextField.getText());
+
+            String outputPath = _outputPathTextField.getText(),
+                    extName = _archiveTypeComboBox.getValue().getExtensionNames()[0];
+
+            if (FileUtil.isValidDirectory(outputPath)) {
+                // user has not specified output filename
+                outputPath = new FileUtil().generateUniqueFilename(
+                        outputPath, DEFAULT_ARCHIVE_NAME, extName);
+            }
+
+            if (FileUtil.isValidOutputFile(outputPath)) {
+                _outputPathTextField.setText(outputPath);
+                return true;
+            }
+            return false;
         }
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_selectedFiles != null) {
+            if (_selectedFiles != null && !_selectedFiles.isEmpty()) {
                 super.performOperation(operation);
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,

@@ -32,62 +32,81 @@ import java.nio.file.StandardCopyOption;
 public class FileUtil {
 
     /**
-     * Validates the specified path, which has to be a file or directory.
+     * Validates the specified path, which has to exist.
      *
      * @param path the path as string to be validated.
-     * @return true if path exists, false otherwise.
+     * @return true if file exists, false otherwise.
+     */
+    public static boolean isValid(String path) {
+        final File file = new File(path);
+        return file.exists();
+    }
+
+    /**
+     * Validates the specified path, which has to be a normal file.
+     *
+     * @param path the path as string to be validated.
+     * @return true if file is a file, false otherwise.
      */
     public static boolean isValidFile(String path) {
         final File file = new File(path);
-        return file.exists();
+        return file.isFile();
+    }
+
+    /**
+     * Validates the specified path, which has to be the full name of a file
+     * that shall be created and therefore does not exist yet.
+     *
+     * @param path the path as string to be validated.
+     * @return true if the parent file is a directory, false otherwise.
+     */
+    public static boolean isValidOutputFile(String path) {
+        final File file = new File(path);
+        return file.getParentFile().isDirectory();
     }
 
     /**
      * Validates the specified path, which has to be the path of a directory.
      *
      * @param path the path as string to be validated.
-     * @return true if path exists and is a directory, false otherwise.
+     * @return true if file exists and is a directory, false otherwise.
      */
     public static boolean isValidDirectory(String path) {
         final File file = new File(path);
-        return file.exists() && file.isDirectory();
+        return file.isDirectory();
     }
 
     /**
-     * Validates the specified path, which has to be the path of a file.
+     * Checks whether the filename contains illegal characters.
      *
-     * @param path the path as string to be validated.
-     * @return true if path exists and is not a directory, false otherwise.
+     * @param filename the name to be checked for illegal characters.
+     * @return true if filename contains illegal characters, false otherwise.
      */
-    public static boolean isValidFileName(String path) {
-        final File file = new File(path);
-        return file.isAbsolute() && !file.isDirectory();
-    }
-
-    /**
-     * Checks whether the file name contains illegal characters.
-     *
-     * @param fileName the name to be checked for illegal characters.
-     * @return true if file name contains illegal characters, false otherwise.
-     */
-    public static boolean containsIllegalChars(String fileName) {
-        return fileName.contains("<") || fileName.contains(">") || fileName.contains("/")
-                || fileName.contains("\\") || fileName.contains("|") || fileName.contains(":")
-                || fileName.contains("*") || fileName.contains("\"") || fileName.contains("?");
+    public static boolean containsIllegalChars(String filename) {
+        final File file = new File(filename);
+        if (!file.isDirectory()) {
+            final String name = file.getName();
+            return name.contains("<") || name.contains(">") || name.contains("/")
+                    || name.contains("\\") || name.contains("|") || name.contains(":")
+                    || name.contains("*") || name.contains("\"") || name.contains("?");
+        } else { // is directory
+            return filename.contains("<") || filename.contains(">") || filename.contains("|")
+                    || filename.contains("*") || filename.contains("\"") || filename.contains("?");
+        }
     }
 
     /**
      * Concatenates a file path and file name. Before doing so, a check will be
      * performed whether the path ends with an separator. If the separator is
-     * missing it will be added. As a result, a valid absolute path will be
-     * returned, although it is not guaranteed that this file exists.
+     * missing it will be added. As a result, a valid absolute path is returned,
+     * although it is not guaranteed that this file exists.
      *
-     * @param path location of a folder.
-     * @param file the file name.
+     * @param path location of a folder as string.
+     * @param file the file name as string.
      * @return {@code null} if either any of the parameters is {@code null} or
      * empty. Otherwise the concatenated absolute path is returned.
      */
-    public static String combinePathAndFileName(String path, String file) {
+    public static String combinePathAndFilename(String path, String file) {
         // check if parameters are not null and not empty
         if (path == null || file == null || path.isEmpty() || file.isEmpty()) {
             return null;
@@ -127,5 +146,32 @@ public class FileUtil {
      */
     public static synchronized boolean delete(String src) throws IOException {
         return Files.deleteIfExists(Paths.get(src));
+    }
+
+    /**
+     * Generates a unique file name using the specified parameters.
+     *
+     * @param path the file path including only the directory.
+     * @param name the name of the file of which to generate a unique version.
+     * @param ext the name of the file extension.
+     * @return a unique filename including path, name, suffix and extension.
+     */
+    public String generateUniqueFilename(String path, String name, String ext) {
+        String uniqueFilename;
+        int suffix = 0; // will be appended to file name
+        final StringBuilder filename = new StringBuilder();
+
+        if (ext.startsWith("*")) { // ignore wildcard if any
+            ext = ext.substring(1);
+        }
+
+        do {
+            ++suffix;
+            filename.append(name).append(suffix).append(ext);
+            uniqueFilename = FileUtil.combinePathAndFilename(path, filename.toString());
+            filename.setLength(0); // clear
+        } while (FileUtil.isValidFile(uniqueFilename));
+
+        return uniqueFilename;
     }
 }

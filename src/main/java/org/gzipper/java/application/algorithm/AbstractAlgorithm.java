@@ -161,8 +161,8 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        final String fullName = FileUtil.combinePathAndFileName(location, name);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullName));
+        final String fullname = FileUtil.combinePathAndFilename(location, name);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
 
         CompressorOutputStream cos = makeCompressorOutputStream(bos);
         try (ArchiveOutputStream aos = cos != null

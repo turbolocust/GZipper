@@ -84,8 +84,8 @@ public class DropViewController extends BaseController {
                 StringTokenizer tokenizer = new StringTokenizer(text, "\"\n");
                 while (tokenizer.hasMoreTokens()) {
                     String token = tokenizer.nextToken();
-                    // only add token if it is a path to a valid file
-                    if (FileUtil.isValidFile(token)) {
+                    // only add token if it is a valid file or directory
+                    if (FileUtil.isValid(token)) {
                         _addresses.add(token);
                     }
                 }

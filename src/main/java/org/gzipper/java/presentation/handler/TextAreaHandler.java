@@ -45,7 +45,7 @@ public class TextAreaHandler extends StreamHandler {
     }
 
     @Override
-    public void publish(LogRecord record) {
+    public synchronized void publish(LogRecord record) {
         super.publish(record);
         flush();
 
