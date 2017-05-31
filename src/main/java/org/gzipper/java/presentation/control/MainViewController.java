@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import org.gzipper.java.application.model.OperatingSystem;
@@ -208,6 +209,7 @@ public class MainViewController extends BaseController {
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
             close();
+            Platform.exit();
             System.exit(0);
         }
     }
@@ -514,7 +516,6 @@ public class MainViewController extends BaseController {
             }
             finalizeArchivingJob(operation, task);
         });
-
         return task;
     }
 

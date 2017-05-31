@@ -61,7 +61,7 @@ public class ArchiveInfoFactory {
         }
 
         if (!hasExtension) {
-            // add extension to archive name if missing and ignore the star character
+            // add extension to archive name if missing and ignore the wildcard
             archiveName = archiveName + extNames[0].substring(1);
         }
 

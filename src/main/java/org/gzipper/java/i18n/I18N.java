@@ -61,7 +61,7 @@ public class I18N {
     /**
      * Determines the {@link Locale} of the system.
      *
-     * @return the {@link Locale} of the system.
+     * @return the {@link Locale} of the system. May be {@code null}.
      */
     private static Locale determineLocale() {
         String userLang = System.getProperty("user.language");

@@ -67,7 +67,7 @@ public class AboutViewController extends BaseController {
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "23/05/2017";
+    private final String _appBuildDate = "31/05/2017";
 
     /**
      * The author of this application.
