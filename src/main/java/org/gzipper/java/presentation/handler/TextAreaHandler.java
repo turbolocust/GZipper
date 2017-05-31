@@ -18,6 +18,7 @@ package org.gzipper.java.presentation.handler;
 
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 /**
@@ -45,12 +46,15 @@ public class TextAreaHandler extends StreamHandler {
     }
 
     @Override
-    public synchronized void publish(LogRecord record) {
+    public void publish(LogRecord record) {
         super.publish(record);
         flush();
 
         if (_textArea != null) {
-            _textArea.appendText(getFormatter().format(record));
+            String formattedText = getFormatter().format(record);
+            Platform.runLater(() -> {
+                _textArea.appendText(formattedText);
+            });
         }
     }
 }
