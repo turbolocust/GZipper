@@ -4,7 +4,7 @@
   <groupId>org.gzipper</groupId>
   <artifactId>GZipper</artifactId>
   <name>GZipper</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.5.1-BETA</version>
   <url>https://github.com/turbolocust/GZipper</url>
   <build>
     <plugins>
