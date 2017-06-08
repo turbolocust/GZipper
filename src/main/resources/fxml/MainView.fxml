@@ -123,12 +123,12 @@
                         <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.rowIndex="1">
                             <children>
                                 <Label text="%mode.text" />
-                                <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" onAction="#handleCompressRadioButtonAction" selected="true" text="%compress.text">
+                                <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" selected="true" text="%compress.text">
                                     <toggleGroup>
                                         <ToggleGroup fx:id="_compressionType" />
                                     </toggleGroup>
                                 </RadioButton>
-                                <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleDecompressRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
+                                <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
                             </children>
                             <GridPane.margin>
                                 <Insets left="16.0" />
@@ -136,7 +136,7 @@
                         </HBox>
                         <TextField fx:id="_outputPathTextField" onKeyTyped="#onOutputPathTextFieldKeyTyped" promptText="%outputPath.text" GridPane.rowIndex="3">
                             <GridPane.margin>
-                                <Insets left="2.0" right="2.0" />
+                                <Insets left="4.0" right="4.0" />
                             </GridPane.margin>
                             <padding>
                                 <Insets bottom="4.0" top="2.0" />
@@ -148,14 +148,20 @@
                             </GridPane.margin>
                             <children>
                                 <Button fx:id="_selectFilesButton" minWidth="150.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER">
-                                    <padding>
-                                        <Insets bottom="5.0" top="5.0" />
-                                    </padding>
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
                                 </Button>
-                                <Button fx:id="_saveAsButton" minWidth="132.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
+                                <Button fx:id="_saveAsButton" minWidth="132.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding></Button>
                                 <Separator orientation="VERTICAL" prefHeight="200.0" />
                                 <Label text="%archiveType.text" />
-                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" promptText="..." />
+                                <ComboBox fx:id="_archiveTypeComboBox" onAction="#handleArchiveTypeComboBoxAction" promptText="...">
+                           <padding>
+                              <Insets bottom="1.0" top="1.0" />
+                           </padding></ComboBox>
                                 <ProgressIndicator fx:id="_progressIndicator" visible="false">
                                     <HBox.margin>
                                         <Insets bottom="4.0" left="8.0" top="4.0" />

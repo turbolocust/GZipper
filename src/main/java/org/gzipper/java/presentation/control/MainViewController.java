@@ -351,21 +351,25 @@ public class MainViewController extends BaseController {
     }
 
     @FXML
-    void handleCompressRadioButtonAction(ActionEvent evt) {
+    void handleModeRadioButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_compressRadioButton)) {
-            _strategy = new CompressStrategy();
-            _selectFilesButton.setText(I18N.getString("browseForFiles.text"));
-            _saveAsButton.setText(I18N.getString("saveAsArchive.text"));
+            performCompressRadioButtonAction();
+        } else if (evt.getSource().equals(_decompressRadioButton)) {
+            performDecompressRadioButtonAction();
         }
+        resetSelections();
     }
 
-    @FXML
-    void handleDecompressRadioButtonAction(ActionEvent evt) {
-        if (evt.getSource().equals(_decompressRadioButton)) {
-            _strategy = new DecompressStrategy();
-            _selectFilesButton.setText(I18N.getString("browseForArchive.text"));
-            _saveAsButton.setText(I18N.getString("saveAsFiles.text"));
-        }
+    private void performCompressRadioButtonAction() {
+        _strategy = new CompressStrategy();
+        _selectFilesButton.setText(I18N.getString("browseForFiles.text"));
+        _saveAsButton.setText(I18N.getString("saveAsArchive.text"));
+    }
+
+    private void performDecompressRadioButtonAction() {
+        _strategy = new DecompressStrategy();
+        _selectFilesButton.setText(I18N.getString("browseForArchive.text"));
+        _saveAsButton.setText(I18N.getString("saveAsFiles.text"));
     }
 
     @FXML
@@ -376,6 +380,9 @@ public class MainViewController extends BaseController {
                     "Archive type selection change to: {0}",
                     _archiveTypeComboBox.getItems().get(i)
             );
+            if (_decompressRadioButton.isSelected()) {
+                resetSelections();
+            }
         }
     }
 
@@ -422,6 +429,14 @@ public class MainViewController extends BaseController {
         } else {
             _abortButton.setDisable(true);
         }
+    }
+
+    /**
+     * Resets the selected files.
+     */
+    private void resetSelections() {
+        _selectedFiles = Collections.<File>emptyList();
+        _startButton.setDisable(true);
     }
 
     /**
@@ -631,7 +646,20 @@ public class MainViewController extends BaseController {
          * @param chooser the {@link FileChooser} to which the extension filters
          * will be applied to.
          */
-        public abstract void applyExtensionFilters(FileChooser chooser);
+        public void applyExtensionFilters(FileChooser chooser) {
+            if (chooser != null) {
+                final ArchiveType selectedType = _archiveTypeComboBox
+                        .getSelectionModel()
+                        .getSelectedItem();
+                for (ArchiveType type : ArchiveType.values()) {
+                    if (type.equals(selectedType)) {
+                        ExtensionFilter extFilter = new ExtensionFilter(
+                                type.getDisplayName(), type.getExtensionNames());
+                        chooser.getExtensionFilters().add(extFilter);
+                    }
+                }
+            }
+        }
 
         /**
          * Initializes the archiving operation.
@@ -693,7 +721,7 @@ public class MainViewController extends BaseController {
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_selectedFiles != null && !_selectedFiles.isEmpty()) {
+            if (!_selectedFiles.isEmpty()) {
                 super.performOperation(operation);
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
@@ -710,22 +738,6 @@ public class MainViewController extends BaseController {
                     _selectedFiles, _outputFile.getParent());
             return new ArchiveOperation[]{new ArchiveOperation(info, true)};
         }
-
-        @Override
-        public void applyExtensionFilters(FileChooser chooser) {
-            if (chooser != null) {
-                final ArchiveType selectedType = _archiveTypeComboBox
-                        .getSelectionModel()
-                        .getSelectedItem();
-                for (ArchiveType type : ArchiveType.values()) {
-                    if (type.equals(selectedType)) {
-                        ExtensionFilter extFilter = new ExtensionFilter(
-                                type.getDisplayName(), type.getExtensionNames());
-                        chooser.getExtensionFilters().add(extFilter);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -740,7 +752,7 @@ public class MainViewController extends BaseController {
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_outputFile != null) {
+            if (_outputFile != null && !_selectedFiles.isEmpty()) {
                 super.performOperation(operation);
             } else {
                 Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
@@ -765,17 +777,6 @@ public class MainViewController extends BaseController {
                 operations[i] = new ArchiveOperation(info, false);
             }
             return operations;
-        }
-
-        @Override
-        public void applyExtensionFilters(FileChooser chooser) {
-            if (chooser != null) {
-                for (ArchiveType type : ArchiveType.values()) {
-                    ExtensionFilter extFilter = new ExtensionFilter(
-                            type.getDisplayName(), type.getExtensionNames());
-                    chooser.getExtensionFilters().add(extFilter);
-                }
-            }
         }
     }
 }
