@@ -117,6 +117,11 @@ public class MainViewController extends BaseController {
     private String _archiveName;
 
     /**
+     * The file extension of the archive type.
+     */
+    private String _archiveFileExtension;
+
+    /**
      * The compression level. Initialized with default compression level.
      */
     private int _compressionLevel = Deflater.DEFAULT_COMPRESSION;
@@ -186,6 +191,7 @@ public class MainViewController extends BaseController {
     public MainViewController(CSS.Theme theme) {
         super(theme);
         _archiveName = DEFAULT_ARCHIVE_NAME;
+        _archiveFileExtension = "";
         _activeTasks = Collections.synchronizedMap(new HashMap<>());
         Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
                 "Default archive name set to: {0}", _archiveName);
@@ -376,12 +382,24 @@ public class MainViewController extends BaseController {
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
             int i = _archiveTypeComboBox.getSelectionModel().getSelectedIndex();
+            ArchiveType selectedType = _archiveTypeComboBox.getItems().get(i);
             Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                    "Archive type selection change to: {0}",
-                    _archiveTypeComboBox.getItems().get(i)
-            );
+                    "Archive type selection change to: {0}", selectedType);
             if (_decompressRadioButton.isSelected()) {
                 resetSelections();
+            } else if (!_archiveFileExtension.isEmpty()) {
+                // change file extension if set in output text field
+                String outputPathText = _outputPathTextField.getText();
+                String fileExtension = FileUtil.getFileExtension(
+                        selectedType.getDefaultExtensionName()
+                );
+                if (outputPathText.endsWith(_archiveFileExtension)) {
+                    String outputPath = outputPathText.replace(
+                            _archiveFileExtension, fileExtension
+                    );
+                    _archiveFileExtension = fileExtension;
+                    _outputPathTextField.setText(outputPath);
+                }
             }
         }
     }
@@ -391,7 +409,7 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_outputPathTextField)) {
             String filename = _outputPathTextField.getText();
             if (!FileUtil.containsIllegalChars(filename)) {
-                updateSelectedFile(new File(filename));
+                updateSelectedFile(new File(filename + evt.getCharacter()));
             }
         }
     }
@@ -399,7 +417,7 @@ public class MainViewController extends BaseController {
     @FXML
     void handleEnableLoggingCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
-            final boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
+            boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
             Settings.getInstance().setProperty("loggingEnabled", enableLogging);
         }
     }
@@ -447,7 +465,8 @@ public class MainViewController extends BaseController {
     private void updateSelectedFile(File file) {
         if (file != null) {
             if (!file.isDirectory()) {
-                _archiveName = file.getName();
+                String archiveName = _archiveName = file.getName();
+                _archiveFileExtension = FileUtil.getFileExtension(archiveName);
             }
             _outputFile = file;
         }
@@ -617,8 +636,8 @@ public class MainViewController extends BaseController {
         _archiveTypeComboBox.setValue(archiveTypes[0]);
 
         // set menu item for logging as selected if logging has been enabled before
-        final String loggingEnabled = settings.getProperty("loggingEnabled");
-        _enableLoggingCheckMenuItem.setSelected(loggingEnabled.equalsIgnoreCase("true"));
+        final String enableLogging = settings.getProperty("loggingEnabled");
+        _enableLoggingCheckMenuItem.setSelected(enableLogging.equalsIgnoreCase("true"));
 
         // set up strategy, frame image and the default text for the text area
         _strategy = new CompressStrategy();
@@ -704,7 +723,7 @@ public class MainViewController extends BaseController {
         public boolean validateOutputPath() {
 
             String outputPath = _outputPathTextField.getText(),
-                    extName = _archiveTypeComboBox.getValue().getExtensionNames()[0];
+                    extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
 
             if (FileUtil.isValidDirectory(outputPath)) {
                 // user has not specified output filename
@@ -714,6 +733,7 @@ public class MainViewController extends BaseController {
 
             if (FileUtil.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
+                _archiveFileExtension = extName.substring(1);
                 return true;
             }
             return false;

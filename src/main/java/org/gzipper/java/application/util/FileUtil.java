@@ -119,6 +119,18 @@ public class FileUtil {
     }
 
     /**
+     * Returns the file extension of a specified string.
+     *
+     * @param filename the name of the file as string.
+     * @return the file extension including period or an empty string if the
+     * specified filename has no file extension.
+     */
+    public static String getFileExtension(String filename) {
+        int period = new File(filename).getName().indexOf('.');
+        return period > 0 ? filename.substring(period) : "";
+    }
+
+    /**
      * Copies a file from the specified source to destination. If no copy
      * options are specified, the file at the destination will not be replaced
      * in case it already exists.

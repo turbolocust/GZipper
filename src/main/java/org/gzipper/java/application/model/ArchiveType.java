@@ -62,7 +62,6 @@ public enum ArchiveType {
      * @return the corresponding {@link ArchiveType}.
      */
     public static synchronized ArchiveType determineArchiveType(String name) {
-
         ArchiveType archiveType = null;
         for (ArchiveType type : values()) {
             if (type.getName().equals(name)) {
@@ -126,6 +125,17 @@ public enum ArchiveType {
      */
     public String[] getExtensionNames() {
         return _extensionNames;
+    }
+
+    /**
+     * Returns the default file extension of this archive type. The default file
+     * extension is the first one that has been specified in the array of file
+     * extensions.
+     *
+     * @return the default file extension of this archive type as string.
+     */
+    public String getDefaultExtensionName() {
+        return _extensionNames.length > 0 ? _extensionNames[0] : "";
     }
 
     @Override
