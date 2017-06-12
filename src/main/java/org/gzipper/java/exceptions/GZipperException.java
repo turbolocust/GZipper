@@ -23,7 +23,7 @@ package org.gzipper.java.exceptions;
  */
 public class GZipperException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5822293002523982761L;
 
     /**
      * Delegates exception to its super class {@link Exception}.

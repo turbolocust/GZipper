@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
@@ -65,6 +64,7 @@ import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.util.ArchiveOperation;
 import org.gzipper.java.presentation.util.ArchiveInfoFactory;
 import org.gzipper.java.style.CSS;
+import org.gzipper.java.util.Log;
 
 /**
  * Controller for the FXML named "MainView.fxml".
@@ -72,11 +72,6 @@ import org.gzipper.java.style.CSS;
  * @author Matthias Fussenegger
  */
 public class MainViewController extends BaseController {
-
-    /**
-     * The logger this class uses to log messages.
-     */
-    private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
 
     /**
      * Key constant used to access the properties map for menu items.
@@ -193,8 +188,7 @@ public class MainViewController extends BaseController {
         _archiveName = DEFAULT_ARCHIVE_NAME;
         _archiveFileExtension = "";
         _activeTasks = Collections.synchronizedMap(new HashMap<>());
-        Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                "Default archive name set to: {0}", _archiveName);
+        Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 
     @FXML
@@ -204,10 +198,10 @@ public class MainViewController extends BaseController {
 
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
-            Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                    "Compression level set to: {0}", _compressionLevel);
-            LOGGER.log(Level.INFO, "{0}{1}", new Object[]{I18N.getString(
-                "compressionLevelChange.text"), selectedItem.getText()});
+            Log.i("{0}{1}", true, new Object[]{
+                I18N.getString("compressionLevelChange.text"),
+                selectedItem.getText()
+            });
         }
     }
 
@@ -243,12 +237,14 @@ public class MainViewController extends BaseController {
                 _startButton.setDisable(false);
                 files.forEach((filePath) -> {
                     _selectedFiles.add(new File(filePath));
-                    LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{I18N.getString(
-                        "fileSelected.text"), filePath});
+                    Log.i("{0}: {1}", true, new Object[]{
+                        I18N.getString("fileSelected.text"),
+                        filePath
+                    });
                 });
             } else {
                 _startButton.setDisable(true);
-                LOGGER.log(Level.INFO, I18N.getString("noFilesSelected.text"));
+                Log.i(I18N.getString("noFilesSelected.text"), true);
             }
         }
     }
@@ -269,17 +265,16 @@ public class MainViewController extends BaseController {
                     String archiveType = _archiveTypeComboBox.getValue().getName();
                     ArchiveOperation[] operations = _strategy.initOperation(archiveType);
                     for (ArchiveOperation operation : operations) {
-                        Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                                "Operation started using the following archive info: {0}",
-                                operation.getArchiveInfo().toString());
+                        Log.i("Operation started using the following archive info: {0}",
+                                operation.getArchiveInfo().toString(), false);
                         _strategy.performOperation(operation);
                     }
                 } else {
-                    LOGGER.log(Level.WARNING, I18N.getString("invalidOutputPath.text"));
+                    Log.w(I18N.getString("invalidOutputPath.text"), true);
                 }
             } catch (GZipperException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
-                LOGGER.log(Level.SEVERE, ex.getMessage());
+                Log.e(null, ex);
+                Log.e(ex.getMessage());
             }
         }
     }
@@ -288,11 +283,10 @@ public class MainViewController extends BaseController {
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
             if (_activeTasks != null && !_activeTasks.isEmpty()) {
+                // log warning message when cancellation of task has failed
                 _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
                         .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                    // log warning message when cancellation of task has failed
-                    Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
-                            "Task cancellation failed for {0}", task.toString());
+                    Log.w("Task cancellation failed for {0}", task.toString(), false);
                 });
             }
         }
@@ -320,14 +314,16 @@ public class MainViewController extends BaseController {
                 message = message.replace("{0}", Integer.toString(selectedFiles));
                 // log the path of each selected file
                 _selectedFiles.forEach((file) -> {
-                    LOGGER.log(Level.INFO, "{0}: {1}", new Object[]{
-                        I18N.getString("fileSelected.text"), file.getAbsolutePath()});
+                    Log.i("{0}: {1}", true, new Object[]{
+                        I18N.getString("fileSelected.text"),
+                        file.getAbsolutePath()
+                    });
                 });
             } else {
                 _startButton.setDisable(true);
                 message = I18N.getString("noFilesSelected.text");
             }
-            LOGGER.log(Level.INFO, message);
+            Log.i(message, true);
         }
     }
 
@@ -350,8 +346,7 @@ public class MainViewController extends BaseController {
             if (file != null) {
                 updateSelectedFile(file);
                 _outputPathTextField.setText(file.getAbsolutePath());
-                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                        "Output directory set to: {0}", file.getAbsolutePath());
+                Log.i("Output directory set to: {0}", file.getAbsolutePath(), false);
             }
         }
     }
@@ -383,8 +378,7 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
             int i = _archiveTypeComboBox.getSelectionModel().getSelectedIndex();
             ArchiveType selectedType = _archiveTypeComboBox.getItems().get(i);
-            Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                    "Archive type selection change to: {0}", selectedType);
+            Log.i("Archive type selection change to: {0}", selectedType, false);
             if (_decompressRadioButton.isSelected()) {
                 resetSelections();
             } else if (!_archiveFileExtension.isEmpty()) {
@@ -419,6 +413,7 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
             boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
             Settings.getInstance().setProperty("loggingEnabled", enableLogging);
+            Log.setVerboseUiLogging(enableLogging);
         }
     }
 
@@ -497,14 +492,13 @@ public class MainViewController extends BaseController {
                         Thread.sleep(10); // check for interruption
                     } catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
-                        LOGGER.log(Level.INFO, I18N.getString("interrupt.text"));
-                        Logger.getLogger(GZipper.class.getName()).log(
-                                Level.WARNING, "Operation has been interrupted.", ex);
+                        Log.i(I18N.getString("interrupt.text"), true);
+                        Log.w("Operation has been interrupted.", ex, false);
                         operation.interrupt();
                         boolean cancelled = futureTask.cancel(true);
 
                         if (cancelled) {
-                            LOGGER.log(Level.INFO, I18N.getString("operationCancel.text"));
+                            Log.i(I18N.getString("operationCancel.text"), true);
                         }
                     }
                 }
@@ -515,19 +509,19 @@ public class MainViewController extends BaseController {
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
-                LOGGER.log(Level.INFO, I18N.getString("operationSuccess.text"));
+                Log.i(I18N.getString("operationSuccess.text"), true);
             } else { // operation failed
-                LOGGER.log(Level.SEVERE, I18N.getString("operationFail.text"));
-                LOGGER.log(Level.WARNING, I18N.getString("missingAccessRights.text"));
+                Log.e(I18N.getString("operationFail.text"));
+                Log.w(I18N.getString("missingAccessRights.text"), true);
             }
             finalizeArchivingJob(operation, task);
         });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
-            LOGGER.log(Level.INFO, I18N.getString("operationFail.text"));
+            Log.i(I18N.getString("operationFail.text"), true);
             final Throwable throwable = e.getSource().getException();
             if (throwable != null) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.WARNING, null, throwable);
+                Log.w(null, throwable, false);
             }
             // delete corrupt archive on operation fail
             if (operation.isCompress()) {
@@ -536,15 +530,12 @@ public class MainViewController extends BaseController {
                         info.getOutputPath(), info.getArchiveName());
                 try {
                     if (FileUtil.delete(archive)) {
-                        Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
-                                "Archive file deleted: {0}", archive);
+                        Log.w("Archive file deleted: {0}", archive, false);
                     } else {
-                        Logger.getLogger(GZipper.class.getName()).log(Level.WARNING,
-                                "Archive could not be deleted as it no longer exists.");
+                        Log.w("Archive could not be deleted as it no longer exists.", false);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
-                            "I/O error occurred while trying to delete "
+                    Log.e("I/O error occurred while trying to delete "
                             + "corrupt archive after fail of operation.", ex);
                 }
             }
@@ -562,9 +553,11 @@ public class MainViewController extends BaseController {
      * @param task the task that will be removed from {@link #_activeTasks}.
      */
     private void finalizeArchivingJob(ArchiveOperation operation, Task<?> task) {
-        LOGGER.log(Level.INFO, "{0}{1} seconds.",
-                new Object[]{I18N.getString("elapsedTime.text"),
-                    operation.calculateElapsedTime()});
+        Log.i("{0}{1} seconds.", true,
+                new Object[]{
+                    I18N.getString("elapsedTime.text"),
+                    operation.calculateElapsedTime()
+                });
         _activeTasks.remove(task.toString());
         _progressIndicator.setVisible(false);
         toggleStartAndAbortButton();
@@ -593,7 +586,7 @@ public class MainViewController extends BaseController {
      * Initializes the logger that will append text to {@link #_textArea}.
      */
     private void initLogger() {
-        Logger logger = Logger.getLogger(MainViewController.class.getName());
+        Logger logger = Logger.getLogger(Log.UI_LOGGER_NAME);
         TextAreaHandler handler = new TextAreaHandler(_textArea);
         handler.setFormatter(new SimpleFormatter());
         logger.addHandler(handler);
@@ -701,12 +694,16 @@ public class MainViewController extends BaseController {
             if (operation != null) {
                 Task<Boolean> task = initArchivingJob(operation);
                 ArchiveInfo info = operation.getArchiveInfo();
-                LOGGER.log(Level.INFO, "{0}{1}",
-                        new Object[]{I18N.getString("outputPath.text"),
-                            info.getOutputPath()});
-                Logger.getLogger(GZipper.class.getName()).log(Level.INFO,
-                        I18N.getString("operationStarted.text"),
-                        new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
+                Log.i("{0}{1}", true,
+                        new Object[]{
+                            I18N.getString("outputPath.text"),
+                            info.getOutputPath()
+                        });
+                Log.i(I18N.getString("operationStarted.text"), true,
+                        new Object[]{
+                            info.getArchiveType().getDisplayName(),
+                            info.getOutputPath()
+                        });
                 _progressIndicator.setVisible(true);
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
                 toggleStartAndAbortButton();
@@ -744,9 +741,8 @@ public class MainViewController extends BaseController {
             if (!_selectedFiles.isEmpty()) {
                 super.performOperation(operation);
             } else {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
-                        "Operation cannot be started as no files have been specified.");
-                LOGGER.log(Level.INFO, I18N.getString("noFilesSelectedWarning.text"));
+                Log.e("Operation cannot be started as no files have been specified.");
+                Log.i(I18N.getString("noFilesSelectedWarning.text"), true);
             }
         }
 
@@ -775,9 +771,8 @@ public class MainViewController extends BaseController {
             if (_outputFile != null && !_selectedFiles.isEmpty()) {
                 super.performOperation(operation);
             } else {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
-                        "Operation cannot be started as an invalid path has been specified.");
-                LOGGER.log(Level.WARNING, I18N.getString("outputPathWarning.text"));
+                Log.e("Operation cannot be started as an invalid path has been specified.");
+                Log.w(I18N.getString("outputPathWarning.text"), true);
                 _outputPathTextField.requestFocus();
             }
         }

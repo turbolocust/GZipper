@@ -23,8 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -37,8 +35,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.control.MainViewController;
+import org.gzipper.java.util.Log;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -48,11 +45,6 @@ import org.gzipper.java.presentation.control.MainViewController;
  * @author Matthias Fussenegger
  */
 public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
-
-    /**
-     * The logger this class uses to log messages.
-     */
-    private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
 
     /**
      * True if this algorithm is performing an operation, false otherwise.
@@ -117,8 +109,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
             while (!_interrupt && entry != null) {
                 final String entryName = entry.getName();
 
-                LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                    I18N.getString("extracting.text"), " ", entryName});
+                Log.i("{0}{1}{2}", true, new Object[]{
+                    I18N.getString("extracting.text"), " ", entryName
+                });
 
                 final File newFile = new File(
                         folder.getAbsolutePath() + File.separator + entryName);
@@ -138,14 +131,15 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         buf.write(buffer, 0, readBytes);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
-                            "Output stream for file to extract could not be opened. ", ex);
-                    LOGGER.log(Level.SEVERE, "{0}\n{1}", new Object[]{
-                        I18N.getString("errorWritingFile.text"), newFile.getPath()});
+                    Log.e("Output stream for file to extract could not be opened.", ex);
+                    Log.e("{0}\n{1}", new Object[]{
+                        I18N.getString("errorWritingFile.text"), newFile.getPath()
+                    });
                 }
                 if (!_interrupt) {
-                    LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                        entryName, " ", I18N.getString("extracted.text")});
+                    Log.i("{0}{1}{2}", true, new Object[]{
+                        entryName, " ", I18N.getString("extracted.text")
+                    });
                     entry = inputStream.getNextEntry();
                 }
             }
@@ -199,8 +193,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 String entryName = base + newFile.getName();
                 // start compressing the file
                 if (newFile.isFile()) {
-                    LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                        I18N.getString("compressing.text"), " ", newFile.getName()});
+                    Log.i("{0}{1}{2}", true, new Object[]{
+                        I18N.getString("compressing.text"), " ", newFile.getName()
+                    });
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
@@ -212,14 +207,15 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         }
                         outputStream.closeArchiveEntry();
                     } catch (IOException ex) {
-                        Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE,
-                                "Input stream for file to compress could not be opened. ", ex);
-                        LOGGER.log(Level.SEVERE, "{0}\n{1}", new Object[]{
-                            I18N.getString("errorReadingFile.text"), newFile.getPath()});
+                        Log.e("Input stream for file to compress could not be opened.", ex);
+                        Log.e("{0}\n{1}", new Object[]{
+                            I18N.getString("errorReadingFile.text"), newFile.getPath()
+                        });
                     }
                     if (!_interrupt) {
-                        LOGGER.log(Level.INFO, "{0}{1}{2}", new Object[]{
-                            newFile.getName(), " ", I18N.getString("compressed.text")});
+                        Log.i("{0}{1}{2}", true, new Object[]{
+                            newFile.getName(), " ", I18N.getString("compressed.text")
+                        });
                     }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());

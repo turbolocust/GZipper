@@ -23,11 +23,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.util.Log;
 
 /**
  * Singleton that provides convenience when working with {@link Properties} and
@@ -78,7 +76,7 @@ public class Settings {
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(props))) {
             _props.load(bis);
         } catch (IOException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+            Log.e(null, ex);
         }
     }
 

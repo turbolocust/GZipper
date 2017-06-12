@@ -33,7 +33,7 @@ public abstract class OperatingSystem {
     /**
      * Constructs a new instance of this class using the specified enumeration.
      *
-     * @param operatingSystem
+     * @param operatingSystem the operating system to aggregate.
      */
     protected OperatingSystem(OS operatingSystem) {
         this._operatingSystem = operatingSystem;

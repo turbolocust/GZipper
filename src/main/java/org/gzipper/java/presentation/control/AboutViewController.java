@@ -21,8 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,8 +32,10 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import org.gzipper.java.application.util.AppUtil;
+import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.style.CSS;
+import org.gzipper.java.util.Log;
 
 /**
  * Controller for the FXML named "AboutView.fxml".
@@ -67,7 +67,7 @@ public class AboutViewController extends BaseController {
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "11/06/2017";
+    private final String _appBuildDate = "12/06/2017";
 
     /**
      * The author of this application.
@@ -108,11 +108,11 @@ public class AboutViewController extends BaseController {
                 // load image from JAR and display it in image view
                 imgRes = AppUtil.getResource(GZipper.class, "/" + IMG_NAME);
             } catch (URISyntaxException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                Log.e(I18N.getString("error.text"), ex);
                 try {
                     imgRes = AppUtil.getDecodedRootPath(getClass()) + IMG_NAME;
                 } catch (UnsupportedEncodingException ex1) {
-                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex1);
+                    Log.e(I18N.getString("error.text"), ex1);
                 }
             } finally {
                 if (imgRes != null) {
@@ -124,16 +124,24 @@ public class AboutViewController extends BaseController {
         _imageView.setImage(new Image(_imageFile.toURI().toString()));
 
         final Text appName = new Text(_appName + "\n");
-        final Text appVersion = new Text("Version" + ": " + _appVersion + "\n");
-        final Text appLicense = new Text(resources.getString("license.text") + "\n");
+        final Text appVersion = new Text(
+                "Version"
+                + ": "
+                + _appVersion
+                + "\n");
+        final Text appLicense = new Text(
+                resources.getString("license.text")
+                + "\n");
         final Text appBuildDate = new Text(
                 resources.getString("buildDate.text")
                 + ": "
-                + _appBuildDate + "\n");
+                + _appBuildDate
+                + "\n");
         final Text appCopyright = new Text(
                 resources.getString("author.text")
                 + ": "
-                + _appCopyright + "\n\r");
+                + _appCopyright
+                + "\n\r");
 
         // apply different font to app name
         appName.setFont(Font.font("System", FontWeight.BOLD, 16));

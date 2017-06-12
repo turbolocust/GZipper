@@ -17,17 +17,14 @@
 package org.gzipper.java.presentation.control;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.presentation.GZipper;
-import static org.gzipper.java.presentation.control.BaseController._frameImage;
 import org.gzipper.java.style.CSS;
+import org.gzipper.java.util.Log;
 
 /**
  *
@@ -66,13 +63,14 @@ public class ViewControllers {
         controller.setPrimaryStage(aboutView);
 
         try {
-            aboutView.getIcons().add(_frameImage);
+            aboutView.getIcons().add(BaseController._frameImage);
             aboutView.setTitle(I18N.getString("aboutViewTitle.text"));
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
         } catch (IOException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
-            AlertDialog.showErrorDialog(I18N.getString("error.text"),
+            String errorText = I18N.getString("error.text");
+            Log.e(errorText, ex);
+            AlertDialog.showErrorDialog(errorText,
                     I18N.getString("errorOpeningWindow.text"));
         }
         return controller;
@@ -94,13 +92,14 @@ public class ViewControllers {
         controller.setPrimaryStage(dropView);
 
         try {
-            dropView.getIcons().add(_frameImage);
+            dropView.getIcons().add(BaseController._frameImage);
             dropView.setTitle("Address Dropper");
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
-            AlertDialog.showErrorDialog(I18N.getString("error.text"),
+            String errorText = I18N.getString("error.text");
+            Log.e(errorText, ex);
+            AlertDialog.showErrorDialog(errorText,
                     I18N.getString("errorOpeningWindow.text"));
         }
         return controller;

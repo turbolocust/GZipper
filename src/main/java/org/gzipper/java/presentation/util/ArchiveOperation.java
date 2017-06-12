@@ -18,8 +18,6 @@ package org.gzipper.java.presentation.util;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
@@ -27,7 +25,7 @@ import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
-import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.util.Log;
 
 /**
  * Object that represents an archiving operation.
@@ -119,7 +117,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
                 }
                 success = true;
             } catch (IOException | CompressorException | ArchiveException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                Log.e(null, ex);
             }
             _elapsedTime = System.nanoTime() - startTime;
         }

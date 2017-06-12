@@ -40,11 +40,9 @@ public interface ArchivingAlgorithm extends Interruptable {
      *
      * @param location the location where to extract the archive.
      * @param name the filename of the archive to extract.
-     * @throws java.io.IOException if an I/O error occurs.
-     * @throws org.apache.commons.compress.archivers.ArchiveException if an
-     * error related to the archiver occurs.
-     * @throws org.apache.commons.compress.compressors.CompressorException if an
-     * error related to the compressor occurs.
+     * @throws IOException if an I/O error occurs.
+     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws CompressorException if an error related to the compressor occurs.
      */
     void extract(String location, String name)
             throws IOException, ArchiveException, CompressorException;
@@ -68,10 +66,9 @@ public interface ArchivingAlgorithm extends Interruptable {
      * @param files the files selected from the file chooser.
      * @param location defines where to store the archive.
      * @param name the name of the archive.
-     * @throws java.io.IOException if an I/O error occurs.
-     * @throws org.apache.commons.compress.archivers.ArchiveException
-     * @throws org.apache.commons.compress.compressors.CompressorException if an
-     * error related to the compressor occurs.
+     * @throws IOException if an I/O error occurs.
+     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws CompressorException if an error related to the compressor occurs.
      */
     void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException;
@@ -96,9 +93,8 @@ public interface ArchivingAlgorithm extends Interruptable {
      * @param stream the {@link OutputStream} being used when creating a new
      * {@link ArchiveOutputStream}.
      * @return new instance of {@link ArchiveOutputStream}.
-     * @throws java.io.IOException if an I/O error occurs.
-     * @throws org.apache.commons.compress.archivers.ArchiveException if an
-     * error related to the archiver occurs.
+     * @throws IOException if an I/O error occurs.
+     * @throws ArchiveException if an error related to the archiver occurs.
      */
     ArchiveOutputStream makeArchiveOutputStream(
             OutputStream stream) throws IOException, ArchiveException;

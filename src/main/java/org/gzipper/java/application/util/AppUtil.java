@@ -26,10 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.util.Log;
 
 /**
  * Utility class that provides static methods for e.g. receiving resources from
@@ -47,7 +44,7 @@ public class AppUtil {
      * @param clazz the class of which to receive the resource path.
      * @param name the name of the resource to receive.
      * @return the resource path of the specified class.
-     * @throws URISyntaxException
+     * @throws URISyntaxException if URL conversion failed.
      */
     public static String getResource(Class<?> clazz, String name) throws URISyntaxException {
 
@@ -75,7 +72,7 @@ public class AppUtil {
                 file.deleteOnExit();
 
             } catch (IOException ex) {
-                Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                Log.e(null, ex);
             }
         } else {
             resource = Paths.get(url.toURI()).toString();
@@ -89,7 +86,7 @@ public class AppUtil {
      *
      * @param clazz the class of which to receive the root path.
      * @return the decoded root path of the JAR-file.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException if encoding is not supported.
      */
     public static String getDecodedRootPath(Class<?> clazz) throws UnsupportedEncodingException {
 

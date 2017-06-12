@@ -42,6 +42,7 @@ import org.gzipper.java.application.util.AppUtil;
 import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.application.util.Settings;
 import org.gzipper.java.style.CSS;
+import org.gzipper.java.util.Log;
 
 /**
  *
@@ -55,11 +56,12 @@ public class GZipper extends Application {
         initApplication(); // has to be the first call
 
         Settings settings = Settings.getInstance();
-        final String loggingEnabled = settings.getProperty("loggingEnabled");
+        final String enableLogging = settings.getProperty("loggingEnabled");
         final String enableDarkTheme = settings.getProperty("darkThemeEnabled");
 
         // initialize logger if logging has been enabled
-        if (loggingEnabled.equalsIgnoreCase("true")) {
+        boolean loggingEnabled = enableLogging.equalsIgnoreCase("true");
+        if (loggingEnabled) {
             initLogger();
         }
 
@@ -111,7 +113,7 @@ public class GZipper extends Application {
                     String resource = AppUtil.getResource(GZipper.class, "/settings.properties");
                     FileUtil.copy(resource, decPath + "settings.properties");
                 } catch (URISyntaxException | IOException ex) {
-                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                    Log.e(null, ex);
                 }
             }
 
@@ -123,7 +125,7 @@ public class GZipper extends Application {
             Settings.getInstance().init(settings, os);
 
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+            Log.e(null, ex);
         }
     }
 
@@ -132,17 +134,18 @@ public class GZipper extends Application {
      */
     private void initLogger() {
 
-        Logger logger = Logger.getLogger(GZipper.class.getName());
+        Logger logger = Logger.getLogger(Log.DEFAULT_LOGGER_NAME);
 
         try {
             final String decPath = AppUtil.getDecodedRootPath(getClass());
             FileHandler handler = new FileHandler(decPath + "gzipper.log");
             handler.setFormatter(new SimpleFormatter());
             logger.addHandler(handler);
+            Log.setVerboseUiLogging(true);
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException | SecurityException ex) {
-            Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -153,20 +156,20 @@ public class GZipper extends Application {
         // adjust output of the simple formatter
         System.setProperty(
                 "java.util.logging.SimpleFormatter.format",
-                "[%1$tm-%1$te-%1$ty, %1$tH:%1$tM:%1$tS] %4$s: %5$s %n");
-
+                "[%1$tm-%1$te-%1$ty, %1$tH:%1$tM:%1$tS] %4$s: %5$s %n"
+        );
         // store away settings file at application termination
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 try {
                     Settings.getInstance().storeAway();
-                    Logger logger = Logger.getLogger(GZipper.class.getName());
+                    Logger logger = Logger.getLogger(Log.DEFAULT_LOGGER_NAME);
                     for (Handler handler : logger.getHandlers()) {
                         handler.close();
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(GZipper.class.getName()).log(Level.SEVERE, null, ex);
+                    Log.e(null, ex);
                 }
             }
         });
