@@ -7,7 +7,25 @@
     -fx-control-inner-background:  rgb(50, 50, 50); 
 }
 
-/* Color for bold text in Address Dropper */
+.button:default {
+    -fx-base: rgb(51, 153, 255); 
+    -fx-background: rgb(50, 50, 50); 
+    -fx-control-inner-background:  rgb(50, 50, 50); 
+}
+
+/* Color for bold text in DropView */
 #dropViewText {
     -fx-fill: #FFFFFF;
+}
+
+#aboutViewGridPane {
+    -fx-background-color: rgb(180, 180, 180);
+}
+
+#aboutViewImageView {
+    -fx-background-color: rgb(180, 180, 180); 
+}
+
+#aboutViewTextFlow {
+    -fx-background-color: rgb(180, 180, 180); 
 }

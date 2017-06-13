@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     </columnConstraints>
@@ -23,10 +23,16 @@
         <TextArea fx:id="_textArea" onDragDropped="#handleTextAreaOnDragDropped" onDragOver="#handleTextAreaOnDragOver" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
         <AnchorPane GridPane.rowIndex="2">
             <children>
-            <HBox alignment="CENTER_LEFT" spacing="16.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="8.0">
+            <HBox alignment="CENTER_LEFT" spacing="8.0" AnchorPane.bottomAnchor="6.0" AnchorPane.rightAnchor="6.0">
                <children>
-                      <Button fx:id="_submitButton" defaultButton="true" mnemonicParsing="false" onAction="#handleSubmitButtonAction" text="%submit.text" />
-                      <Button fx:id="_cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#handleCancelButtonAction" text="%close.text" />
+                      <Button fx:id="_submitButton" defaultButton="true" minWidth="100.0" mnemonicParsing="false" onAction="#handleSubmitButtonAction" text="%submit.text">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding></Button>
+                      <Button fx:id="_cancelButton" cancelButton="true" minWidth="100.0" mnemonicParsing="false" onAction="#handleCancelButtonAction" text="%close.text">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding></Button>
                </children>
             </HBox>
             </children>
