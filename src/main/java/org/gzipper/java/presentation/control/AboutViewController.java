@@ -21,9 +21,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
@@ -74,6 +76,11 @@ public class AboutViewController extends BaseController {
      */
     private final String _appCopyright = "Matthias Fussenegger";
 
+    /**
+     * The home page of this project.
+     */
+    private final String _appHomePage = "https://github.com/turbolocust/GZipper";
+
     @FXML
     private ImageView _imageView;
 
@@ -84,12 +91,14 @@ public class AboutViewController extends BaseController {
     private Button _closeButton;
 
     /**
-     * Constructs a new controller with the specified CSS theme.
+     * Constructs a controller for About View with the specified CSS theme and
+     * host services.
      *
      * @param theme the {@link CSS} theme to apply.
+     * @param hostServices the host services to aggregate.
      */
-    public AboutViewController(CSS.Theme theme) {
-        super(theme);
+    public AboutViewController(CSS.Theme theme, HostServices hostServices) {
+        super(theme, hostServices);
     }
 
     @FXML
@@ -129,9 +138,6 @@ public class AboutViewController extends BaseController {
                 + ": "
                 + _appVersion
                 + "\n");
-        final Text appLicense = new Text(
-                resources.getString("license.text")
-                + "\n");
         final Text appBuildDate = new Text(
                 resources.getString("buildDate.text")
                 + ": "
@@ -142,12 +148,23 @@ public class AboutViewController extends BaseController {
                 + ": "
                 + _appCopyright
                 + "\n\r");
+        final Text appLicense = new Text(
+                resources.getString("license.text")
+                + "\n\r");
+
+        final Hyperlink appHomePage = new Hyperlink(_appHomePage);
+        appHomePage.setId("aboutViewAppHomePage");
+        appHomePage.setOnAction((ActionEvent evt) -> {
+            if (evt.getSource().equals(appHomePage)) {
+                _hostServices.showDocument(appHomePage.getText());
+            }
+        });
 
         // apply different font to app name
         appName.setFont(Font.font("System", FontWeight.BOLD, 16));
 
         _textFlow.setTextAlignment(TextAlignment.CENTER);
         _textFlow.getChildren().addAll(appName, appVersion,
-                appBuildDate, appCopyright, appLicense);
+                appBuildDate, appCopyright, appLicense, appHomePage);
     }
 }

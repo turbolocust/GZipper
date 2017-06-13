@@ -17,6 +17,7 @@
 package org.gzipper.java.presentation.control;
 
 import java.io.IOException;
+import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -51,11 +52,17 @@ public class ViewControllers {
      * Shows the about view in a separate window.
      *
      * @param theme the theme to apply.
+     * @param hostServices the host services to aggregate.
      * @return the controller for the view.
      */
-    static AboutViewController showAboutView(CSS.Theme theme) {
+    static AboutViewController showAboutView(CSS.Theme theme, HostServices hostServices) {
+
+        if (hostServices == null) {
+            throw new NullPointerException("Host services must not be null.");
+        }
+
         FXMLLoader fxmlLoader = initFXMLLoader(ABOUT_VIEW_RES);
-        AboutViewController controller = new AboutViewController(theme);
+        AboutViewController controller = new AboutViewController(theme, hostServices);
         fxmlLoader.setController(controller);
 
         final Stage aboutView = new Stage();

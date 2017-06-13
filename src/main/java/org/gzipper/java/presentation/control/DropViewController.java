@@ -59,7 +59,7 @@ public class DropViewController extends BaseController {
     private Text _titleText;
 
     /**
-     * Constructs a new controller with the specified CSS theme.
+     * Constructs a controller for Address Dropper with the specified CSS theme.
      *
      * @param theme the {@link CSS} theme to apply.
      */

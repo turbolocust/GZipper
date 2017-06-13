@@ -18,6 +18,7 @@ package org.gzipper.java.presentation.control;
 
 import java.util.HashSet;
 import java.util.Set;
+import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -61,17 +62,33 @@ public abstract class BaseController implements Initializable {
     }
 
     /**
+     * The aggregated host services. May be {@code null} if not set.
+     */
+    protected HostServices _hostServices;
+
+    /**
      * The currently active theme.
      */
     protected CSS.Theme _theme = CSS.Theme.MODENA;
 
     /**
-     * Constructs a new controller with the specified CSS theme.
+     * Constructs a controller with the specified CSS theme.
      *
      * @param theme the {@link CSS} theme to apply.
      */
     public BaseController(CSS.Theme theme) {
         _theme = theme;
+    }
+
+    /**
+     * Constructs a controller with the specified CSS theme and host services.
+     *
+     * @param theme the {@link CSS} theme to apply.
+     * @param hostServices the host services to aggregate.
+     */
+    public BaseController(CSS.Theme theme, HostServices hostServices) {
+        _theme = theme;
+        _hostServices = hostServices;
     }
 
     /**
@@ -87,7 +104,7 @@ public abstract class BaseController implements Initializable {
     @FXML
     protected void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
-            ViewControllers.showAboutView(_theme);
+            ViewControllers.showAboutView(_theme, _hostServices);
         }
     }
 }

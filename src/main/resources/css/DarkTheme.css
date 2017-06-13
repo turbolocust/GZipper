@@ -29,3 +29,7 @@
 #aboutViewTextFlow {
     -fx-background-color: rgb(180, 180, 180); 
 }
+
+#aboutViewAppHomePage {
+    -fx-text-fill: rgb(0, 0, 153);
+}

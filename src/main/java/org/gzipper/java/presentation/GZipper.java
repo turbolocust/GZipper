@@ -60,8 +60,7 @@ public class GZipper extends Application {
         final String enableDarkTheme = settings.getProperty("darkThemeEnabled");
 
         // initialize logger if logging has been enabled
-        boolean loggingEnabled = enableLogging.equalsIgnoreCase("true");
-        if (loggingEnabled) {
+        if (enableLogging.equalsIgnoreCase("true")) {
             initLogger();
         }
 
@@ -71,15 +70,15 @@ public class GZipper extends Application {
                 : CSS.Theme.MODENA;
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
-        MainViewController mvc = new MainViewController(theme);
+        BaseController controller = new MainViewController(theme, getHostServices());
 
         fxmlLoader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView", Locale.ENGLISH));
-        fxmlLoader.setController(mvc);
+        fxmlLoader.setController(controller);
 
         // load parent to initialize scene
         Scene scene = new Scene(fxmlLoader.load());
         BaseController.getStages().add(stage);
-        mvc.setPrimaryStage(stage);
+        controller.setPrimaryStage(stage);
 
         // load dark theme if it was enabled on previous application run
         if (theme == CSS.Theme.DARK_THEME) {

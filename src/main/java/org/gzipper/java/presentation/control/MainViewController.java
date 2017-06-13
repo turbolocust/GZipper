@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
@@ -179,12 +180,14 @@ public class MainViewController extends BaseController {
     private ProgressIndicator _progressIndicator;
 
     /**
-     * Constructs a new controller with the specified CSS theme.
+     * Constructs a controller for Main View with the specified CSS theme and
+     * host services.
      *
      * @param theme the {@link CSS} theme to apply.
+     * @param hostServices the host services to aggregate.
      */
-    public MainViewController(CSS.Theme theme) {
-        super(theme);
+    public MainViewController(CSS.Theme theme, HostServices hostServices) {
+        super(theme, hostServices);
         _archiveName = DEFAULT_ARCHIVE_NAME;
         _archiveFileExtension = "";
         _activeTasks = Collections.synchronizedMap(new HashMap<>());
