@@ -17,6 +17,7 @@
 <b>The application has been tested on these platforms:</b>
  - Windows
  - Unix-based systems
+
 <br /><br />
 For compression and decompression the commons-compress library by Apache Foundation is used.
 <br />The source code for that library can be found here: <a href>http://commons.apache.org/</a>
