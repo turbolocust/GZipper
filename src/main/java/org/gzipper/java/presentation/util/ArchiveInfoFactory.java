@@ -33,7 +33,7 @@ public class ArchiveInfoFactory {
     /**
      * Creates a new {@link ArchiveInfo} for compression operation.
      *
-     * @param type the type of the archive as string.
+     * @param archiveType the type of the archive, see {@link ArchiveType}.
      * @param level the compression level of the archive.
      * @param archiveName the name of the archive to create.
      * @param files the files to be compressed.
@@ -41,28 +41,27 @@ public class ArchiveInfoFactory {
      * @return {@link ArchiveInfo} that may be used for an operation.
      * @throws GZipperException if archive type could not be determined.
      */
-    public static ArchiveInfo createArchiveInfo(String type, String archiveName,
+    public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
 
-        ArchiveType archiveType = ArchiveType.determineArchiveType(type);
-
         if (archiveType == null) {
-            throw new GZipperException("Archive type could not be determined.");
+            throw new NullPointerException("Archive type must not be null.");
         } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
             throw new GZipperException("Faulty compression level specified.");
         }
 
         boolean hasExtension = false;
-        String[] extNames = archiveType.getExtensionNames();
+        String[] extNames = archiveType.getExtensionNames(false);
         for (String extName : extNames) {
-            if (archiveName.endsWith(extName.substring(1))) {
+            if (archiveName.endsWith(extName)) {
                 hasExtension = true;
+                break;
             }
         }
 
         if (!hasExtension) {
-            // add extension to archive name if missing and ignore the wildcard
-            archiveName = archiveName + extNames[0].substring(1);
+            // add extension to archive name if missing and ignore the asterisk
+            archiveName = archiveName + extNames[0];
         }
 
         return new ArchiveInfo(archiveType, archiveName, level, files, outputPath);
@@ -71,21 +70,18 @@ public class ArchiveInfoFactory {
     /**
      * Creates a new {@link ArchiveInfo} for decompression operation.
      *
-     * @param type the type of the archive as string.
+     * @param archiveType the type of the archive, see {@link ArchiveType}.
      * @param archiveName the name of the archive to extract.
      * @param outputPath the path where to extract the archive.
      * @return {@link ArchiveInfo} that may be used for an operation.
      * @throws GZipperException if archive type could not be determined.
      */
-    public static ArchiveInfo createArchiveInfo(String type, String archiveName,
-            String outputPath) throws GZipperException {
-
-        ArchiveType archiveType = ArchiveType.determineArchiveType(type);
+    public static ArchiveInfo createArchiveInfo(ArchiveType archiveType,
+            String archiveName, String outputPath) throws GZipperException {
 
         if (archiveType == null) {
-            throw new GZipperException("Archive type could not be determined.");
+            throw new NullPointerException("Archive type must not be null.");
         }
-
         return new ArchiveInfo(archiveType, archiveName, 0, null, outputPath);
     }
 }

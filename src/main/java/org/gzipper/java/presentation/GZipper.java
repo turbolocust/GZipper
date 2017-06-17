@@ -129,7 +129,7 @@ public class GZipper extends Application {
     }
 
     /**
-     * Initializes the logger that will append text to {@link #_textArea}.
+     * Initializes the logger that will append text to the console.
      */
     private void initLogger() {
 

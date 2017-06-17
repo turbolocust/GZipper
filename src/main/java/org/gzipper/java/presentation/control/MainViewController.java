@@ -189,7 +189,6 @@ public class MainViewController extends BaseController {
     public MainViewController(CSS.Theme theme, HostServices hostServices) {
         super(theme, hostServices);
         _archiveName = DEFAULT_ARCHIVE_NAME;
-        _archiveFileExtension = "";
         _activeTasks = Collections.synchronizedMap(new HashMap<>());
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
@@ -246,8 +245,10 @@ public class MainViewController extends BaseController {
                     });
                 });
             } else {
-                _startButton.setDisable(true);
                 Log.i(I18N.getString("noFilesSelected.text"), true);
+                if (_selectedFiles == null || _selectedFiles.isEmpty()) {
+                    _startButton.setDisable(true);
+                }
             }
         }
     }
@@ -265,7 +266,7 @@ public class MainViewController extends BaseController {
                         }
                     }
                     Settings.getInstance().setProperty("recentPath", outputPath);
-                    String archiveType = _archiveTypeComboBox.getValue().getName();
+                    ArchiveType archiveType = _archiveTypeComboBox.getValue();
                     ArchiveOperation[] operations = _strategy.initOperation(archiveType);
                     for (ArchiveOperation operation : operations) {
                         Log.i("Operation started using the following archive info: {0}",
@@ -307,24 +308,27 @@ public class MainViewController extends BaseController {
                 _strategy.applyExtensionFilters(fc);
             }
 
-            _selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
+            List<File> selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
 
             String message;
-            if (_selectedFiles != null) {
+            if (selectedFiles != null) {
                 _startButton.setDisable(false);
-                final int selectedFiles = _selectedFiles.size();
+                int selectionCount = selectedFiles.size();
                 message = I18N.getString("filesSelected.text");
-                message = message.replace("{0}", Integer.toString(selectedFiles));
+                message = message.replace("{0}", Integer.toString(selectionCount));
                 // log the path of each selected file
-                _selectedFiles.forEach((file) -> {
+                selectedFiles.forEach((file) -> {
                     Log.i("{0}: {1}", true, new Object[]{
                         I18N.getString("fileSelected.text"),
                         file.getAbsolutePath()
                     });
                 });
+                _selectedFiles = selectedFiles;
             } else {
-                _startButton.setDisable(true);
                 message = I18N.getString("noFilesSelected.text");
+                if (_selectedFiles == null || _selectedFiles.isEmpty()) {
+                    _startButton.setDisable(true);
+                }
             }
             Log.i(message, true);
         }
@@ -348,8 +352,12 @@ public class MainViewController extends BaseController {
 
             if (file != null) {
                 updateSelectedFile(file);
-                _outputPathTextField.setText(file.getAbsolutePath());
-                Log.i("Output directory set to: {0}", file.getAbsolutePath(), false);
+                String absolutePath = file.getAbsolutePath();
+                if (FileUtil.getFileExtension(absolutePath).isEmpty()) {
+                    absolutePath = absolutePath + _archiveFileExtension;
+                }
+                _outputPathTextField.setText(absolutePath);
+                Log.i("Output file set to: {0}", file.getAbsolutePath(), false);
             }
         }
     }
@@ -379,24 +387,23 @@ public class MainViewController extends BaseController {
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
-            int i = _archiveTypeComboBox.getSelectionModel().getSelectedIndex();
-            ArchiveType selectedType = _archiveTypeComboBox.getItems().get(i);
-            Log.i("Archive type selection change to: {0}", selectedType, false);
+            ArchiveType type = _archiveTypeComboBox.getValue();
+            Log.i("Archive type selection change to: {0}", type, false);
             if (_decompressRadioButton.isSelected()) {
                 resetSelections();
-            } else if (!_archiveFileExtension.isEmpty()) {
-                // change file extension if set in output text field
-                String outputPathText = _outputPathTextField.getText();
-                String fileExtension = FileUtil.getFileExtension(
-                        selectedType.getDefaultExtensionName()
-                );
+            } else { // update file extension
+                String outputPathText = _outputPathTextField.getText(),
+                        fileExtension = type.getDefaultExtensionName(false);
+                String outputPath;
                 if (outputPathText.endsWith(_archiveFileExtension)) {
-                    String outputPath = outputPathText.replace(
+                    outputPath = outputPathText.replace(
                             _archiveFileExtension, fileExtension
                     );
-                    _archiveFileExtension = fileExtension;
-                    _outputPathTextField.setText(outputPath);
+                } else {
+                    outputPath = outputPathText + fileExtension;
                 }
+                _outputPathTextField.setText(outputPath);
+                _archiveFileExtension = fileExtension;
             }
         }
     }
@@ -456,7 +463,8 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Updates the selected file and the archive name if it is not a directory.
+     * Updates the selected file, the archive name and the file name extension
+     * of the archive if it is not a directory.
      *
      * @param file the updated file.
      */
@@ -464,7 +472,12 @@ public class MainViewController extends BaseController {
         if (file != null) {
             if (!file.isDirectory()) {
                 String archiveName = _archiveName = file.getName();
-                _archiveFileExtension = FileUtil.getFileExtension(archiveName);
+                String fileExtension = FileUtil.getFileExtension(archiveName);
+                if (fileExtension.isEmpty()) { // update file extension
+                    fileExtension = _archiveTypeComboBox.getValue()
+                            .getDefaultExtensionName(false);
+                }
+                _archiveFileExtension = fileExtension;
             }
             _outputFile = file;
         }
@@ -498,9 +511,7 @@ public class MainViewController extends BaseController {
                         Log.i(I18N.getString("interrupt.text"), true);
                         Log.w("Operation has been interrupted.", ex, false);
                         operation.interrupt();
-                        boolean cancelled = futureTask.cancel(true);
-
-                        if (cancelled) {
+                        if (futureTask.cancel(true)) {
                             Log.i(I18N.getString("operationCancel.text"), true);
                         }
                     }
@@ -529,7 +540,7 @@ public class MainViewController extends BaseController {
             // delete corrupt archive on operation fail
             if (operation.isCompress()) {
                 ArchiveInfo info = operation.getArchiveInfo();
-                final String archive = FileUtil.combinePathAndFilename(
+                String archive = FileUtil.combinePathAndFilename(
                         info.getOutputPath(), info.getArchiveName());
                 try {
                     if (FileUtil.delete(archive)) {
@@ -592,12 +603,13 @@ public class MainViewController extends BaseController {
         Logger logger = Logger.getLogger(Log.UI_LOGGER_NAME);
         TextAreaHandler handler = new TextAreaHandler(_textArea);
         handler.setFormatter(new SimpleFormatter());
+        logger.setUseParentHandlers(false);
         logger.addHandler(handler);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        final Settings settings = Settings.getInstance();
+        Settings settings = Settings.getInstance();
         OperatingSystem os = settings.getOperatingSystem();
 
         initLogger();
@@ -627,9 +639,10 @@ public class MainViewController extends BaseController {
                 COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
 
         // set up combo box items
-        final ArchiveType[] archiveTypes = ArchiveType.values();
-        _archiveTypeComboBox.getItems().addAll(archiveTypes);
-        _archiveTypeComboBox.setValue(archiveTypes[0]);
+        final ArchiveType selectedType = ArchiveType.values()[0];
+        _archiveTypeComboBox.getItems().addAll(ArchiveType.values());
+        _archiveTypeComboBox.setValue(selectedType);
+        _archiveFileExtension = selectedType.getDefaultExtensionName(false);
 
         // set menu item for logging as selected if logging has been enabled before
         final String enableLogging = settings.getProperty("loggingEnabled");
@@ -664,12 +677,11 @@ public class MainViewController extends BaseController {
         public void applyExtensionFilters(FileChooser chooser) {
             if (chooser != null) {
                 final ArchiveType selectedType = _archiveTypeComboBox
-                        .getSelectionModel()
-                        .getSelectedItem();
+                        .getSelectionModel().getSelectedItem();
                 for (ArchiveType type : ArchiveType.values()) {
                     if (type.equals(selectedType)) {
                         ExtensionFilter extFilter = new ExtensionFilter(
-                                type.getDisplayName(), type.getExtensionNames());
+                                type.getDisplayName(), type.getExtensionNames(true));
                         chooser.getExtensionFilters().add(extFilter);
                     }
                 }
@@ -685,7 +697,7 @@ public class MainViewController extends BaseController {
          * determined.
          */
         public abstract ArchiveOperation[] initOperation(
-                String archiveType) throws GZipperException;
+                ArchiveType archiveType) throws GZipperException;
 
         /**
          * Performs the specified {@link ArchiveOperation} using the concrete
@@ -722,8 +734,9 @@ public class MainViewController extends BaseController {
         @Override
         public boolean validateOutputPath() {
 
-            String outputPath = _outputPathTextField.getText(),
-                    extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
+            String outputPath = _outputPathTextField.getText();
+            String extName = _archiveTypeComboBox.getValue()
+                    .getDefaultExtensionName(false);
 
             if (FileUtil.isValidDirectory(outputPath)) {
                 // user has not specified output filename
@@ -733,7 +746,7 @@ public class MainViewController extends BaseController {
 
             if (FileUtil.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
-                _archiveFileExtension = extName.substring(1);
+                _archiveFileExtension = extName;
                 return true;
             }
             return false;
@@ -750,7 +763,7 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation[] initOperation(String archiveType)
+        public ArchiveOperation[] initOperation(ArchiveType archiveType)
                 throws GZipperException {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _compressionLevel,
@@ -781,7 +794,7 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation[] initOperation(String archiveType)
+        public ArchiveOperation[] initOperation(ArchiveType archiveType)
                 throws GZipperException {
             // array consisting of operations for each selected archive
             ArchiveOperation[] operations

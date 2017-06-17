@@ -54,25 +54,6 @@ public enum ArchiveType {
     }
 
     /**
-     * Determines the archive type by using the specified value. The specified
-     * value has to match with the name of the archive type in order to
-     * successfully determine it.
-     *
-     * @param name the name of the archive type.
-     * @return the corresponding {@link ArchiveType}.
-     */
-    public static synchronized ArchiveType determineArchiveType(String name) {
-        ArchiveType archiveType = null;
-        for (ArchiveType type : values()) {
-            if (type.getName().equals(name)) {
-                archiveType = type;
-                break;
-            }
-        }
-        return archiveType;
-    }
-
-    /**
      * Determines the correct {@link ArchivingAlgorithm} to be used with this
      * archive type.
      *
@@ -121,10 +102,23 @@ public enum ArchiveType {
     /**
      * Returns the file extensions of this archive type.
      *
+     * @param includeAsterisks true to include asterisks, false to remove them.
      * @return the file extensions of this archive type as string array.
      */
-    public String[] getExtensionNames() {
-        return _extensionNames;
+    public String[] getExtensionNames(boolean includeAsterisks) {
+
+        String[] extensionNames;
+
+        if (includeAsterisks) {
+            extensionNames = _extensionNames;
+        } else {
+            extensionNames = new String[_extensionNames.length];
+            for (int i = 0; i < _extensionNames.length; ++i) {
+                extensionNames[i] = _extensionNames[i].substring(1);
+            }
+        }
+
+        return extensionNames;
     }
 
     /**
@@ -132,10 +126,11 @@ public enum ArchiveType {
      * extension is the first one that has been specified in the array of file
      * extensions.
      *
+     * @param includeAsterisk true to include asterisk, false to remove it.
      * @return the default file extension of this archive type as string.
      */
-    public String getDefaultExtensionName() {
-        return _extensionNames.length > 0 ? _extensionNames[0] : "";
+    public String getDefaultExtensionName(boolean includeAsterisk) {
+        return _extensionNames.length > 0 ? _extensionNames[0].substring(1) : "";
     }
 
     @Override

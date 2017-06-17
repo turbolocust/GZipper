@@ -75,9 +75,8 @@ public class ViewControllers {
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
         } catch (IOException ex) {
-            String errorText = I18N.getString("error.text");
-            Log.e(errorText, ex);
-            AlertDialog.showErrorDialog(errorText,
+            Log.e(ex.getLocalizedMessage(), ex);
+            AlertDialog.showErrorDialog(I18N.getString("error.text"),
                     I18N.getString("errorOpeningWindow.text"));
         }
         return controller;
@@ -104,9 +103,8 @@ public class ViewControllers {
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {
-            String errorText = I18N.getString("error.text");
-            Log.e(errorText, ex);
-            AlertDialog.showErrorDialog(errorText,
+            Log.e(ex.getLocalizedMessage(), ex);
+            AlertDialog.showErrorDialog(I18N.getString("error.text"),
                     I18N.getString("errorOpeningWindow.text"));
         }
         return controller;

@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.2-BETA</version>
+    <version>0.5.3-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -43,7 +43,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>false</addClasspath>
+                            <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>org.gzipper.java.presentation.GZipper</mainClass>
                         </manifest>

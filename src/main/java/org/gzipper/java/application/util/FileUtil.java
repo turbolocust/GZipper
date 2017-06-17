@@ -173,7 +173,7 @@ public class FileUtil {
         int suffix = 0; // will be appended to file name
         final StringBuilder filename = new StringBuilder();
 
-        if (ext.startsWith("*")) { // ignore wildcard if any
+        if (ext.startsWith("*")) { // ignore asterisk if any
             ext = ext.substring(1);
         }
 

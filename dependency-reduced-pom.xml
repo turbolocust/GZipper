@@ -4,7 +4,7 @@
   <groupId>org.gzipper</groupId>
   <artifactId>GZipper</artifactId>
   <name>GZipper</name>
-  <version>0.5.2-BETA</version>
+  <version>0.5.3-BETA</version>
   <url>https://github.com/turbolocust/GZipper</url>
   <build>
     <plugins>
@@ -33,7 +33,7 @@
         <configuration>
           <archive>
             <manifest>
-              <addClasspath>false</addClasspath>
+              <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
               <mainClass>org.gzipper.java.presentation.GZipper</mainClass>
             </manifest>
