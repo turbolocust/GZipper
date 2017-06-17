@@ -17,14 +17,18 @@
 package org.gzipper.java.presentation.control;
 
 import java.net.URL;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -32,6 +36,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.style.CSS;
 
 /**
@@ -44,7 +49,7 @@ public class DropViewController extends BaseController {
     /**
      * A list consisting of the parsed file addresses.
      */
-    private final List<String> _addresses;
+    private final Set<String> _addresses;
 
     @FXML
     private TextArea _textArea;
@@ -56,6 +61,9 @@ public class DropViewController extends BaseController {
     private Button _submitButton;
 
     @FXML
+    private CheckBox _appendAddressesCheckBox;
+
+    @FXML
     private Text _titleText;
 
     /**
@@ -65,7 +73,7 @@ public class DropViewController extends BaseController {
      */
     public DropViewController(CSS.Theme theme) {
         super(theme);
-        _addresses = new LinkedList<>();
+        _addresses = new LinkedHashSet<>();
     }
 
     @FXML
@@ -108,7 +116,8 @@ public class DropViewController extends BaseController {
         Dragboard dragboard = evt.getDragboard();
         boolean success = false;
         if (dragboard.hasFiles()) {
-            if (!_textArea.getText().isEmpty()) {
+            if (!_appendAddressesCheckBox.isSelected()
+                    && !_textArea.getText().isEmpty()) {
                 _textArea.clear();
             }
             // add each dropped file's path to text area
@@ -128,11 +137,13 @@ public class DropViewController extends BaseController {
      * @return a {@link List} consisting of file paths.
      */
     public List<String> getAddresses() {
-        return _addresses;
+        return new LinkedList<>(_addresses);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         _titleText.setFont(Font.font("System", FontWeight.BOLD, -1));
+        _appendAddressesCheckBox.setTooltip(
+                new Tooltip(I18N.getString("appendAddressesTooltip.text")));
     }
 }
