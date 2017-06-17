@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation.util;
+package org.gzipper.java.application.pojo;
 
 import java.io.File;
 import java.util.List;
 import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 
 /**

@@ -30,13 +30,10 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
+
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-
-import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.util.Settings;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -53,18 +50,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+
 import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.application.util.TaskHandler;
+import org.gzipper.java.application.ArchiveOperation;
+import org.gzipper.java.application.pojo.ArchiveInfoFactory;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
-import org.gzipper.java.presentation.util.ArchiveOperation;
-import org.gzipper.java.presentation.util.ArchiveInfoFactory;
+import org.gzipper.java.presentation.AlertDialog;
+import org.gzipper.java.presentation.GZipper;
+
 import org.gzipper.java.style.CSS;
+import org.gzipper.java.util.Settings;
 import org.gzipper.java.util.Log;
 
 /**

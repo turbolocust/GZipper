@@ -40,7 +40,7 @@ import org.gzipper.java.application.model.Unix;
 import org.gzipper.java.application.model.Windows;
 import org.gzipper.java.application.util.AppUtil;
 import org.gzipper.java.application.util.FileUtil;
-import org.gzipper.java.application.util.Settings;
+import org.gzipper.java.util.Settings;
 import org.gzipper.java.style.CSS;
 import org.gzipper.java.util.Log;
 

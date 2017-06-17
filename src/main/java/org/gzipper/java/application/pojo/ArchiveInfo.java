@@ -53,7 +53,7 @@ public class ArchiveInfo {
      */
     private String _outputPath;
 
-    public ArchiveInfo(ArchiveType archiveType, String archiveName,
+    ArchiveInfo(ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) {
         _archiveType = archiveType;
         _archiveName = archiveName;

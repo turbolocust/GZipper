@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.application.util;
+package org.gzipper.java.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.util.Log;
 
 /**
  * Singleton that provides convenience when working with {@link Properties} and

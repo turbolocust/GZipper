@@ -28,7 +28,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
-import org.gzipper.java.application.util.Settings;
+import org.gzipper.java.util.Settings;
 
 /**
  *
