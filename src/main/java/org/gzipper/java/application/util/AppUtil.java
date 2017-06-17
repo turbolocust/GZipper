@@ -72,7 +72,7 @@ public class AppUtil {
                 file.deleteOnExit();
 
             } catch (IOException ex) {
-                Log.e(null, ex);
+                Log.e(ex.getLocalizedMessage(), ex);
             }
         } else {
             resource = Paths.get(url.toURI()).toString();

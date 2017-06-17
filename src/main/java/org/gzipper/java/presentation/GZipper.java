@@ -112,7 +112,7 @@ public class GZipper extends Application {
                     String resource = AppUtil.getResource(GZipper.class, "/settings.properties");
                     FileUtil.copy(resource, decPath + "settings.properties");
                 } catch (URISyntaxException | IOException ex) {
-                    Log.e(null, ex);
+                    Log.e(ex.getLocalizedMessage(), ex);
                 }
             }
 
@@ -124,7 +124,7 @@ public class GZipper extends Application {
             Settings.getInstance().init(settings, os);
 
         } catch (UnsupportedEncodingException ex) {
-            Log.e(null, ex);
+            Log.e(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -168,7 +168,7 @@ public class GZipper extends Application {
                         handler.close();
                     }
                 } catch (IOException ex) {
-                    Log.e(null, ex);
+                    Log.e(ex.getLocalizedMessage(), ex);
                 }
             }
         });

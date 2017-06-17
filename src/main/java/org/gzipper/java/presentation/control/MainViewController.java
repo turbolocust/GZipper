@@ -277,8 +277,7 @@ public class MainViewController extends BaseController {
                     Log.w(I18N.getString("invalidOutputPath.text"), true);
                 }
             } catch (GZipperException ex) {
-                Log.e(null, ex);
-                Log.e(ex.getMessage());
+                Log.e(ex.getLocalizedMessage(), ex);
             }
         }
     }
@@ -549,8 +548,9 @@ public class MainViewController extends BaseController {
                         Log.w("Archive could not be deleted as it no longer exists.", false);
                     }
                 } catch (IOException ex) {
-                    Log.e("I/O error occurred while trying to delete "
-                            + "corrupt archive after fail of operation.", ex);
+                    Log.e(ex.getLocalizedMessage(), ex);
+                    Log.e("I/O error occurred while trying to delete possibly "
+                            + "incomplete archive after fail of operation.");
                 }
             }
             finalizeArchivingJob(operation, task);

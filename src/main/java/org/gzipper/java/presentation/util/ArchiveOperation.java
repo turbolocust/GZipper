@@ -117,7 +117,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
                 }
                 success = true;
             } catch (IOException | CompressorException | ArchiveException ex) {
-                Log.e(null, ex);
+                Log.e(ex.getLocalizedMessage(), ex);
             }
             _elapsedTime = System.nanoTime() - startTime;
         }

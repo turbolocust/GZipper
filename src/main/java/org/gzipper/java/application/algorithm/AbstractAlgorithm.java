@@ -131,7 +131,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         buf.write(buffer, 0, readBytes);
                     }
                 } catch (IOException ex) {
-                    Log.e("Output stream for file to extract could not be opened.", ex);
+                    Log.e(ex.getLocalizedMessage(), ex);
                     Log.e("{0}\n{1}", new Object[]{
                         I18N.getString("errorWritingFile.text"), newFile.getPath()
                     });
@@ -207,7 +207,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         }
                         outputStream.closeArchiveEntry();
                     } catch (IOException ex) {
-                        Log.e("Input stream for file to compress could not be opened.", ex);
+                        Log.e(ex.getLocalizedMessage(), ex);
                         Log.e("{0}\n{1}", new Object[]{
                             I18N.getString("errorReadingFile.text"), newFile.getPath()
                         });

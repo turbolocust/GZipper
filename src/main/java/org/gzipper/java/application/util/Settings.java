@@ -76,7 +76,7 @@ public class Settings {
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(props))) {
             _props.load(bis);
         } catch (IOException ex) {
-            Log.e(null, ex);
+            Log.e(ex.getLocalizedMessage(), ex);
         }
     }
 
