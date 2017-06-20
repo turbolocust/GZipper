@@ -17,6 +17,7 @@
 package org.gzipper.java.application.algorithm.type;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
@@ -24,6 +25,7 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
@@ -54,8 +56,13 @@ public class Zip extends AbstractAlgorithm {
     }
 
     @Override
+    public CompressorInputStream makeCompressorInputStream(InputStream stream) throws CompressorException {
+        return null; // as no separate compressor stream is required
+    }
+
+    @Override
     public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
-        return null; // as no compressor stream is required
+        return null; // as no separate compressor stream is required
     }
 }

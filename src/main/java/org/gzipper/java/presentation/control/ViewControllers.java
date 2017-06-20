@@ -20,6 +20,7 @@ import java.io.IOException;
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
@@ -76,8 +77,9 @@ public class ViewControllers {
             aboutView.showAndWait();
         } catch (IOException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
-            AlertDialog.showErrorDialog(I18N.getString("error.text"),
-                    I18N.getString("errorOpeningWindow.text"));
+            String errorText = I18N.getString("error.text");
+            AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
+                    I18N.getString("errorOpeningWindow.text"), theme);
         }
         return controller;
     }
@@ -104,8 +106,9 @@ public class ViewControllers {
             dropView.showAndWait();
         } catch (IOException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
-            AlertDialog.showErrorDialog(I18N.getString("error.text"),
-                    I18N.getString("errorOpeningWindow.text"));
+            String errorText = I18N.getString("error.text");
+            AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
+                    I18N.getString("errorOpeningWindow.text"), theme);
         }
         return controller;
     }
@@ -134,10 +137,7 @@ public class ViewControllers {
      */
     private static Scene loadScene(FXMLLoader loader, CSS.Theme theme) throws IOException {
         Scene scene = new Scene(loader.load());
-        if (theme == CSS.Theme.DARK_THEME) {
-            scene.getStylesheets().add(CLAZZ.getResource(
-                    CSS.STYLESHEET_DARK_THEME).toExternalForm());
-        }
+        CSS.load(theme, scene.getStylesheets());
         return scene;
     }
 

@@ -32,10 +32,10 @@ import java.util.logging.SimpleFormatter;
 import java.util.zip.Deflater;
 
 import javafx.application.HostServices;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
@@ -62,7 +62,6 @@ import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.presentation.GZipper;
 
 import org.gzipper.java.style.CSS;
 import org.gzipper.java.util.Settings;
@@ -145,6 +144,12 @@ public class MainViewController extends BaseController {
     private MenuItem _dropAddressesMenuItem;
 
     @FXML
+    private MenuItem _resetAppMenuItem;
+
+    @FXML
+    private MenuItem _aboutMenuItem;
+
+    @FXML
     private RadioButton _compressRadioButton;
 
     @FXML
@@ -211,9 +216,7 @@ public class MainViewController extends BaseController {
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
-            close();
-            Platform.exit();
-            System.exit(0);
+            exit();
         }
     }
 
@@ -221,8 +224,9 @@ public class MainViewController extends BaseController {
     void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
             Optional<ButtonType> result = AlertDialog.showConfirmationDialog(
-                    I18N.getString("clearTextWarning.text"),
-                    I18N.getString("confirmation.text"));
+                    I18N.getString("clearText.text"),
+                    I18N.getString("clearTextConfirmation.text"),
+                    I18N.getString("confirmation.text"), _theme);
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -233,13 +237,15 @@ public class MainViewController extends BaseController {
     @FXML
     void handleDropAddressesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_dropAddressesMenuItem)) {
-            List<String> files = ViewControllers
+            List<String> filePaths = ViewControllers
                     .showDropView(_theme).getAddresses();
-            if (files != null && !files.isEmpty()) {
-                _selectedFiles = new ArrayList<>(files.size());
+            if (filePaths != null && !filePaths.isEmpty()) {
+                _selectedFiles = new ArrayList<>(filePaths.size());
                 _startButton.setDisable(false);
-                files.forEach((filePath) -> {
+                filePaths.stream().map((filePath) -> {
                     _selectedFiles.add(new File(filePath));
+                    return filePath;
+                }).forEachOrdered((filePath) -> {
                     Log.i("{0}: {1}", true, new Object[]{
                         I18N.getString("fileSelected.text"),
                         filePath
@@ -247,10 +253,28 @@ public class MainViewController extends BaseController {
                 });
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
-                if (_selectedFiles == null || _selectedFiles.isEmpty()) {
-                    _startButton.setDisable(true);
-                }
+                _startButton.setDisable(_selectedFiles == null || _selectedFiles.isEmpty());
             }
+        }
+    }
+
+    @FXML
+    void handleResetAppMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_resetAppMenuItem)) {
+            Optional<ButtonType> result = AlertDialog.showConfirmationDialog(
+                    I18N.getString("resetApp.text"),
+                    I18N.getString("resetAppConfirmation.text"),
+                    I18N.getString("confirmation.text"), _theme);
+            if (result.isPresent() && result.get() == ButtonType.YES) {
+                Settings.getInstance().restoreDefaults();
+            }
+        }
+    }
+
+    @FXML
+    void handleAboutMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_aboutMenuItem)) {
+            ViewControllers.showAboutView(_theme, _hostServices);
         }
     }
 
@@ -308,7 +332,16 @@ public class MainViewController extends BaseController {
                 _strategy.applyExtensionFilters(fc);
             }
 
-            List<File> selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
+            List<File> selectedFiles = null;
+            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP) {
+                File selectedFile = fc.showOpenDialog(_primaryStage);
+                if (selectedFile != null) {
+                    selectedFiles = new ArrayList<>(1);
+                    selectedFiles.add(selectedFile);
+                }
+            } else {
+                selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
+            }
 
             String message;
             if (selectedFiles != null) {
@@ -326,9 +359,7 @@ public class MainViewController extends BaseController {
                 _selectedFiles = selectedFiles;
             } else {
                 message = I18N.getString("noFilesSelected.text");
-                if (_selectedFiles == null || _selectedFiles.isEmpty()) {
-                    _startButton.setDisable(true);
-                }
+                _startButton.setDisable(_selectedFiles == null || _selectedFiles.isEmpty());
             }
             Log.i(message, true);
         }
@@ -353,7 +384,7 @@ public class MainViewController extends BaseController {
             if (file != null) {
                 updateSelectedFile(file);
                 String absolutePath = file.getAbsolutePath();
-                if (FileUtil.getFileExtension(absolutePath).isEmpty()) {
+                if (!file.isDirectory() && FileUtil.getFileExtension(absolutePath).isEmpty()) {
                     absolutePath = absolutePath + _archiveFileExtension;
                 }
                 _outputPathTextField.setText(absolutePath);
@@ -372,23 +403,15 @@ public class MainViewController extends BaseController {
         resetSelections();
     }
 
-    private void performCompressRadioButtonAction() {
-        _strategy = new CompressStrategy();
-        _selectFilesButton.setText(I18N.getString("browseForFiles.text"));
-        _saveAsButton.setText(I18N.getString("saveAsArchive.text"));
-    }
-
-    private void performDecompressRadioButtonAction() {
-        _strategy = new DecompressStrategy();
-        _selectFilesButton.setText(I18N.getString("browseForArchive.text"));
-        _saveAsButton.setText(I18N.getString("saveAsFiles.text"));
-    }
-
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
             ArchiveType type = _archiveTypeComboBox.getValue();
             Log.i("Archive type selection change to: {0}", type, false);
+            _dropAddressesMenuItem.setDisable(type == ArchiveType.GZIP);
+            if (type == ArchiveType.GZIP) {
+                performGzipSelectionAction();
+            }
             if (_decompressRadioButton.isSelected()) {
                 resetSelections();
             } else { // update file extension
@@ -399,8 +422,10 @@ public class MainViewController extends BaseController {
                     outputPath = outputPathText.replace(
                             _archiveFileExtension, fileExtension
                     );
-                } else {
+                } else if (!FileUtil.isValidDirectory(outputPathText)) {
                     outputPath = outputPathText + fileExtension;
+                } else {
+                    outputPath = outputPathText;
                 }
                 _outputPathTextField.setText(outputPath);
                 _archiveFileExtension = fileExtension;
@@ -434,6 +459,45 @@ public class MainViewController extends BaseController {
             loadAlternativeTheme(enableTheme, CSS.Theme.DARK_THEME);
             Settings.getInstance().setProperty("darkThemeEnabled", enableTheme);
         }
+    }
+
+    /**
+     * Performs a specific operation when the compress radio button has been
+     * selected. This method only exists to reduce redundancy.
+     */
+    private void performCompressRadioButtonAction() {
+        _strategy = new CompressStrategy();
+        _selectFilesButton.setText(I18N.getString("browseForFiles.text"));
+        _saveAsButton.setText(I18N.getString("saveAsArchive.text"));
+    }
+
+    /**
+     * Performs a specific operation when the decompress radio button has been
+     * selected. This method only exists to reduce redundancy.
+     */
+    private void performDecompressRadioButtonAction() {
+        _strategy = new DecompressStrategy();
+        _selectFilesButton.setText(I18N.getString("browseForArchive.text"));
+        _saveAsButton.setText(I18N.getString("saveAsFiles.text"));
+    }
+
+    /**
+     * Performs a specific operation when the GZIP type has been selected in the
+     * combo box. This method only exists to reduce redundancy.
+     */
+    private void performGzipSelectionAction() {
+        Settings settings = Settings.getInstance();
+        final String propertyKey = "showGzipInfoDialog";
+        boolean showDialog = settings.evaluateProperty(propertyKey);
+        if (showDialog) {
+            final String infoText = I18N.getString("info.text");
+            AlertDialog.showDialog(Alert.AlertType.INFORMATION, infoText, infoText,
+                    I18N.getString("gzipCompressionInfo.text")
+                    + "\n\n"
+                    + I18N.getString("dialogWontShowAgain.text"), _theme);
+            settings.setProperty(propertyKey, false);
+        }
+        resetSelections();
     }
 
     /**
@@ -579,25 +643,6 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Loads an alternative theme.
-     *
-     * @param enableTheme true to enable, false to disable alternative theme.
-     * @param theme the theme to load.
-     */
-    private void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
-        final String sheetLocation = GZipper.class.getResource(
-                theme.getLocation()).toExternalForm();
-        _theme = enableTheme ? theme : CSS.Theme.getDefault();
-        _stages.forEach((stage) -> {
-            if (enableTheme) {
-                stage.getScene().getStylesheets().add(sheetLocation);
-            } else {
-                stage.getScene().getStylesheets().clear();
-            }
-        });
-    }
-
-    /**
      * Initializes the logger that will append text to {@link #_textArea}.
      */
     private void initLogger() {
@@ -639,8 +684,8 @@ public class MainViewController extends BaseController {
         _bestCompressionMenuItem.getProperties().put(
                 COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
 
-        // set up combo box items
-        final ArchiveType selectedType = ArchiveType.values()[0];
+        // set up combo box items and set default selected type
+        final ArchiveType selectedType = ArchiveType.TAR_GZ;
         _archiveTypeComboBox.getItems().addAll(ArchiveType.values());
         _archiveTypeComboBox.setValue(selectedType);
         _archiveFileExtension = selectedType.getDefaultExtensionName(false);
@@ -741,7 +786,7 @@ public class MainViewController extends BaseController {
 
             if (FileUtil.isValidDirectory(outputPath)) {
                 // user has not specified output filename
-                outputPath = new FileUtil().generateUniqueFilename(
+                outputPath = FileUtil.generateUniqueFilename(
                         outputPath, DEFAULT_ARCHIVE_NAME, extName);
             }
 

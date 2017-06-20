@@ -19,10 +19,8 @@ package org.gzipper.java.presentation.control;
 import java.util.HashSet;
 import java.util.Set;
 import javafx.application.HostServices;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.application.Platform;
 import javafx.fxml.Initializable;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.gzipper.java.style.CSS;
@@ -37,7 +35,7 @@ public abstract class BaseController implements Initializable {
     /**
      * A set with all the stages currently open.
      */
-    protected static Set<Stage> _stages = new HashSet<>();
+    private static Set<Stage> _stages = new HashSet<>();
 
     public static Set<Stage> getStages() {
         return _stages;
@@ -92,19 +90,31 @@ public abstract class BaseController implements Initializable {
     }
 
     /**
+     * Loads an alternative theme.
+     *
+     * @param enableTheme true to enable, false to disable alternative theme.
+     * @param theme the theme to be loaded.
+     */
+    protected void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
+        _theme = enableTheme ? theme : CSS.Theme.getDefault();
+        _stages.forEach((stage) -> {
+            CSS.load(_theme, stage.getScene().getStylesheets());
+        });
+    }
+
+    /**
      * Closes the primary stage of this controller.
      */
     protected void close() {
         _primaryStage.close();
     }
 
-    @FXML
-    protected MenuItem _aboutMenuItem;
-
-    @FXML
-    protected void handleAboutMenuItemAction(ActionEvent evt) {
-        if (evt.getSource().equals(_aboutMenuItem)) {
-            ViewControllers.showAboutView(_theme, _hostServices);
-        }
+    /**
+     * Exits the application.
+     */
+    protected void exit() {
+        close();
+        Platform.exit();
+        System.exit(0);
     }
 }

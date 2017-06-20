@@ -91,6 +91,7 @@ public class Settings {
         defaults.setProperty("loggingEnabled", "false");
         defaults.setProperty("recentPath", "");
         defaults.setProperty("darkThemeEnabled", "false");
+        defaults.setProperty("showGzipInfoDialog", "true");
 
         return defaults;
     }
@@ -126,6 +127,17 @@ public class Settings {
      */
     public String getProperty(String key) {
         return _props.getProperty(key);
+    }
+
+    /**
+     * Evaluates and returns the property with the specified key if it exists.
+     *
+     * @param key the key of the property.
+     * @return true if property equals "true", false otherwise.
+     */
+    public boolean evaluateProperty(String key) {
+        String property = _props.getProperty(key);
+        return property != null && property.equals("true");
     }
 
     /**

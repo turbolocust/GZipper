@@ -19,8 +19,10 @@ package org.gzipper.java.presentation;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import org.gzipper.java.style.CSS;
 
 /**
  * Convenience class that offers the creation of alert dialogs.
@@ -30,49 +32,46 @@ import javafx.scene.control.ButtonType;
 public class AlertDialog {
 
     /**
-     * Brings up a confirmation dialog titled "Please confirm".
+     * Brings up a dialog using the specified parameters.
      *
+     * @param type the type of the alert.
+     * @param title the title of the dialog.
      * @param header the header text of the dialog
      * @param content the content text of the dialog
+     * @param theme the CSS theme to be applied.
+     * @param buttonTypes the buttons to be added.
      * @return an {@link Optional} to indicate which button has been pressed
      */
-    public static Optional<ButtonType> showConfirmationDialog(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content, ButtonType.YES, ButtonType.NO);
-        alert.setTitle("Please confirm");
+    public static Optional<ButtonType> showDialog(AlertType type, String title,
+            String header, String content, CSS.Theme theme, ButtonType... buttonTypes) {
+        final Alert alert = new Alert(type, content, buttonTypes);
+        alert.setTitle(title);
         alert.setHeaderText(header);
+        CSS.load(theme, alert.getDialogPane().getScene().getStylesheets());
+        return alert.showAndWait();
+    }
+
+    /**
+     * Brings up a confirmation dialog using the specified parameters.
+     *
+     * @param title the title of the dialog.
+     * @param header the header text of the dialog
+     * @param content the content text of the dialog
+     * @param theme the CSS theme to be applied.
+     * @return an {@link Optional} to indicate which button has been pressed
+     */
+    public static Optional<ButtonType> showConfirmationDialog(String title,
+            String header, String content, CSS.Theme theme) {
+        final Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content,
+                ButtonType.YES, ButtonType.NO);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        CSS.load(theme, alert.getDialogPane().getScene().getStylesheets());
         // changing default button to {@code ButtonType.NO} to avoid accidential press of return key
         Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.YES);
         Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);
         yesButton.setDefaultButton(false);
         noButton.setDefaultButton(true);
-        return alert.showAndWait();
-    }
-
-    /**
-     * Brings up a warning dialog titled "Warning".
-     *
-     * @param header the header text of the dialog
-     * @param content the content text of the dialog
-     * @return an {@link Optional} to indicate which button has been pressed
-     */
-    public static Optional<ButtonType> showWarningDialog(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING, content);
-        alert.setTitle("Warning");
-        alert.setHeaderText(header);
-        return alert.showAndWait();
-    }
-
-    /**
-     * Brings up an error dialog titled "Error".
-     *
-     * @param header the header text of the dialog
-     * @param content the content text of the dialog
-     * @return an {@link Optional} to indicate which button has been pressed
-     */
-    public static Optional<ButtonType> showErrorDialog(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, content);
-        alert.setTitle("Error");
-        alert.setHeaderText(header);
         return alert.showAndWait();
     }
 }

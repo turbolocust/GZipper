@@ -71,14 +71,11 @@ public class Tarball extends AbstractAlgorithm {
     @Override
     public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
-        // configure additional parameters for compressor stream
+        // set additional parameters for compressor stream
         GzipParameters params = new GzipParameters();
-        final Settings settings = Settings.getInstance();
-        int value = settings.getOperatingSystem().getCurrentSystem().getValue();
-        params.setOperatingSystem(value);
+        Settings settings = Settings.getInstance();
+        params.setOperatingSystem(settings.getOperatingSystem().getOSInfo().getValue());
         params.setCompressionLevel(_compressionLevel);
-        // apply additional parameters
-        GzipCompressorOutputStream gcos = new GzipCompressorOutputStream(stream, params);
-        return gcos;
+        return new GzipCompressorOutputStream(stream, params);
     }
 }

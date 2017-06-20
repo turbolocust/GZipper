@@ -18,12 +18,9 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 
@@ -85,31 +82,4 @@ public interface ArchivingAlgorithm extends Interruptable {
      */
     void compress(ArchiveInfo info)
             throws IOException, ArchiveException, CompressorException;
-
-    /**
-     * Creates a new instance of an {@link ArchiveOutputStream}. This is
-     * required so that specific algorithms can apply individual parameters.
-     *
-     * @param stream the {@link OutputStream} being used when creating a new
-     * {@link ArchiveOutputStream}.
-     * @return new instance of {@link ArchiveOutputStream}.
-     * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException if an error related to the archiver occurs.
-     */
-    ArchiveOutputStream makeArchiveOutputStream(
-            OutputStream stream) throws IOException, ArchiveException;
-
-    /**
-     * Creates a new instance of an {@link CompressorOutputStream}. This can be
-     * used so specific algorithms can e.g. skip the compression if required.
-     *
-     * @param stream the {@link OutputStream} being used when creating a new
-     * {@link CompressorOutputStream}.
-     * @return new instance of {@link CompressorOutputStream}.
-     * @throws IOException if an I/O error occurs.
-     * @throws CompressorException if an error related to the compressor occurs.
-     */
-    CompressorOutputStream makeCompressorOutputStream(
-            OutputStream stream) throws IOException, CompressorException;
-
 }

@@ -168,7 +168,7 @@ public class FileUtil {
      * @param ext the name of the file extension.
      * @return a unique filename including path, name, suffix and extension.
      */
-    public String generateUniqueFilename(String path, String name, String ext) {
+    public static String generateUniqueFilename(String path, String name, String ext) {
         String uniqueFilename;
         int suffix = 0; // will be appended to file name
         final StringBuilder filename = new StringBuilder();

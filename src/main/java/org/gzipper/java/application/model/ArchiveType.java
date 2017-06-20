@@ -28,6 +28,7 @@ public enum ArchiveType {
 
     ZIP("Zip", "ZIP", new String[]{"*.zip"}),
     JAR("Jar", "JAR", new String[]{"*.jar"}),
+    GZIP("Gzip", "GZIP", new String[]{"*.gz", "*.z", "*.gzip"}),
     TAR_GZ("TarGz", "TAR+GZ", new String[]{"*.tar.gz", "*.tgz"}),
     TAR_BZ("TarBz2", "TAR+BZ2", new String[]{"*.tar.bz2", "*.tbz2"});
 
@@ -68,6 +69,9 @@ public enum ArchiveType {
                 break;
             case JAR:
                 algorithm = new Jar();
+                break;
+            case GZIP:
+                algorithm = new Gzip();
                 break;
             case TAR_GZ:
                 algorithm = new Tarball();

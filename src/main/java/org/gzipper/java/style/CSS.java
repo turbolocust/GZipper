@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.style;
 
+import java.util.List;
+
 /**
  * Class that allows global access to CSS related information.
  *
@@ -24,14 +26,27 @@ package org.gzipper.java.style;
 public class CSS {
 
     /**
-     * The location of the dark theme style sheet.
-     */
-    public static final String STYLESHEET_DARK_THEME = "/css/DarkTheme.css";
-
-    /**
      * Holds static members only.
      */
     private CSS() {
+    }
+
+    /**
+     * Loads the specified theme. The list of style sheets should be those of
+     * the respective {@link javafx.scene.Scene}. To be more precise, this
+     * method clears the specified list of style sheets and adds the resource
+     * location of the respective CSS file in external form to the list. This
+     * way the alternative theme will be loaded.
+     *
+     * @param theme the theme to be loaded.
+     * @param stylesheets the list of style sheets of the stage.
+     */
+    public static void load(Theme theme, List<String> stylesheets) {
+        stylesheets.clear();
+        if (theme != Theme.MODENA) {
+            stylesheets.add(CSS.class.getResource(
+                    theme.getLocation()).toExternalForm());
+        }
     }
 
     /**
@@ -39,7 +54,8 @@ public class CSS {
      */
     public enum Theme {
 
-        MODENA(""), DARK_THEME("/css/DarkTheme.css");
+        MODENA("MODENA"),
+        DARK_THEME("/css/DarkTheme.css");
 
         /**
          * The physical location of the associated style sheet.

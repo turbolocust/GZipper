@@ -80,11 +80,8 @@ public class GZipper extends Application {
         BaseController.getStages().add(stage);
         controller.setPrimaryStage(stage);
 
-        // load dark theme if it was enabled on previous application run
-        if (theme == CSS.Theme.DARK_THEME) {
-            scene.getStylesheets().add(getClass().getResource(
-                    CSS.STYLESHEET_DARK_THEME).toExternalForm());
-        }
+        // load CSS theme
+        CSS.load(theme, scene.getStylesheets());
 
         // properly shut down application when closing window
         stage.setOnCloseRequest((WindowEvent evt) -> {

@@ -64,12 +64,12 @@ public class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private final String _appVersion = "0.5.3 BETA";
+    private final String _appVersion = "0.5.4 BETA";
 
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "17/06/2017";
+    private final String _appBuildDate = "20/06/2017";
 
     /**
      * The author of this application.
@@ -147,10 +147,10 @@ public class AboutViewController extends BaseController {
                 resources.getString("author.text")
                 + ": "
                 + _appCopyright
-                + "\n\r");
+                + "\r\n");
         final Text appLicense = new Text(
                 resources.getString("license.text")
-                + "\n\r");
+                + "\r\n");
 
         final Hyperlink appHomePage = new Hyperlink(_appHomePage);
         appHomePage.setId("aboutViewAppHomePage");

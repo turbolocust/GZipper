@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -34,7 +36,7 @@ public class Log {
     /**
      * Map that holds the loggers that are used by this application.
      */
-    private static final Map<String, Logger> LOGGERS = new HashMap<>();
+    private static final Map<String, Logger> LOGGERS = new HashMap<>(2);
 
     /**
      * Default logger named {@code GZipper.class.getName()}.
@@ -76,6 +78,7 @@ public class Log {
      * @param thrown the exception to include.
      */
     public static void e(String msg, Throwable thrown) {
+        msg += "\n" + stackTraceAsString(thrown);
         LogRecord record = new LogRecord(Level.SEVERE, msg);
         record.setThrown(thrown);
         log(record, _verboseUiLogging);
@@ -113,6 +116,7 @@ public class Log {
      * @param uiLogging true to log to the UI as well.
      */
     public static void i(String msg, Throwable thrown, boolean uiLogging) {
+        msg += "\n" + stackTraceAsString(thrown);
         LogRecord record = new LogRecord(Level.INFO, msg);
         record.setThrown(thrown);
         log(record, uiLogging);
@@ -152,6 +156,7 @@ public class Log {
      * @param uiLogging true to log to the UI as well.
      */
     public static void w(String msg, Throwable thrown, boolean uiLogging) {
+        msg += "\n" + stackTraceAsString(thrown);
         LogRecord record = new LogRecord(Level.WARNING, msg);
         record.setThrown(thrown);
         log(record, uiLogging);
@@ -181,6 +186,18 @@ public class Log {
         LogRecord record = new LogRecord(Level.WARNING, msg);
         record.setParameters(params);
         log(record, uiLogging);
+    }
+
+    /**
+     * Converts the stack trace of the specified {@link Throwable} to a string.
+     *
+     * @param thrown holds the stack trace.
+     * @return string representation of the stack trace.
+     */
+    public static String stackTraceAsString(Throwable thrown) {
+        StringWriter errors = new StringWriter();
+        thrown.printStackTrace(new PrintWriter(errors));
+        return errors.toString();
     }
 
     /**
