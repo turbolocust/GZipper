@@ -2,11 +2,12 @@
 
 <b>Features:</b><br />
 
-* Compress and extract the following archive types:
+* Create and extract the following archive types:
   - ZIP
   - JAR
   - Tarball (GZIP)
   - Tarball (BZIP2)
+* Compression and decompression of GZIP.
 * Compression levels can be adjusted.
 * Supports a dark theme (CSS style).
   - More styles may be added in the future.
