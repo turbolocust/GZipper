@@ -34,7 +34,7 @@ public interface ArchivingAlgorithm extends Interruptable {
     /**
      * The default size of the buffer.
      */
-    int DEFAULT_BUFFER_SIZE = 4096;
+    int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
      * Extracts an archive using the algorithm of the concrete class and stores

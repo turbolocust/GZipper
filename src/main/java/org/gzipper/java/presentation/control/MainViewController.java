@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -573,33 +574,39 @@ public class MainViewController extends BaseController {
                     } catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
                         Log.i(I18N.getString("interrupt.text"), true);
-                        Log.w("Operation has been interrupted.", ex, false);
+                        Log.w(ex.getLocalizedMessage(), false);
                         operation.interrupt();
                         if (futureTask.cancel(true)) {
                             Log.i(I18N.getString("operationCancel.text"), true);
                         }
                     }
                 }
-                return futureTask.get();
+
+                try { // check for cancellation
+                    return futureTask.get();
+                } catch (CancellationException ex) {
+                    Log.w(ex.getLocalizedMessage(), false);
+                    return false;
+                }
             }
         };
         // show success message and finalize archiving job when task has succeeded
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
+            System.out.println(e.getTarget());
             if (success) {
                 Log.i(I18N.getString("operationSuccess.text"), true);
-            } else { // operation failed
-                Log.e(I18N.getString("operationFail.text"));
-                Log.w(I18N.getString("missingAccessRights.text"), true);
+            } else {
+                Log.w(I18N.getString("operationNoSuccess.text"), true);
             }
             finalizeArchivingJob(operation, task);
         });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
             Log.i(I18N.getString("operationFail.text"), true);
-            final Throwable throwable = e.getSource().getException();
-            if (throwable != null) {
-                Log.w(null, throwable, false);
+            final Throwable thrown = e.getSource().getException();
+            if (thrown != null) {
+                Log.e(thrown.getLocalizedMessage(), thrown);
             }
             finalizeArchivingJob(operation, task);
         });

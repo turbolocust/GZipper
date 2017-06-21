@@ -25,6 +25,7 @@ import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 
 /**
@@ -49,6 +50,11 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * True if operation is being used for compression, false otherwise.
      */
     private final boolean _compress;
+
+    /**
+     * True if a request for interruption has been received.
+     */
+    private volatile boolean _interrupt;
 
     /**
      * The elapsed time of the operation which will be stored after its end.
@@ -116,7 +122,12 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
                     _algorithm.extract(_archiveInfo);
                 }
                 success = true;
-            } catch (IOException | CompressorException | ArchiveException ex) {
+            } catch (IOException ex) {
+                if (!_interrupt) { // considered to be critical
+                    Log.e(ex.getLocalizedMessage(), ex);
+                    Log.w(I18N.getString("missingAccessRights.text"), true);
+                }
+            } catch (CompressorException | ArchiveException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }
             _elapsedTime = System.nanoTime() - startTime;
@@ -135,6 +146,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
 
     @Override
     public void interrupt() {
+        _interrupt = true;
         _algorithm.interrupt();
     }
 }

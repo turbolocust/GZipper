@@ -136,10 +136,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         bos.write(buffer, 0, readBytes);
                     }
                 } catch (IOException ex) {
-                    Log.e(ex.getLocalizedMessage(), ex);
-                    Log.e("{0}\n{1}", new Object[]{
-                        I18N.getString("errorWritingFile.text"), newFile.getPath()
-                    });
+                    if (!_interrupt) {
+                        Log.e(ex.getLocalizedMessage(), ex);
+                        Log.e("{0}\n{1}", new Object[]{
+                            I18N.getString("errorWritingFile.text"), newFile.getPath()
+                        });
+                    }
                 }
                 if (!_interrupt) {
                     Log.i("{0}{1}{2}", true, new Object[]{
@@ -212,10 +214,12 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         }
                         outputStream.closeArchiveEntry();
                     } catch (IOException ex) {
-                        Log.e(ex.getLocalizedMessage(), ex);
-                        Log.e("{0}\n{1}", new Object[]{
-                            I18N.getString("errorReadingFile.text"), newFile.getPath()
-                        });
+                        if (!_interrupt) {
+                            Log.e(ex.getLocalizedMessage(), ex);
+                            Log.e("{0}\n{1}", new Object[]{
+                                I18N.getString("errorReadingFile.text"), newFile.getPath()
+                            });
+                        }
                     }
                     if (!_interrupt) {
                         Log.i("{0}{1}{2}", true, new Object[]{
