@@ -150,17 +150,6 @@ public class FileUtil {
     }
 
     /**
-     * Deletes a file from the specified source location if it exists.
-     *
-     * @param src the source file.
-     * @return true if file was deleted, false if it did not exist.
-     * @throws IOException if an I/O error occurs.
-     */
-    public static synchronized boolean delete(String src) throws IOException {
-        return Files.deleteIfExists(Paths.get(src));
-    }
-
-    /**
      * Generates a unique file name using the specified parameters.
      *
      * @param path the file path including only the directory.

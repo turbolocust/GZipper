@@ -17,7 +17,6 @@
 package org.gzipper.java.presentation.control;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -602,23 +601,6 @@ public class MainViewController extends BaseController {
             if (throwable != null) {
                 Log.w(null, throwable, false);
             }
-            // delete corrupt archive on operation fail
-            if (operation.isCompress()) {
-                ArchiveInfo info = operation.getArchiveInfo();
-                String archive = FileUtil.combinePathAndFilename(
-                        info.getOutputPath(), info.getArchiveName());
-                try {
-                    if (FileUtil.delete(archive)) {
-                        Log.w("Archive file deleted: {0}", archive, false);
-                    } else {
-                        Log.w("Archive could not be deleted as it no longer exists.", false);
-                    }
-                } catch (IOException ex) {
-                    Log.e(ex.getLocalizedMessage(), ex);
-                    Log.e("I/O error occurred while trying to delete possibly "
-                            + "incomplete archive after fail of operation.");
-                }
-            }
             finalizeArchivingJob(operation, task);
         });
         return task;
@@ -639,7 +621,6 @@ public class MainViewController extends BaseController {
                     operation.calculateElapsedTime()
                 });
         _activeTasks.remove(task.toString());
-        _progressIndicator.setVisible(false);
         toggleStartAndAbortButton();
     }
 
@@ -766,7 +747,7 @@ public class MainViewController extends BaseController {
                             info.getArchiveType().getDisplayName(),
                             info.getOutputPath()
                         });
-                _progressIndicator.setVisible(true);
+                _progressIndicator.visibleProperty().bind(task.runningProperty());
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
                 toggleStartAndAbortButton();
             }
