@@ -24,7 +24,7 @@
 
 <br /><br />
 For compression and decompression the commons-compress library by Apache Foundation is used.
-<br />The source code and documentation for that library can be found here: <a href>http://commons.apache.org/</a>
+<br />Its source code and documentation can be found here: <a href>http://commons.apache.org/</a>
 <br /><br />
 <b>This application requires at least Java 1.8.0_40 (Java 8 Update 40)</b>
 

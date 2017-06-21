@@ -60,7 +60,7 @@ public class GZipper extends Application {
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
         final boolean enableDarkTheme = settings.evaluateProperty("darkThemeEnabled");
 
-        // initialize logger if logging has been enabled
+        // initialize logger if logging is enabled
         if (enableLogging) {
             initLogger();
         }

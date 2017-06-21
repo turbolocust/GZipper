@@ -120,7 +120,7 @@ public class MainViewController extends BaseController {
     /**
      * The compression level. Initialized with default compression level.
      */
-    private int _compressionLevel = Deflater.DEFAULT_COMPRESSION;
+    private int _compressionLevel;
 
     @FXML
     private MenuItem _noCompressionMenuItem;
@@ -195,6 +195,7 @@ public class MainViewController extends BaseController {
     public MainViewController(CSS.Theme theme, HostServices hostServices) {
         super(theme, hostServices);
         _archiveName = DEFAULT_ARCHIVE_NAME;
+        _compressionLevel = Deflater.DEFAULT_COMPRESSION;
         _activeTasks = Collections.synchronizedMap(new HashMap<>());
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
@@ -593,7 +594,6 @@ public class MainViewController extends BaseController {
         // show success message and finalize archiving job when task has succeeded
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
-            System.out.println(e.getTarget());
             if (success) {
                 Log.i(I18N.getString("operationSuccess.text"), true);
             } else {
