@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -41,7 +42,7 @@ import org.gzipper.java.application.model.Windows;
 import org.gzipper.java.application.util.AppUtil;
 import org.gzipper.java.application.util.FileUtil;
 import org.gzipper.java.util.Settings;
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
 
 /**
@@ -56,18 +57,17 @@ public class GZipper extends Application {
         initApplication(); // has to be the first call
 
         Settings settings = Settings.getInstance();
-        final String enableLogging = settings.getProperty("loggingEnabled");
-        final String enableDarkTheme = settings.getProperty("darkThemeEnabled");
+        final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
+        final boolean enableDarkTheme = settings.evaluateProperty("darkThemeEnabled");
 
         // initialize logger if logging has been enabled
-        if (enableLogging.equalsIgnoreCase("true")) {
+        if (enableLogging) {
             initLogger();
         }
 
         // set correct theme based on settings
-        final CSS.Theme theme = enableDarkTheme.equalsIgnoreCase("true")
-                ? CSS.Theme.DARK_THEME
-                : CSS.Theme.MODENA;
+        final CSS.Theme theme = enableDarkTheme
+                ? CSS.Theme.DARK_THEME : CSS.Theme.MODENA;
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
         BaseController controller = new MainViewController(theme, getHostServices());
@@ -81,11 +81,12 @@ public class GZipper extends Application {
         controller.setPrimaryStage(stage);
 
         // load CSS theme
-        CSS.load(theme, scene.getStylesheets());
+        CSS.load(theme, scene);
 
         // properly shut down application when closing window
         stage.setOnCloseRequest((WindowEvent evt) -> {
             evt.consume();
+            Platform.exit();
             System.exit(0);
         });
 
@@ -130,7 +131,7 @@ public class GZipper extends Application {
      */
     private void initLogger() {
 
-        Logger logger = Logger.getLogger(Log.DEFAULT_LOGGER_NAME);
+        Logger logger = Log.DEFAULT_LOGGER;
 
         try {
             final String decPath = AppUtil.getDecodedRootPath(getClass());
@@ -160,7 +161,7 @@ public class GZipper extends Application {
             public void run() {
                 try {
                     Settings.getInstance().storeAway();
-                    Logger logger = Logger.getLogger(Log.DEFAULT_LOGGER_NAME);
+                    Logger logger = Log.DEFAULT_LOGGER;
                     for (Handler handler : logger.getHandlers()) {
                         handler.close();
                     }
@@ -169,7 +170,6 @@ public class GZipper extends Application {
                 }
             }
         });
-
         launch(args); // actually launch the UI
     }
 }

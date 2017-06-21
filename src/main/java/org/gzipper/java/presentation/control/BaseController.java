@@ -23,7 +23,7 @@ import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 
 /**
  * The base controller each other controller should derive from.
@@ -98,7 +98,7 @@ public abstract class BaseController implements Initializable {
     protected void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
         _theme = enableTheme ? theme : CSS.Theme.getDefault();
         _stages.forEach((stage) -> {
-            CSS.load(_theme, stage.getScene().getStylesheets());
+            CSS.load(_theme, stage.getScene());
         });
     }
 

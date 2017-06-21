@@ -63,7 +63,7 @@ import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.AlertDialog;
 
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Settings;
 import org.gzipper.java.util.Log;
 
@@ -369,7 +369,7 @@ public class MainViewController extends BaseController {
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
 
-            File file;
+            final File file;
             if (_compressRadioButton.isSelected()) {
                 FileChooser fc = new FileChooser();
                 fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
@@ -396,9 +396,11 @@ public class MainViewController extends BaseController {
     @FXML
     void handleModeRadioButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_compressRadioButton)) {
-            performCompressRadioButtonAction();
+            performModeRadioButtonAction(true,
+                    "browseForFiles.text", "saveAsArchive.text");
         } else if (evt.getSource().equals(_decompressRadioButton)) {
-            performDecompressRadioButtonAction();
+            performModeRadioButtonAction(false,
+                    "browseForArchive.text", "saveAsFiles.text");
         }
         resetSelections();
     }
@@ -408,8 +410,9 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
             ArchiveType type = _archiveTypeComboBox.getValue();
             Log.i("Archive type selection change to: {0}", type, false);
-            _dropAddressesMenuItem.setDisable(type == ArchiveType.GZIP);
-            if (type == ArchiveType.GZIP) {
+            boolean isGzipType = type == ArchiveType.GZIP;
+            _dropAddressesMenuItem.setDisable(isGzipType);
+            if (isGzipType) {
                 performGzipSelectionAction();
             }
             if (_decompressRadioButton.isSelected()) {
@@ -462,28 +465,23 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Performs a specific operation when the compress radio button has been
-     * selected. This method only exists to reduce redundancy.
+     * Called when the archiving mode has been changed via a radio button.
+     *
+     * @param compress true for compress, false for decompress strategy.
+     * @param selectFilesButtonText text to display on the button which brings
+     * up a dialog to select files or an archive.
+     * @param saveAsButtonText text to display on the button which brings up the
+     * "Save as..." dialog.
      */
-    private void performCompressRadioButtonAction() {
-        _strategy = new CompressStrategy();
-        _selectFilesButton.setText(I18N.getString("browseForFiles.text"));
-        _saveAsButton.setText(I18N.getString("saveAsArchive.text"));
+    private void performModeRadioButtonAction(boolean compress,
+            String selectFilesButtonText, String saveAsButtonText) {
+        _strategy = compress ? new CompressStrategy() : new DecompressStrategy();
+        _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
+        _saveAsButton.setText(I18N.getString(saveAsButtonText));
     }
 
     /**
-     * Performs a specific operation when the decompress radio button has been
-     * selected. This method only exists to reduce redundancy.
-     */
-    private void performDecompressRadioButtonAction() {
-        _strategy = new DecompressStrategy();
-        _selectFilesButton.setText(I18N.getString("browseForArchive.text"));
-        _saveAsButton.setText(I18N.getString("saveAsFiles.text"));
-    }
-
-    /**
-     * Performs a specific operation when the GZIP type has been selected in the
-     * combo box. This method only exists to reduce redundancy.
+     * Called when the GZIP type has been selected in the combo box of types.
      */
     private void performGzipSelectionAction() {
         Settings settings = Settings.getInstance();
@@ -522,6 +520,9 @@ public class MainViewController extends BaseController {
      * Resets the selected files.
      */
     private void resetSelections() {
+        if (_selectedFiles != null && !_selectedFiles.isEmpty()) {
+            Log.i(I18N.getString("selectionReset.text"), true);
+        }
         _selectedFiles = Collections.<File>emptyList();
         _startButton.setDisable(true);
     }
@@ -646,7 +647,7 @@ public class MainViewController extends BaseController {
      * Initializes the logger that will append text to {@link #_textArea}.
      */
     private void initLogger() {
-        Logger logger = Logger.getLogger(Log.UI_LOGGER_NAME);
+        Logger logger = Log.UI_LOGGER;
         TextAreaHandler handler = new TextAreaHandler(_textArea);
         handler.setFormatter(new SimpleFormatter());
         logger.setUseParentHandlers(false);
@@ -691,8 +692,8 @@ public class MainViewController extends BaseController {
         _archiveFileExtension = selectedType.getDefaultExtensionName(false);
 
         // set menu item for logging as selected if logging has been enabled before
-        final String enableLogging = settings.getProperty("loggingEnabled");
-        _enableLoggingCheckMenuItem.setSelected(enableLogging.equalsIgnoreCase("true"));
+        final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
+        _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
         // set up strategy, frame image and the default text for the text area
         _strategy = new CompressStrategy();

@@ -22,7 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 
 /**
  * Convenience class that offers the creation of alert dialogs.
@@ -32,33 +32,34 @@ import org.gzipper.java.style.CSS;
 public class AlertDialog {
 
     /**
-     * Brings up a dialog using the specified parameters.
+     * Brings up a dialog that consists of the specified parameters.
      *
      * @param type the type of the alert.
      * @param title the title of the dialog.
-     * @param header the header text of the dialog
-     * @param content the content text of the dialog
+     * @param header the header text of the dialog.
+     * @param content the content text of the dialog.
      * @param theme the CSS theme to be applied.
      * @param buttonTypes the buttons to be added.
-     * @return an {@link Optional} to indicate which button has been pressed
+     * @return an {@link Optional} to indicate which button has been pressed.
      */
     public static Optional<ButtonType> showDialog(AlertType type, String title,
             String header, String content, CSS.Theme theme, ButtonType... buttonTypes) {
         final Alert alert = new Alert(type, content, buttonTypes);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        CSS.load(theme, alert.getDialogPane().getScene().getStylesheets());
+        CSS.load(theme, alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
 
     /**
-     * Brings up a confirmation dialog using the specified parameters.
+     * Brings up a confirmation dialog that consists of the specified
+     * parameters.
      *
      * @param title the title of the dialog.
-     * @param header the header text of the dialog
-     * @param content the content text of the dialog
+     * @param header the header text of the dialog.
+     * @param content the content text of the dialog.
      * @param theme the CSS theme to be applied.
-     * @return an {@link Optional} to indicate which button has been pressed
+     * @return an {@link Optional} to indicate which button has been pressed.
      */
     public static Optional<ButtonType> showConfirmationDialog(String title,
             String header, String content, CSS.Theme theme) {
@@ -66,7 +67,7 @@ public class AlertDialog {
                 ButtonType.YES, ButtonType.NO);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        CSS.load(theme, alert.getDialogPane().getScene().getStylesheets());
+        CSS.load(theme, alert.getDialogPane().getScene());
         // changing default button to {@code ButtonType.NO} to avoid accidential press of return key
         Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.YES);
         Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);

@@ -18,8 +18,6 @@ package org.gzipper.java.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -31,28 +29,22 @@ import org.gzipper.java.presentation.control.MainViewController;
  *
  * @author Matthias Fussenegger
  */
+@SuppressWarnings("ClassWithMultipleLoggers")
 public class Log {
-
-    /**
-     * Map that holds the loggers that are used by this application.
-     */
-    private static final Map<String, Logger> LOGGERS = new HashMap<>(2);
 
     /**
      * Default logger named {@code GZipper.class.getName()}.
      */
-    public static final String DEFAULT_LOGGER_NAME;
+    public static final Logger DEFAULT_LOGGER;
 
     /**
      * UI logger named {@code MainViewController.class.getName()}.
      */
-    public static final String UI_LOGGER_NAME;
+    public static final Logger UI_LOGGER;
 
     static {
-        DEFAULT_LOGGER_NAME = GZipper.class.getName();
-        UI_LOGGER_NAME = MainViewController.class.getName();
-        LOGGERS.put(DEFAULT_LOGGER_NAME, Logger.getLogger(DEFAULT_LOGGER_NAME));
-        LOGGERS.put(UI_LOGGER_NAME, Logger.getLogger(UI_LOGGER_NAME));
+        DEFAULT_LOGGER = Logger.getLogger(GZipper.class.getName());
+        UI_LOGGER = Logger.getLogger(MainViewController.class.getName());
     }
 
     /**
@@ -208,9 +200,9 @@ public class Log {
      * @param uiLogging true to also log using the logger for UI.
      */
     private static void log(LogRecord record, boolean uiLogging) {
-        LOGGERS.get(DEFAULT_LOGGER_NAME).log(record);
+        DEFAULT_LOGGER.log(record);
         if (uiLogging) {
-            LOGGERS.get(UI_LOGGER_NAME).log(record);
+            UI_LOGGER.log(record);
         }
     }
 }

@@ -130,7 +130,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 // create new output stream and write bytes to file
                 try (BufferedOutputStream bos = new BufferedOutputStream(
                         new FileOutputStream(newFile))) {
-                    final byte[] buffer = new byte[4096];
+                    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                     int readBytes;
                     while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
                         bos.write(buffer, 0, readBytes);
@@ -188,7 +188,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
      */
     private void compress(File[] files, String base, ArchiveOutputStream outputStream) throws IOException {
 
-        final byte[] buffer = new byte[4096];
+        final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int readBytes;
 
         if (files.length > 0) {
@@ -252,21 +252,21 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
      * @return new instance of {@link ArchiveInputStream}.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
-    public ArchiveInputStream makeArchiveInputStream(InputStream stream)
+    protected ArchiveInputStream makeArchiveInputStream(InputStream stream)
             throws ArchiveException {
         return _archiveStreamFactory.createArchiveInputStream(_archiveType, stream);
     }
 
     /**
-     * Creates a new instance of an {@link CompressorInputStream}. This is
-     * required so that specific algorithms can apply individual parameters.
+     * Creates a new instance of an {@link CompressorInputStream}. This can be
+     * used so that specific algorithms can e.g. apply individual parameters.
      *
      * @param stream the {@link InputStream} being used when creating a new
      * {@link CompressorInputStream}.
-     * @return new instance of {@link CompressorOutputStream}.
+     * @return new instance of {@link CompressorInputStream}.
      * @throws CompressorException if an error related to the compressor occurs.
      */
-    public CompressorInputStream makeCompressorInputStream(InputStream stream)
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream)
             throws CompressorException {
         return _compressorStreamFactory.createCompressorInputStream(_compressionType, stream);
     }
@@ -281,14 +281,14 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
      * @throws IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
-    public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
             throws IOException, ArchiveException {
         return _archiveStreamFactory.createArchiveOutputStream(_archiveType, stream);
     }
 
     /**
-     * Creates a new instance of an {@link CompressorOutputStream}. This is
-     * required so that specific algorithms can apply individual parameters.
+     * Creates a new instance of an {@link CompressorOutputStream}. This can be
+     * used so that specific algorithms can e.g. apply individual parameters.
      *
      * @param stream the {@link OutputStream} being used when creating a new
      * {@link CompressorOutputStream}.
@@ -296,7 +296,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
      * @throws IOException if an I/O error occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
-    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         return _compressorStreamFactory.createCompressorOutputStream(_compressionType, stream);
     }

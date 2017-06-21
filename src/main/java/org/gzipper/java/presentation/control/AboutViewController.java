@@ -36,7 +36,7 @@ import javafx.scene.text.TextFlow;
 import org.gzipper.java.application.util.AppUtil;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
 
 /**
@@ -69,7 +69,7 @@ public class AboutViewController extends BaseController {
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "20/06/2017";
+    private final String _appBuildDate = "21/06/2017";
 
     /**
      * The author of this application.

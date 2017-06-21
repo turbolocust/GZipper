@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.style;
+package org.gzipper.java.presentation.style;
 
 import java.util.List;
+import javafx.scene.Scene;
 
 /**
  * Class that allows global access to CSS related information.
@@ -32,18 +33,20 @@ public class CSS {
     }
 
     /**
-     * Loads the specified theme. The list of style sheets should be those of
-     * the respective {@link javafx.scene.Scene}. To be more precise, this
-     * method clears the specified list of style sheets and adds the resource
-     * location of the respective CSS file in external form to the list. This
-     * way the alternative theme will be loaded.
+     * Applies the specified {@link Theme} to the specified {@link Scene}.
+     *
+     * To be more precise, this method clears the list of style sheets of the
+     * specified scene and adds the resource location of the respective CSS file
+     * in external form to the list. This way the alternative theme will be
+     * loaded.
      *
      * @param theme the theme to be loaded.
-     * @param stylesheets the list of style sheets of the stage.
+     * @param scene the scene to which to apply the theme.
      */
-    public static void load(Theme theme, List<String> stylesheets) {
+    public static void load(Theme theme, Scene scene) {
+        List<String> stylesheets = scene.getStylesheets();
         stylesheets.clear();
-        if (theme != Theme.MODENA) {
+        if (theme != Theme.getDefault()) {
             stylesheets.add(CSS.class.getResource(
                     theme.getLocation()).toExternalForm());
         }

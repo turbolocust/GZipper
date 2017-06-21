@@ -75,7 +75,7 @@ public class Gzip extends AbstractAlgorithm {
             try (BufferedInputStream bis
                     = new BufferedInputStream(new FileInputStream(file))) {
                 try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
-                    final byte[] buffer = new byte[4096];
+                    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                     int readBytes = 0;
                     while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
                         cos.write(buffer, 0, readBytes);
@@ -103,7 +103,7 @@ public class Gzip extends AbstractAlgorithm {
             }
             try (BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(outputFile))) {
-                final byte[] buffer = new byte[4096];
+                final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                 int readBytes = 0;
                 while (!_interrupt && (readBytes = gcis.read(buffer)) != -1) {
                     bos.write(buffer, 0, readBytes);

@@ -25,7 +25,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.style.CSS;
+import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
 
 /**
@@ -33,11 +33,6 @@ import org.gzipper.java.util.Log;
  * @author Matthias Fussenegger
  */
 public class ViewControllers {
-
-    /**
-     * Static reference to the class of {@link ViewControllers}.
-     */
-    private static final Class<ViewControllers> CLAZZ = ViewControllers.class;
 
     /**
      * Defines the resource for the about view.
@@ -76,10 +71,7 @@ public class ViewControllers {
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
         } catch (IOException ex) {
-            Log.e(ex.getLocalizedMessage(), ex);
-            String errorText = I18N.getString("error.text");
-            AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
-                    I18N.getString("errorOpeningWindow.text"), theme);
+            handleErrorLoadingView(ex, theme);
         }
         return controller;
     }
@@ -105,10 +97,7 @@ public class ViewControllers {
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {
-            Log.e(ex.getLocalizedMessage(), ex);
-            String errorText = I18N.getString("error.text");
-            AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
-                    I18N.getString("errorOpeningWindow.text"), theme);
+            handleErrorLoadingView(ex, theme);
         }
         return controller;
     }
@@ -121,7 +110,8 @@ public class ViewControllers {
      * @return the initialized {@link FXMLLoader}.
      */
     private static FXMLLoader initFXMLLoader(String resource) {
-        FXMLLoader loader = new FXMLLoader(CLAZZ.getResource(resource));
+        Class<ViewControllers> clazz = ViewControllers.class;
+        FXMLLoader loader = new FXMLLoader(clazz.getResource(resource));
         loader.setResources(I18N.getBundle());
         return loader;
     }
@@ -137,8 +127,23 @@ public class ViewControllers {
      */
     private static Scene loadScene(FXMLLoader loader, CSS.Theme theme) throws IOException {
         Scene scene = new Scene(loader.load());
-        CSS.load(theme, scene.getStylesheets());
+        CSS.load(theme, scene);
         return scene;
+    }
+
+    /**
+     * Handles errors that can occur when trying to load a view. This method
+     * will log the localized exception message and bring up an error dialog
+     * using the specified theme.
+     *
+     * @param ex the {@link Exception} to be logged.
+     * @param theme the theme to be applied to the error dialog.
+     */
+    private static void handleErrorLoadingView(Exception ex, CSS.Theme theme) {
+        Log.e(ex.getLocalizedMessage(), ex);
+        String errorText = I18N.getString("error.text");
+        AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
+                I18N.getString("errorOpeningWindow.text"), theme);
     }
 
     /**
