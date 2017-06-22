@@ -35,7 +35,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.style.CSS;
 
@@ -93,7 +93,7 @@ public class DropViewController extends BaseController {
                 while (tokenizer.hasMoreTokens()) {
                     String token = tokenizer.nextToken();
                     // only add token if it is a valid file or directory
-                    if (FileUtil.isValid(token)) {
+                    if (FileUtils.isValid(token)) {
                         _addresses.add(token);
                     }
                 }

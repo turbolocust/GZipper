@@ -17,13 +17,12 @@
 package org.gzipper.java.application.util;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Handler used to execute tasks using an {@link Executor}.
+ * Handler used to execute tasks via {@link ExecutorService}.
  *
  * @author Matthias Fussenegger
  */

@@ -141,14 +141,8 @@ public class ViewControllers {
      */
     private static void handleErrorLoadingView(Exception ex, CSS.Theme theme) {
         Log.e(ex.getLocalizedMessage(), ex);
-        String errorText = I18N.getString("error.text");
+        final String errorText = I18N.getString("error.text");
         AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
                 I18N.getString("errorOpeningWindow.text"), theme);
-    }
-
-    /**
-     * Holds static members only.
-     */
-    private ViewControllers() {
     }
 }

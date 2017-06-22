@@ -35,7 +35,7 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.pojo.ArchiveInfo;
-import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 
@@ -162,7 +162,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        final String fullname = FileUtil.combinePathAndFilename(location, name);
+        final String fullname = FileUtils.combinePathAndFilename(location, name);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
 
         CompressorOutputStream cos = makeCompressorOutputStream(bos);

@@ -32,7 +32,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
-import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.util.Settings;
 
@@ -68,7 +68,7 @@ public class Gzip extends AbstractAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        final String fullname = FileUtil.combinePathAndFilename(location, name);
+        final String fullname = FileUtils.combinePathAndFilename(location, name);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
         if (files.length > 0 && files[0].isFile()) { // directories are not supported
             final File file = files[0];
@@ -98,7 +98,7 @@ public class Gzip extends AbstractAlgorithm {
                     name.lastIndexOf(File.separator) + 1, name.lastIndexOf('.')));
             if (outputFile.getAbsolutePath().equals(name)) {
                 // generate unique file as input file has no file name extension
-                outputFile = new File(FileUtil.generateUniqueFilename(
+                outputFile = new File(FileUtils.generateUniqueFilename(
                         location, outputFile.getName(), ""));
             }
             try (BufferedOutputStream bos = new BufferedOutputStream(

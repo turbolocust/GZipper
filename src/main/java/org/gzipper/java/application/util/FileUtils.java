@@ -25,11 +25,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Convenience class for different kinds of file operations.
+ * Utility class that provides methods for different kinds of file operations.
  *
  * @author Matthias Fussenegger
  */
-public class FileUtil {
+public class FileUtils {
 
     /**
      * Validates the specified path, which has to exist.
@@ -141,7 +141,7 @@ public class FileUtil {
      * @return the path to the target file.
      * @throws IOException if an I/O error occurs.
      */
-    public static synchronized Path copy(String src, String dst,
+    public static Path copy(String src, String dst,
             CopyOption... options) throws IOException {
         if (options == null) {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
@@ -169,9 +169,9 @@ public class FileUtil {
         do {
             ++suffix;
             filename.append(name).append(suffix).append(ext);
-            uniqueFilename = FileUtil.combinePathAndFilename(path, filename.toString());
+            uniqueFilename = FileUtils.combinePathAndFilename(path, filename.toString());
             filename.setLength(0); // clear
-        } while (FileUtil.isValidFile(uniqueFilename));
+        } while (FileUtils.isValidFile(uniqueFilename));
 
         return uniqueFilename;
     }

@@ -33,7 +33,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import org.gzipper.java.application.util.AppUtil;
+import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.presentation.style.CSS;
@@ -69,7 +69,7 @@ public class AboutViewController extends BaseController {
     /**
      * The build date of this application.
      */
-    private final String _appBuildDate = "21/06/2017";
+    private final String _appBuildDate = "22/06/2017";
 
     /**
      * The author of this application.
@@ -110,16 +110,15 @@ public class AboutViewController extends BaseController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         if (_imageFile == null || !_imageFile.exists()) {
             String imgRes = null;
             try {
                 // load image from JAR and display it in image view
-                imgRes = AppUtil.getResource(GZipper.class, "/" + IMG_NAME);
+                imgRes = AppUtils.getResource(GZipper.class, "/" + IMG_NAME);
             } catch (URISyntaxException ex) {
                 Log.e(I18N.getString("error.text"), ex);
                 try {
-                    imgRes = AppUtil.getDecodedRootPath(getClass()) + IMG_NAME;
+                    imgRes = AppUtils.getDecodedRootPath(getClass()) + IMG_NAME;
                 } catch (UnsupportedEncodingException ex1) {
                     Log.e(I18N.getString("error.text"), ex1);
                 }
@@ -132,25 +131,25 @@ public class AboutViewController extends BaseController {
 
         _imageView.setImage(new Image(_imageFile.toURI().toString()));
 
-        final Text appName = new Text(_appName + "\n");
-        final Text appVersion = new Text(
-                "Version"
-                + ": "
-                + _appVersion
-                + "\n");
-        final Text appBuildDate = new Text(
-                resources.getString("buildDate.text")
-                + ": "
-                + _appBuildDate
-                + "\n");
-        final Text appCopyright = new Text(
-                resources.getString("author.text")
-                + ": "
-                + _appCopyright
-                + "\r\n");
-        final Text appLicense = new Text(
-                resources.getString("license.text")
-                + "\r\n");
+        final Text appName = new Text(_appName + "\n"),
+                appVersion = new Text(
+                        "Version"
+                        + ": "
+                        + _appVersion
+                        + "\n"),
+                appBuildDate = new Text(
+                        resources.getString("buildDate.text")
+                        + ": "
+                        + _appBuildDate
+                        + "\n"),
+                appCopyright = new Text(
+                        resources.getString("author.text")
+                        + ": "
+                        + _appCopyright
+                        + "\n\r"),
+                appLicense = new Text(
+                        resources.getString("license.text")
+                        + "\n\r");
 
         final Hyperlink appHomePage = new Hyperlink(_appHomePage);
         appHomePage.setId("aboutViewAppHomePage");

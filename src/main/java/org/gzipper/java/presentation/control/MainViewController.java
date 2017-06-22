@@ -54,10 +54,11 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.application.ArchiveOperation;
 import org.gzipper.java.application.pojo.ArchiveInfoFactory;
+import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
@@ -254,7 +255,7 @@ public class MainViewController extends BaseController {
                 });
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
-                _startButton.setDisable(_selectedFiles == null || _selectedFiles.isEmpty());
+                _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
             }
         }
     }
@@ -312,10 +313,10 @@ public class MainViewController extends BaseController {
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
             if (_activeTasks != null && !_activeTasks.isEmpty()) {
-                // log warning message when cancellation of task has failed
                 _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
                         .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                    Log.w("Task cancellation failed for {0}", task.toString(), false);
+                    // log warning message when cancellation of task has failed
+                    Log.e("Task cancellation failed for {0}", task.toString());
                 });
             }
         }
@@ -360,7 +361,7 @@ public class MainViewController extends BaseController {
                 _selectedFiles = selectedFiles;
             } else {
                 message = I18N.getString("noFilesSelected.text");
-                _startButton.setDisable(_selectedFiles == null || _selectedFiles.isEmpty());
+                _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
             }
             Log.i(message, true);
         }
@@ -385,8 +386,8 @@ public class MainViewController extends BaseController {
             if (file != null) {
                 updateSelectedFile(file);
                 String absolutePath = file.getAbsolutePath();
-                if (!file.isDirectory() && FileUtil.getFileExtension(absolutePath).isEmpty()) {
-                    absolutePath = absolutePath + _archiveFileExtension;
+                if (!file.isDirectory() && FileUtils.getFileExtension(absolutePath).isEmpty()) {
+                    absolutePath += _archiveFileExtension;
                 }
                 _outputPathTextField.setText(absolutePath);
                 Log.i("Output file set to: {0}", file.getAbsolutePath(), false);
@@ -426,7 +427,7 @@ public class MainViewController extends BaseController {
                     outputPath = outputPathText.replace(
                             _archiveFileExtension, fileExtension
                     );
-                } else if (!FileUtil.isValidDirectory(outputPathText)) {
+                } else if (!FileUtils.isValidDirectory(outputPathText)) {
                     outputPath = outputPathText + fileExtension;
                 } else {
                     outputPath = outputPathText;
@@ -441,7 +442,7 @@ public class MainViewController extends BaseController {
     void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
             String filename = _outputPathTextField.getText();
-            if (!FileUtil.containsIllegalChars(filename)) {
+            if (!FileUtils.containsIllegalChars(filename)) {
                 updateSelectedFile(new File(filename + evt.getCharacter()));
             }
         }
@@ -521,7 +522,7 @@ public class MainViewController extends BaseController {
      * Resets the selected files.
      */
     private void resetSelections() {
-        if (_selectedFiles != null && !_selectedFiles.isEmpty()) {
+        if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
             Log.i(I18N.getString("selectionReset.text"), true);
         }
         _selectedFiles = Collections.<File>emptyList();
@@ -537,8 +538,8 @@ public class MainViewController extends BaseController {
     private void updateSelectedFile(File file) {
         if (file != null) {
             if (!file.isDirectory()) {
-                String archiveName = _archiveName = file.getName();
-                String fileExtension = FileUtil.getFileExtension(archiveName);
+                String archiveName = _archiveName = file.getName(),
+                        fileExtension = FileUtils.getFileExtension(archiveName);
                 if (fileExtension.isEmpty()) { // update file extension
                     fileExtension = _archiveTypeComboBox.getValue()
                             .getDefaultExtensionName(false);
@@ -604,7 +605,7 @@ public class MainViewController extends BaseController {
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
             Log.i(I18N.getString("operationFail.text"), true);
-            final Throwable thrown = e.getSource().getException();
+            Throwable thrown = e.getSource().getException();
             if (thrown != null) {
                 Log.e(thrown.getLocalizedMessage(), thrown);
             }
@@ -651,7 +652,7 @@ public class MainViewController extends BaseController {
 
         // set recently used path from settings if valid
         final String recentPath = settings.getProperty("recentPath");
-        if (FileUtil.isValidDirectory(recentPath)) {
+        if (FileUtils.isValidDirectory(recentPath)) {
             _outputPathTextField.setText(recentPath);
         } else {
             _outputPathTextField.setText(os.getDefaultUserDirectory());
@@ -773,13 +774,13 @@ public class MainViewController extends BaseController {
             String extName = _archiveTypeComboBox.getValue()
                     .getDefaultExtensionName(false);
 
-            if (FileUtil.isValidDirectory(outputPath)) {
+            if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
-                outputPath = FileUtil.generateUniqueFilename(
+                outputPath = FileUtils.generateUniqueFilename(
                         outputPath, DEFAULT_ARCHIVE_NAME, extName);
             }
 
-            if (FileUtil.isValidOutputFile(outputPath)) {
+            if (FileUtils.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
                 _archiveFileExtension = extName;
                 return true;
@@ -789,7 +790,7 @@ public class MainViewController extends BaseController {
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (!_selectedFiles.isEmpty()) {
+            if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
                 Log.e("Operation cannot be started as no files have been specified.");
@@ -814,12 +815,12 @@ public class MainViewController extends BaseController {
 
         @Override
         public boolean validateOutputPath() {
-            return FileUtil.isValidDirectory(_outputPathTextField.getText());
+            return FileUtils.isValidDirectory(_outputPathTextField.getText());
         }
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_outputFile != null && !_selectedFiles.isEmpty()) {
+            if (_outputFile != null && ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
                 Log.e("Operation cannot be started as an invalid path has been specified.");

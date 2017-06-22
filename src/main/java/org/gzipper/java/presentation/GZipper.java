@@ -39,8 +39,8 @@ import javafx.stage.WindowEvent;
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.model.Unix;
 import org.gzipper.java.application.model.Windows;
-import org.gzipper.java.application.util.AppUtil;
-import org.gzipper.java.application.util.FileUtil;
+import org.gzipper.java.application.util.AppUtils;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.util.Settings;
 import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
@@ -102,13 +102,13 @@ public class GZipper extends Application {
      */
     private void initApplication() {
         try {
-            final String decPath = AppUtil.getDecodedRootPath(getClass());
+            final String decPath = AppUtils.getDecodedRootPath(getClass());
 
             File settings = new File(decPath + "settings.properties");
             if (!settings.exists()) {
                 try { // copy settings file to application folder if missing
-                    String resource = AppUtil.getResource(GZipper.class, "/settings.properties");
-                    FileUtil.copy(resource, decPath + "settings.properties");
+                    String resource = AppUtils.getResource(GZipper.class, "/settings.properties");
+                    FileUtils.copy(resource, decPath + "settings.properties");
                 } catch (URISyntaxException | IOException ex) {
                     Log.e(ex.getLocalizedMessage(), ex);
                 }
@@ -134,7 +134,7 @@ public class GZipper extends Application {
         Logger logger = Log.DEFAULT_LOGGER;
 
         try {
-            final String decPath = AppUtil.getDecodedRootPath(getClass());
+            final String decPath = AppUtils.getDecodedRootPath(getClass());
             FileHandler handler = new FileHandler(decPath + "gzipper.log");
             handler.setFormatter(new SimpleFormatter());
             logger.addHandler(handler);

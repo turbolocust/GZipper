@@ -29,12 +29,12 @@ import java.nio.file.Paths;
 import org.gzipper.java.util.Log;
 
 /**
- * Utility class that provides static methods for e.g. receiving resources from
- * the resource path of a class.
+ * Utility class that provides methods for e.g. receiving resources from the
+ * resource path of a class.
  *
  * @author Matthias Fussenegger
  */
-public class AppUtil {
+public class AppUtils {
 
     /**
      * Returns the resource path of the specified class as string. The file will
@@ -50,7 +50,7 @@ public class AppUtil {
 
         String resource = null;
 
-        URL url = clazz.getResource(name);
+        final URL url = clazz.getResource(name);
         if (url.toString().startsWith("jar:")) {
 
             String tempName = name.substring(name.lastIndexOf('/') + 1, name.length());
@@ -115,13 +115,10 @@ public class AppUtil {
      * @return the cut length, that is the name of the executable or the folder.
      */
     private static int determineCutLength(File f) {
-
         int cutLength = 0;
-
         if (!f.isDirectory()) {
             cutLength = f.getName().length();
         }
-
         return cutLength;
     }
 }
