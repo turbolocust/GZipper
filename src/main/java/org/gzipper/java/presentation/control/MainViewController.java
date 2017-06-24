@@ -57,6 +57,7 @@ import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.application.ArchiveOperation;
+import org.gzipper.java.application.CompressionMode;
 import org.gzipper.java.application.pojo.ArchiveInfoFactory;
 import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.exceptions.GZipperException;
@@ -563,6 +564,7 @@ public class MainViewController extends BaseController {
      * @return a {@link Task} that can be executed to perform the specified
      * archiving operation.
      */
+    @SuppressWarnings("SleepWhileInLoop")
     private Task<Boolean> initArchivingJob(ArchiveOperation operation) {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
@@ -804,7 +806,7 @@ public class MainViewController extends BaseController {
             ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                     archiveType, _archiveName, _compressionLevel,
                     _selectedFiles, _outputFile.getParent());
-            return new ArchiveOperation[]{new ArchiveOperation(info, true)};
+            return new ArchiveOperation[]{new ArchiveOperation(info, CompressionMode.COMPRESS)};
         }
     }
 
@@ -841,7 +843,7 @@ public class MainViewController extends BaseController {
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                         archiveType, file.getAbsolutePath(),
                         _outputFile + File.separator);
-                operations[i] = new ArchiveOperation(info, false);
+                operations[i] = new ArchiveOperation(info, CompressionMode.DECOMPRESS);
             }
             return operations;
         }

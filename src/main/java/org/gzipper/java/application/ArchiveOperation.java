@@ -47,14 +47,14 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     private final ArchivingAlgorithm _algorithm;
 
     /**
-     * True if operation is being used for compression, false otherwise.
+     * Describes what kind of operation shall be performed.
      */
-    private final boolean _compress;
+    private final CompressionMode _compressionMode;
 
     /**
      * True if a request for interruption has been received.
      */
-    private volatile boolean _interrupt;
+    private boolean _interrupt;
 
     /**
      * The elapsed time of the operation which will be stored after its end.
@@ -65,14 +65,14 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * Constructs a new instance of this class using the specified values.
      *
      * @param info the {@link ArchiveInfo} to be aggregated.
-     * @param compress true for compression, false for decompression.
+     * @param compressionMode the {@link CompressionMode} for this operation.
      * @throws org.gzipper.java.exceptions.GZipperException if determination of
      * archiving algorithm has failed.
      */
-    public ArchiveOperation(ArchiveInfo info, boolean compress)
+    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode)
             throws GZipperException {
         _archiveInfo = info;
-        _compress = compress;
+        _compressionMode = compressionMode;
         if ((_algorithm = init(info)) == null) {
             throw new GZipperException();
         }
@@ -112,14 +112,18 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     @Override
     public Boolean call() throws Exception {
         boolean success = false;
-
         if (_algorithm != null) {
             long startTime = System.nanoTime();
             try {
-                if (_compress) {
-                    _algorithm.compress(_archiveInfo);
-                } else {
-                    _algorithm.extract(_archiveInfo);
+                switch (_compressionMode) {
+                    case COMPRESS:
+                        _algorithm.compress(_archiveInfo);
+                        break;
+                    case DECOMPRESS:
+                        _algorithm.extract(_archiveInfo);
+                        break;
+                    default:
+                        throw new GZipperException("Mode could not be determined.");
                 }
                 success = true;
             } catch (IOException ex) {
@@ -133,15 +137,6 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
             _elapsedTime = System.nanoTime() - startTime;
         }
         return success;
-    }
-
-    /**
-     * Checks whether this operation is for compression or decompression.
-     *
-     * @return true if operation is for compression, false for decompression.
-     */
-    public boolean isCompress() {
-        return _compress;
     }
 
     @Override
