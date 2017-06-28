@@ -43,6 +43,11 @@ import org.gzipper.java.util.Settings;
  */
 public class Gzip extends AbstractAlgorithm {
 
+    /**
+     * The file that will be compressed.
+     */
+    private File _file;
+
     public Gzip() {
         super(null, CompressorStreamFactory.GZIP);
     }
@@ -51,7 +56,7 @@ public class Gzip extends AbstractAlgorithm {
     public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         // set additional parameters for compressor stream
-        GzipParameters params = getDefaultGzipParams(null);
+        GzipParameters params = getDefaultGzipParams(_file.getName());
         params.setCompressionLevel(_compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
     }
@@ -69,7 +74,7 @@ public class Gzip extends AbstractAlgorithm {
         final String fullname = FileUtils.combinePathAndFilename(location, name);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
         if (files.length > 0 && files[0].isFile()) { // directories are not supported
-            final File file = files[0];
+            final File file = _file = files[0];
             try (BufferedInputStream bis
                     = new BufferedInputStream(new FileInputStream(file))) {
                 try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
