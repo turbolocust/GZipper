@@ -822,7 +822,7 @@ public class MainViewController extends BaseController {
 
         @Override
         public void performOperation(ArchiveOperation operation) {
-            if (_outputFile != null && ListUtils.isNullOrEmpty(_selectedFiles)) {
+            if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
                 Log.e("Operation cannot be started as an invalid path has been specified.");
