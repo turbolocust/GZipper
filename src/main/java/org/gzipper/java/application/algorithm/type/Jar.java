@@ -23,17 +23,14 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.gzipper.java.application.algorithm.AbstractAlgorithm;
 
 /**
  * Represents the JAR archive type.
  *
  * @author Matthias Fussenegger
  */
-public class Jar extends AbstractAlgorithm {
+public class Jar extends Zip {
 
     /**
      * Constructs a new instance of this class using the JAR constant of
@@ -52,11 +49,5 @@ public class Jar extends AbstractAlgorithm {
         jaos.setUseZip64(Zip64Mode.AsNeeded);
         jaos.setFallbackToUTF8(true);
         return jaos;
-    }
-
-    @Override
-    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
-            throws IOException, CompressorException {
-        return null; // as no compressor stream is required
     }
 }

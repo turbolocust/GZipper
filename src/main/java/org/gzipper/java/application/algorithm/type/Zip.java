@@ -46,6 +46,18 @@ public class Zip extends AbstractAlgorithm {
         super(ArchiveStreamFactory.ZIP, CompressorStreamFactory.DEFLATE);
     }
 
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param archiveType the archive type, which has to be a constant of
+     * {@link ArchiveStreamFactory}.
+     * @param compressionType the compression type, which has to be a constant
+     * of {@link CompressorStreamFactory}.
+     */
+    public Zip(String archiveType, String compressionType) {
+        super(archiveType, compressionType);
+    }
+
     @Override
     public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
             throws IOException, ArchiveException {
