@@ -51,9 +51,7 @@ public class Gzip extends AbstractAlgorithm {
     public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         // set additional parameters for compressor stream
-        GzipParameters params = new GzipParameters();
-        Settings settings = Settings.getInstance();
-        params.setOperatingSystem(settings.getOperatingSystem().getOSInfo().getValue());
+        GzipParameters params = getDefaultGzipParams(null);
         params.setCompressionLevel(_compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
     }
@@ -94,12 +92,11 @@ public class Gzip extends AbstractAlgorithm {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(name));
         try (GzipCompressorInputStream gcis = new GzipCompressorInputStream(bis)) {
             // create output file without last file name extension
-            File outputFile = new File(location + name.substring(
-                    name.lastIndexOf(File.separator) + 1, name.lastIndexOf('.')));
+            File outputFile = new File(location + removeFilenameExtension(name));
             if (outputFile.getAbsolutePath().equals(name)) {
                 // generate unique file as input file has no file name extension
                 outputFile = new File(FileUtils.generateUniqueFilename(
-                        location, outputFile.getName(), ""));
+                        location, outputFile.getName()));
             }
             try (BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(outputFile))) {
@@ -110,5 +107,37 @@ public class Gzip extends AbstractAlgorithm {
                 }
             }
         }
+    }
+
+    /**
+     * Removes the filename extension of the specified filename.
+     *
+     * @param filename the name of which to remove the filename extension.
+     * @return a string that represents the filename without its extension.
+     */
+    private String removeFilenameExtension(String filename) {
+        return filename.substring(
+                filename.lastIndexOf(File.separator) + 1,
+                filename.lastIndexOf('.'));
+    }
+
+    /**
+     * Returns {@link GzipParameters} with the operating system, modification
+     * time (which is the current time in milliseconds) and the specified
+     * filename without the directory path already set.
+     *
+     * @param filename the name of the file without directory path.
+     * @return the default {@link GzipParameters}.
+     */
+    public static GzipParameters getDefaultGzipParams(String filename) {
+        GzipParameters params = new GzipParameters();
+        Settings settings = Settings.getInstance();
+        int osValue = settings.getOs().getOsInfo().getValue();
+        params.setOperatingSystem(osValue);
+        params.setModificationTime(System.currentTimeMillis());
+        if (filename != null && !filename.contains(File.separator)) {
+            params.setFilename(filename);
+        }
+        return params;
     }
 }

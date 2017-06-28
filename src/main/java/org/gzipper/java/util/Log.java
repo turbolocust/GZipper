@@ -30,7 +30,7 @@ import org.gzipper.java.presentation.control.MainViewController;
  * @author Matthias Fussenegger
  */
 @SuppressWarnings("ClassWithMultipleLoggers")
-public class Log {
+public final class Log {
 
     /**
      * Default logger named {@code GZipper.class.getName()}.

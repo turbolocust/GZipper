@@ -41,12 +41,12 @@ public interface ArchivingAlgorithm extends Interruptable {
      * the files of the archive to the specified path.
      *
      * @param location the location where to extract the archive.
-     * @param name the filename of the archive to extract.
+     * @param fullname the filename of the archive to extract.
      * @throws IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
-    void extract(String location, String name)
+    void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException;
 
     /**
@@ -67,7 +67,7 @@ public interface ArchivingAlgorithm extends Interruptable {
      *
      * @param files the files selected from the file chooser.
      * @param location defines where to store the archive.
-     * @param name the name of the archive.
+     * @param name the name of the archive without the directory path.
      * @throws IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.

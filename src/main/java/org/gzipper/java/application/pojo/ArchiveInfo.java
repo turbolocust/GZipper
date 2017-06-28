@@ -49,7 +49,7 @@ public class ArchiveInfo {
     private String _archiveName;
 
     /**
-     * The output path either for the archive or the decompressed files.
+     * The output path either of the archive or the decompressed file(s).
      */
     private String _outputPath;
 
@@ -85,7 +85,7 @@ public class ArchiveInfo {
      *
      * @param level the level for the compression as of {@link Deflater}.
      */
-    public void setLevel(int level) {
+    public void setLevel(final int level) {
         _level = level;
     }
 
@@ -103,7 +103,7 @@ public class ArchiveInfo {
      *
      * @param files the files to be compressed.
      */
-    public void setFiles(List<File> files) {
+    public void setFiles(final List<File> files) {
         _files = files;
     }
 
@@ -121,7 +121,7 @@ public class ArchiveInfo {
      *
      * @param archiveName the name of the archive to be decompressed.
      */
-    public void setArchiveName(String archiveName) {
+    public void setArchiveName(final String archiveName) {
         _archiveName = archiveName;
     }
 
@@ -140,7 +140,7 @@ public class ArchiveInfo {
      * @param outputPath the output path for either the archive or the
      * decompressed files.
      */
-    public void setOutputPath(String outputPath) {
+    public void setOutputPath(final String outputPath) {
         _outputPath = outputPath;
     }
 

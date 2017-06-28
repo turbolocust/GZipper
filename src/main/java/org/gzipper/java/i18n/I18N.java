@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
  *
  * @author Matthias Fussenegger
  */
-public class I18N {
+public final class I18N {
 
     /**
      * The resource bundle used to access internationalized strings.

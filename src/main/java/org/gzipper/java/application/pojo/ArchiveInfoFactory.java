@@ -27,7 +27,7 @@ import org.gzipper.java.exceptions.GZipperException;
  *
  * @author Matthias Fussenegger
  */
-public class ArchiveInfoFactory {
+public final class ArchiveInfoFactory {
 
     /**
      * Creates a new {@link ArchiveInfo} for compression operation.

@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Matthias Fussenegger
  */
-public class ListUtils {
+public final class ListUtils {
 
     /**
      * Checks whether the given list is {@code null} or empty.
@@ -35,5 +35,4 @@ public class ListUtils {
     public static <T> boolean isNullOrEmpty(List<T> list) {
         return list == null || list.isEmpty();
     }
-    
 }

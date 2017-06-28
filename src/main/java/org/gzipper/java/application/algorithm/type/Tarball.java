@@ -28,7 +28,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.gzipper.java.application.algorithm.AbstractAlgorithm;
-import org.gzipper.java.util.Settings;
 
 /**
  *
@@ -72,9 +71,7 @@ public class Tarball extends AbstractAlgorithm {
     public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         // set additional parameters for compressor stream
-        GzipParameters params = new GzipParameters();
-        Settings settings = Settings.getInstance();
-        params.setOperatingSystem(settings.getOperatingSystem().getOSInfo().getValue());
+        GzipParameters params = Gzip.getDefaultGzipParams(null);
         params.setCompressionLevel(_compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
     }

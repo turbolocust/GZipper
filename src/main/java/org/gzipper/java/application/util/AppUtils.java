@@ -34,7 +34,7 @@ import org.gzipper.java.util.Log;
  *
  * @author Matthias Fussenegger
  */
-public class AppUtils {
+public final class AppUtils {
 
     /**
      * Returns the resource path of the specified class as string. The file will

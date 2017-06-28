@@ -53,7 +53,7 @@ public abstract class OperatingSystem {
      *
      * @return the enumeration for the current operating system.
      */
-    public OS getOSInfo() {
+    public OS getOsInfo() {
         return _operatingSystem;
     }
 }

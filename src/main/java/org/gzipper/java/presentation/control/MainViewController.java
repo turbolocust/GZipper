@@ -242,7 +242,7 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_dropAddressesMenuItem)) {
             List<String> filePaths = ViewControllers
                     .showDropView(_theme).getAddresses();
-            if (filePaths != null && !filePaths.isEmpty()) {
+            if (!ListUtils.isNullOrEmpty(filePaths)) {
                 _selectedFiles = new ArrayList<>(filePaths.size());
                 _startButton.setDisable(false);
                 filePaths.stream().map((filePath) -> {
@@ -387,7 +387,7 @@ public class MainViewController extends BaseController {
             if (file != null) {
                 updateSelectedFile(file);
                 String absolutePath = file.getAbsolutePath();
-                if (!file.isDirectory() && FileUtils.getFileExtension(absolutePath).isEmpty()) {
+                if (!file.isDirectory() && FileUtils.getExtension(absolutePath).isEmpty()) {
                     absolutePath += _archiveFileExtension;
                 }
                 _outputPathTextField.setText(absolutePath);
@@ -540,7 +540,7 @@ public class MainViewController extends BaseController {
         if (file != null) {
             if (!file.isDirectory()) {
                 String archiveName = _archiveName = file.getName(),
-                        fileExtension = FileUtils.getFileExtension(archiveName);
+                        fileExtension = FileUtils.getExtension(archiveName);
                 if (fileExtension.isEmpty()) { // update file extension
                     fileExtension = _archiveTypeComboBox.getValue()
                             .getDefaultExtensionName(false);
@@ -648,7 +648,7 @@ public class MainViewController extends BaseController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Settings settings = Settings.getInstance();
-        OperatingSystem os = settings.getOperatingSystem();
+        OperatingSystem os = settings.getOs();
 
         initLogger();
 

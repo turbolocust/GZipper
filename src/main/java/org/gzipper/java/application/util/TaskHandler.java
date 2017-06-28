@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
  *
  * @author Matthias Fussenegger
  */
-public class TaskHandler {
+public final class TaskHandler {
 
     /**
      * The executor service which executes tasks.

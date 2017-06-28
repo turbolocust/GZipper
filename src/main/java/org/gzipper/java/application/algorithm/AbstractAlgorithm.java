@@ -59,7 +59,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     protected int _compressionLevel;
 
     /**
-     * Type of the archive.
+     * Type of the archive stream.
      */
     protected final String _archiveType;
 
@@ -92,9 +92,10 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     }
 
     @Override
-    public void extract(String location, String name) throws IOException, ArchiveException, CompressorException {
+    public void extract(String location, String fullname)
+            throws IOException, ArchiveException, CompressorException {
 
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(name));
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fullname));
         CompressorInputStream cis = makeCompressorInputStream(bis);
 
         try (ArchiveInputStream ais = cis != null
@@ -103,9 +104,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
 
             ArchiveEntry entry = ais.getNextEntry();
 
-            int startIndex = name.lastIndexOf(File.separator) + 1;
-            final File outputFolder = new File(location + name.substring(
-                    startIndex, name.indexOf('.', startIndex)));
+            int startIndex = fullname.lastIndexOf(File.separator) + 1;
+            final File outputFolder = new File(location + fullname.substring(
+                    startIndex, fullname.indexOf('.', startIndex)));
 
             if (!outputFolder.exists()) {
                 outputFolder.mkdir(); // create output folder of archive

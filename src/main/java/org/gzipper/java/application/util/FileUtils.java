@@ -29,7 +29,7 @@ import java.nio.file.StandardCopyOption;
  *
  * @author Matthias Fussenegger
  */
-public class FileUtils {
+public final class FileUtils {
 
     /**
      * Validates the specified path, which has to exist.
@@ -119,13 +119,13 @@ public class FileUtils {
     }
 
     /**
-     * Returns the file extension of a specified string.
+     * Returns the filename extension of a specified string.
      *
      * @param filename the name of the file as string.
-     * @return the file extension including period or an empty string if the
-     * specified filename has no file extension.
+     * @return filename extension including period or an empty string if the
+     * specified filename has no filename extension.
      */
-    public static String getFileExtension(String filename) {
+    public static String getExtension(String filename) {
         int period = new File(filename).getName().indexOf('.');
         return period > 0 ? filename.substring(period) : "";
     }
@@ -154,8 +154,22 @@ public class FileUtils {
      *
      * @param path the file path including only the directory.
      * @param name the name of the file of which to generate a unique version.
+     * @return a unique filename that consists of the path, name, suffix and
+     * filename extension (if any).
+     */
+    public static String generateUniqueFilename(String path, String name) {
+        final String ext = name.contains(".") ? getExtension(name) : "";
+        return generateUniqueFilename(path, name, ext);
+    }
+
+    /**
+     * Generates a unique file name using the specified parameters.
+     *
+     * @param path the file path including only the directory.
+     * @param name the name of the file of which to generate a unique version.
      * @param ext the name of the file extension.
-     * @return a unique filename including path, name, suffix and extension.
+     * @return a unique filename that consists of the path, name, suffix and
+     * filename extension.
      */
     public static String generateUniqueFilename(String path, String name, String ext) {
         String uniqueFilename;

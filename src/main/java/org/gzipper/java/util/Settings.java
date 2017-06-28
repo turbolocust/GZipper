@@ -32,7 +32,7 @@ import org.gzipper.java.application.model.OperatingSystem;
  *
  * @author Matthias Fussenegger
  */
-public class Settings {
+public final class Settings {
 
     /**
      * The actual properties file. Required to store away changed properties.
@@ -52,7 +52,7 @@ public class Settings {
     /**
      * The operating system the JVM runs on.
      */
-    private OperatingSystem _operatingSystem;
+    private OperatingSystem _os;
 
     private Settings() {
         _defaults = initDefaults();
@@ -69,7 +69,7 @@ public class Settings {
 
         _propsFile = props;
 
-        _operatingSystem = os; // to receive environment variables
+        _os = os; // to receive environment variables
         _props = new Properties(_defaults);
 
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(props))) {
@@ -141,12 +141,12 @@ public class Settings {
     }
 
     /**
-     * Returns the operating system the JVM runs on.
+     * Returns the operating system on which the JVM is running on.
      *
-     * @return the operating system the JVM runs on.
+     * @return the operating system on which the JVM is running on.
      */
-    public OperatingSystem getOperatingSystem() {
-        return _operatingSystem;
+    public OperatingSystem getOs() {
+        return _os;
     }
 
     /**
