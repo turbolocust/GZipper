@@ -99,7 +99,7 @@
                                 </Menu>
                                 <Menu mnemonicParsing="false" text="%helpMenu.text">
                                     <items>
-                              <MenuItem fx:id="_resetAppMenuItem" mnemonicParsing="false" onAction="#handleResetAppMenuItemAction" text="%resetApp.text" />
+                                        <MenuItem fx:id="_resetAppMenuItem" mnemonicParsing="false" onAction="#handleResetAppMenuItemAction" text="%resetApp.text" />
                                         <MenuItem fx:id="_aboutMenuItem" mnemonicParsing="false" onAction="#handleAboutMenuItemAction" text="%aboutMenuItem.text">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="F1" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
