@@ -128,20 +128,22 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                 }
 
-                // create new output stream and write bytes to file
-                try (BufferedOutputStream bos = new BufferedOutputStream(
-                        new FileOutputStream(newFile))) {
-                    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                    int readBytes;
-                    while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
-                        bos.write(buffer, 0, readBytes);
-                    }
-                } catch (IOException ex) {
-                    if (!_interrupt) {
-                        Log.e(ex.getLocalizedMessage(), ex);
-                        Log.e("{0}\n{1}", new Object[]{
-                            I18N.getString("errorWritingFile.text"), newFile.getPath()
-                        });
+                if (!entry.isDirectory()) {
+                    // create new output stream and write bytes to file
+                    try (BufferedOutputStream bos = new BufferedOutputStream(
+                            new FileOutputStream(newFile))) {
+                        final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                        int readBytes;
+                        while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
+                            bos.write(buffer, 0, readBytes);
+                        }
+                    } catch (IOException ex) {
+                        if (!_interrupt) {
+                            Log.e(ex.getLocalizedMessage(), ex);
+                            Log.e("{0}\n{1}", new Object[]{
+                                I18N.getString("errorWritingFile.text"), newFile.getPath()
+                            });
+                        }
                     }
                 }
                 if (!_interrupt) {
