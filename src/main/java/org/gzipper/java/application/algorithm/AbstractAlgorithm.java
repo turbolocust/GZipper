@@ -122,7 +122,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 final File newFile = new File(outputFolder.getAbsolutePath()
                         + File.separator + entryName);
                 // check if entry contains a directory
-                if (entryName.contains(File.separator)) {
+                if (entryName.indexOf('/') > -1) {
                     if (!newFile.getParentFile().exists()) {
                         newFile.getParentFile().mkdirs(); // also creates parent directories
                     }
@@ -229,7 +229,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
-                    compress(children, entryName + File.separator, outputStream);
+                    compress(children, entryName + "/", outputStream);
                 }
             }
         }
