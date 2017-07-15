@@ -97,7 +97,7 @@ public class Gzip extends AbstractAlgorithm {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(name));
         try (GzipCompressorInputStream gcis = new GzipCompressorInputStream(bis)) {
             // create output file without last file name extension
-            File outputFile = new File(location + removeFilenameExtension(name));
+            File outputFile = new File(location + gcis.getMetaData().getFilename());
             if (outputFile.getAbsolutePath().equals(name)) {
                 // generate unique file as input file has no file name extension
                 outputFile = new File(FileUtils.generateUniqueFilename(
