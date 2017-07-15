@@ -115,18 +115,6 @@ public class Gzip extends AbstractAlgorithm {
     }
 
     /**
-     * Removes the filename extension of the specified filename.
-     *
-     * @param filename the name of which to remove the filename extension.
-     * @return a string that represents the filename without its extension.
-     */
-    private String removeFilenameExtension(String filename) {
-        return filename.substring(
-                filename.lastIndexOf(File.separator) + 1,
-                filename.lastIndexOf('.'));
-    }
-
-    /**
      * Returns {@link GzipParameters} with the operating system, modification
      * time (which is the current time in milliseconds) and the specified
      * filename without the directory path already set.
