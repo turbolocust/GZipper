@@ -113,14 +113,11 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
             }
 
             while (!_interrupt && entry != null) {
+                
                 final String entryName = entry.getName();
-
-                Log.i("{0}{1}{2}", true, new Object[]{
-                    I18N.getString("extracting.text"), " ", entryName
-                });
-
                 final File newFile = new File(outputFolder.getAbsolutePath()
                         + File.separator + entryName);
+                
                 // check if entry contains a directory
                 if (entryName.indexOf('/') > -1) {
                     if (!newFile.getParentFile().exists()) {
@@ -147,9 +144,6 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                 }
                 if (!_interrupt) {
-                    Log.i("{0}{1}{2}", true, new Object[]{
-                        entryName, " ", I18N.getString("extracted.text")
-                    });
                     entry = ais.getNextEntry();
                 }
             }
@@ -203,9 +197,6 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                 String entryName = base + newFile.getName();
                 // start compressing the file
                 if (newFile.isFile()) {
-                    Log.i("{0}{1}{2}", true, new Object[]{
-                        I18N.getString("compressing.text"), " ", newFile.getName()
-                    });
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
@@ -223,11 +214,6 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                                 I18N.getString("errorReadingFile.text"), newFile.getPath()
                             });
                         }
-                    }
-                    if (!_interrupt) {
-                        Log.i("{0}{1}{2}", true, new Object[]{
-                            newFile.getName(), " ", I18N.getString("compressed.text")
-                        });
                     }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
