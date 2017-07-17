@@ -71,6 +71,7 @@ public class Gzip extends AbstractAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
+        initAlgorithmProgress(files);
         final String fullname = FileUtils.combinePathAndFilename(location, name);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
         if (files.length > 0 && files[0].isFile()) { // directories are not supported
@@ -79,9 +80,12 @@ public class Gzip extends AbstractAlgorithm {
                     = new BufferedInputStream(new FileInputStream(file))) {
                 try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
                     final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                    long totalBytesRead = 0L;
                     int readBytes = 0;
                     while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
                         cos.write(buffer, 0, readBytes);
+                        totalBytesRead += readBytes;
+                        updateProgress(totalBytesRead);
                     }
                 }
             }
@@ -91,14 +95,16 @@ public class Gzip extends AbstractAlgorithm {
     }
 
     @Override
-    public void extract(String location, String name)
+    public void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException {
 
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(name));
+        File archive = new File(fullname);
+        initAlgorithmProgress(archive);
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive));
         try (GzipCompressorInputStream gcis = new GzipCompressorInputStream(bis)) {
             // create output file without last file name extension
             File outputFile = new File(location + gcis.getMetaData().getFilename());
-            if (outputFile.getAbsolutePath().equals(name)) {
+            if (outputFile.getAbsolutePath().equals(fullname)) {
                 // generate unique file as input file has no file name extension
                 outputFile = new File(FileUtils.generateUniqueFilename(
                         location, outputFile.getName()));
@@ -109,6 +115,7 @@ public class Gzip extends AbstractAlgorithm {
                 int readBytes = 0;
                 while (!_interrupt && (readBytes = gcis.read(buffer)) != -1) {
                     bos.write(buffer, 0, readBytes);
+                    updateProgress(gcis.getBytesRead());
                 }
             }
         }

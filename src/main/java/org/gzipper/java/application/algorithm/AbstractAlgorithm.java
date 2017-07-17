@@ -54,6 +54,11 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     protected volatile boolean _interrupt = false;
 
     /**
+     * Object used to update the progress of the algorithm.
+     */
+    protected AlgorithmProgress _algorithmProgress;
+
+    /**
      * The compression level. Will only be considered if supported by algorithm.
      */
     protected int _compressionLevel;
@@ -95,7 +100,9 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     public void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException {
 
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fullname));
+        File archive = new File(fullname);
+        initAlgorithmProgress(archive);
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive));
         CompressorInputStream cis = makeCompressorInputStream(bis);
 
         try (ArchiveInputStream ais = cis != null
@@ -113,11 +120,11 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
             }
 
             while (!_interrupt && entry != null) {
-                
+
                 final String entryName = entry.getName();
                 final File newFile = new File(outputFolder.getAbsolutePath()
                         + File.separator + entryName);
-                
+
                 // check if entry contains a directory
                 if (entryName.indexOf('/') > -1) {
                     if (!newFile.getParentFile().exists()) {
@@ -133,6 +140,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                         int readBytes;
                         while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
                             bos.write(buffer, 0, readBytes);
+                            updateProgress(ais.getBytesRead());
                         }
                     } catch (IOException ex) {
                         if (!_interrupt) {
@@ -159,7 +167,8 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        final String fullname = FileUtils.combinePathAndFilename(location, name);
+        initAlgorithmProgress(files);
+        String fullname = FileUtils.combinePathAndFilename(location, name);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
 
         CompressorOutputStream cos = makeCompressorOutputStream(bos);
@@ -182,10 +191,10 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
      *
      * @param files the files to compress.
      * @param base the base path to store files to.
-     * @param outputStream the output stream to use.
+     * @param aos the output stream to use.
      * @throws IOException if an I/O error occurs.
      */
-    private void compress(File[] files, String base, ArchiveOutputStream outputStream) throws IOException {
+    private void compress(File[] files, String base, ArchiveOutputStream aos) throws IOException {
 
         final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int readBytes;
@@ -200,13 +209,14 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
-                        ArchiveEntry entry = outputStream.createArchiveEntry(newFile, entryName);
-                        outputStream.putArchiveEntry(entry);
+                        ArchiveEntry entry = aos.createArchiveEntry(newFile, entryName);
+                        aos.putArchiveEntry(entry);
                         // write bytes to file
                         while (!_interrupt && (readBytes = buf.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, readBytes);
+                            aos.write(buffer, 0, readBytes);
+                            updateProgress(aos.getBytesWritten());
                         }
-                        outputStream.closeArchiveEntry();
+                        aos.closeArchiveEntry();
                     } catch (IOException ex) {
                         if (!_interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
@@ -217,7 +227,7 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
                     }
                 } else { // child is a directory
                     File[] children = getFiles(newFile.getAbsolutePath());
-                    compress(children, entryName + "/", outputStream);
+                    compress(children, entryName + "/", aos);
                 }
             }
         }
@@ -234,6 +244,30 @@ public abstract class AbstractAlgorithm implements ArchivingAlgorithm {
         final File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
+    }
+
+    /**
+     * Initializes {@link #_algorithmProgress} with the specified files.
+     *
+     * @param files the files to be used for initialization.
+     */
+    protected void initAlgorithmProgress(File... files) {
+        _algorithmProgress = new AlgorithmProgress(files);
+    }
+
+    /**
+     * Updates the progress of the current operation and logs an informational
+     * message to the UI if a threshold has been exceeded. This will prevent the
+     * UI from being flooded.
+     *
+     * @param readBytes the amount of bytes read so far.
+     */
+    protected void updateProgress(long readBytes) {
+        float progress = _algorithmProgress.getProgress(),
+                newProgress = _algorithmProgress.updateProgress(readBytes);
+        if (newProgress > progress) {
+            Log.i(I18N.getString("progress.text"), Float.toString(newProgress), true);
+        }
     }
 
     /**
