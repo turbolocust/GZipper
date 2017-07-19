@@ -82,6 +82,12 @@
             <version>1.14</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <!-- XZ for Java -->
+            <groupId>org.tukaani</groupId>
+            <artifactId>xz</artifactId>
+            <version>1.6</version>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
