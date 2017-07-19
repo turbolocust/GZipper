@@ -72,7 +72,7 @@ public class GZipper extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
         BaseController controller = new MainViewController(theme, getHostServices());
 
-        fxmlLoader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView", Locale.ENGLISH));
+        fxmlLoader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView"));
         fxmlLoader.setController(controller);
 
         // load parent to initialize scene
