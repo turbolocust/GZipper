@@ -30,9 +30,14 @@ public class AlgorithmProgress {
     private long _totalSize;
 
     /**
-     * The progress as rounded integer.
+     * Total amount of bytes already read.
      */
-    private float _progress;
+    private long _totalBytesRead;
+
+    /**
+     * The progress as float that is equal to a mathematical integer.
+     */
+    private float _progressRint;
 
     AlgorithmProgress(String fileName) {
         this(new File(fileName));
@@ -61,23 +66,24 @@ public class AlgorithmProgress {
      *
      * @return the current progress.
      */
-    float getProgress() {
-        return _progress;
+    float getProgressRint() {
+        return _progressRint;
     }
 
     /**
      * Updates the current progress and returns it. The progress is only updated
      * if a threshold has been exceeded. Otherwise the return parameter of this
-     * method is the same as of {@link #getProgress()}.
+     * method is the same as of {@link #getProgressRint()}.
      *
      * @param readBytes the amount of bytes read so far.
      * @return the current progress.
      */
     float updateProgress(long readBytes) {
-        float percentage = ((float) readBytes / (float) _totalSize) * 100;
-        if (Math.rint(percentage) > _progress) {
-            ++_progress;
+        _totalBytesRead += readBytes;
+        float percentage = ((float) _totalBytesRead / (float) _totalSize) * 100;
+        if (Math.rint(percentage) > _progressRint && _progressRint < 100L) {
+            ++_progressRint;
         }
-        return _progress;
+        return _progressRint;
     }
 }
