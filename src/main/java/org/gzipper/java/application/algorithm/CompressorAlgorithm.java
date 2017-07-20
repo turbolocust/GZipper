@@ -132,7 +132,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
     protected static class CompressorOptions {
 
         /**
-         * The name of the archive or the file to be decompressed.
+         * The name of the archive or the file to be compressed.
          */
         private String _name;
 
@@ -149,18 +149,38 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             _level = level;
         }
 
+        /**
+         * Returns the name of the archive or the file to be compressed.
+         *
+         * @return the name of the archive or the file to be compressed.
+         */
         public String getName() {
             return _name;
         }
 
+        /**
+         * Sets the name of the archive or the file to be compressed.
+         *
+         * @param name the name of the archive or the file to be compressed.
+         */
         public void setName(String name) {
             _name = name;
         }
 
+        /**
+         * Returns the compression level.
+         *
+         * @return the compression level.
+         */
         public int getLevel() {
             return _level;
         }
 
+        /**
+         * Sets the compression level.
+         *
+         * @param level the compression level.
+         */
         public void setLevel(int level) {
             _level = level;
         }
