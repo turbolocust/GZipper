@@ -108,7 +108,7 @@ public final class FileUtils {
      */
     public static String combinePathAndFilename(String path, String file) {
         // check if parameters are not null and not empty
-        if (path == null || file == null || path.isEmpty() || file.isEmpty()) {
+        if (StringUtils.isNullOrEmpty(path) || StringUtils.isNullOrEmpty(file)) {
             return null;
         }
         // check if location ends with separator and add it if missing
@@ -119,7 +119,7 @@ public final class FileUtils {
     }
 
     /**
-     * Returns the filename extension of a specified string.
+     * Returns the filename extension of a specified filename.
      *
      * @param filename the name of the file as string.
      * @return filename extension including period or an empty string if the
@@ -128,6 +128,17 @@ public final class FileUtils {
     public static String getExtension(String filename) {
         int period = new File(filename).getName().indexOf('.');
         return period > 0 ? filename.substring(period) : "";
+    }
+
+    /**
+     * Returns the display name of the specified filename without its extension.
+     *
+     * @param filename the name of the file as string.
+     * @return the display name of the filename without its file name extension.
+     */
+    public static String getDisplayName(String filename) {
+        int lastSeparatorIndex = filename.lastIndexOf(File.pathSeparatorChar);
+        return filename.substring(lastSeparatorIndex + 1, filename.lastIndexOf('.'));
     }
 
     /**

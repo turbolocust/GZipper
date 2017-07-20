@@ -16,8 +16,8 @@
  */
 package org.gzipper.java.application.model;
 
-import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 import org.gzipper.java.application.algorithm.type.*;
+import org.gzipper.java.application.algorithm.CompressionAlgorithm;
 
 /**
  * Enumeration for archive types.
@@ -31,7 +31,7 @@ public enum ArchiveType {
     GZIP("Gzip", "GZIP", new String[]{"*.gz", "*.gzip"}),
     TAR_GZ("TarGz", "TAR+GZIP", new String[]{"*.tar.gz", "*.tar.gzip", "*.tgz"}),
     TAR_BZ2("TarBz2", "TAR+BZIP2", new String[]{"*.tar.bz2", "*.tar.bzip2", "*.tbz2"}),
-    TAR_LZ("TarLz", "TAR+LZMA", new String[]{"*.tar.lz", "*.tar.lzma", "*.tlz"});
+    TAR_LZ("TarLz", "TAR+LZIP", new String[]{"*.tar.lz", "*.tar.lzip", "*.tar.lzma", "*.tlz"});
 
     /**
      * The name of the archive type.
@@ -56,14 +56,14 @@ public enum ArchiveType {
     }
 
     /**
-     * Determines the correct {@link ArchivingAlgorithm} to be used with this
+     * Determines the correct {@link CompressionAlgorithm} to be used with this
      * archive type.
      *
-     * @return the correct {@link ArchivingAlgorithm} for this archive type.
+     * @return the correct {@link CompressionAlgorithm} for this archive type.
      */
-    public ArchivingAlgorithm determineArchivingAlgorithm() {
+    public CompressionAlgorithm determineArchivingAlgorithm() {
 
-        final ArchivingAlgorithm algorithm;
+        final CompressionAlgorithm algorithm;
         switch (this) {
             case ZIP:
                 algorithm = new Zip();

@@ -16,24 +16,16 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
-import org.gzipper.java.application.algorithm.AbstractAlgorithm;
-import org.gzipper.java.application.util.FileUtils;
-import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.application.algorithm.CompressorAlgorithm;
 import org.gzipper.java.util.Settings;
 
 /**
@@ -41,85 +33,7 @@ import org.gzipper.java.util.Settings;
  *
  * @author Matthias Fussenegger
  */
-public class Gzip extends AbstractAlgorithm {
-
-    /**
-     * The file that will be compressed.
-     */
-    private File _file;
-
-    public Gzip() {
-        super(null, CompressorStreamFactory.GZIP);
-    }
-
-    @Override
-    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
-            throws IOException, CompressorException {
-        // set additional parameters for compressor stream
-        GzipParameters params = getDefaultGzipParams(_file.getName());
-        params.setCompressionLevel(_compressionLevel);
-        return new GzipCompressorOutputStream(stream, params);
-    }
-
-    @Override
-    public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
-            throws IOException, ArchiveException {
-        return null;
-    }
-
-    @Override
-    public void compress(File[] files, String location, String name)
-            throws IOException, ArchiveException, CompressorException {
-
-        initAlgorithmProgress(files);
-        final String fullname = FileUtils.combinePathAndFilename(location, name);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
-        if (files.length > 0 && files[0].isFile()) { // directories are not supported
-            final File file = _file = files[0];
-            try (BufferedInputStream bis
-                    = new BufferedInputStream(new FileInputStream(file))) {
-                try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
-                    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                    long totalBytesRead = 0L;
-                    int readBytes = 0;
-                    while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
-                        cos.write(buffer, 0, readBytes);
-                        totalBytesRead += readBytes;
-                        updateProgress(totalBytesRead);
-                    }
-                }
-            }
-        } else {
-            throw new IOException(new GZipperException("Directories are not supported!"));
-        }
-    }
-
-    @Override
-    public void extract(String location, String fullname)
-            throws IOException, ArchiveException, CompressorException {
-
-        File archive = new File(fullname);
-        initAlgorithmProgress(archive);
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive));
-        try (GzipCompressorInputStream gcis = new GzipCompressorInputStream(bis)) {
-            // create output file without last file name extension
-            File outputFile = new File(location + gcis.getMetaData().getFilename());
-            if (outputFile.getAbsolutePath().equals(fullname)) {
-                // generate unique file as input file has no file name extension
-                outputFile = new File(FileUtils.generateUniqueFilename(
-                        location, outputFile.getName()));
-            }
-            try (BufferedOutputStream bos = new BufferedOutputStream(
-                    new FileOutputStream(outputFile))) {
-                final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                int readBytes = 0;
-                while (!_interrupt && (readBytes = gcis.read(buffer)) != -1) {
-                    bos.write(buffer, 0, readBytes);
-                    updateProgress(gcis.getBytesRead());
-                }
-            }
-        }
-    }
+public class Gzip extends CompressorAlgorithm {
 
     /**
      * Returns {@link GzipParameters} with the operating system, modification
@@ -139,5 +53,22 @@ public class Gzip extends AbstractAlgorithm {
             params.setFilename(filename);
         }
         return params;
+    }
+
+    @Override
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream,
+            CompressorOptions options) throws IOException {
+        GzipCompressorInputStream gcis = new GzipCompressorInputStream(stream);
+        options.setName(gcis.getMetaData().getFilename());
+        return gcis;
+    }
+
+    @Override
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream,
+            CompressorOptions options) throws IOException {
+        // set additional parameters for compressor stream
+        GzipParameters params = getDefaultGzipParams(options.getName());
+        params.setCompressionLevel(_compressionLevel);
+        return new GzipCompressorOutputStream(stream, params);
     }
 }

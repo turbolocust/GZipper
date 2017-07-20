@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
+import org.gzipper.java.application.algorithm.CompressionAlgorithm;
 
 /**
  * Object that represents an archiving operation.
@@ -44,7 +44,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * The algorithm that is used for either creating or extracting an archive.
      * It will be determined during the initialization of an object.
      */
-    private final ArchivingAlgorithm _algorithm;
+    private final CompressionAlgorithm _algorithm;
 
     /**
      * Describes what kind of operation shall be performed.
@@ -83,10 +83,10 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * {@link #_algorithm} for more information.
      *
      * @param info the {@link ArchiveInfo} to use for initialization.
-     * @return the determined {@link ArchivingAlgorithm} or {@code null} if it
+     * @return the determined {@link CompressionAlgorithm} or {@code null} if it
      * could not be determined.
      */
-    private ArchivingAlgorithm init(ArchiveInfo info) {
+    private CompressionAlgorithm init(ArchiveInfo info) {
         ArchiveType archiveType = info.getArchiveType();
         return archiveType.determineArchivingAlgorithm();
     }

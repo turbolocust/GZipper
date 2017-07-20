@@ -27,7 +27,7 @@ import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
-import org.gzipper.java.application.algorithm.AbstractAlgorithm;
+import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 
 /**
  *
@@ -35,7 +35,7 @@ import org.gzipper.java.application.algorithm.AbstractAlgorithm;
  *
  * @author Matthias Fussenegger
  */
-public class Tarball extends AbstractAlgorithm {
+public class Tarball extends ArchivingAlgorithm {
 
     /**
      * Constructs a new instance of this class using the TAR constant of

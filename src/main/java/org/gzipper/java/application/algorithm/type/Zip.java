@@ -28,14 +28,14 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.gzipper.java.application.algorithm.AbstractAlgorithm;
+import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 
 /**
  * Represents the ZIP archive type.
  *
  * @author Matthias Fussenegger
  */
-public class Zip extends AbstractAlgorithm {
+public class Zip extends ArchivingAlgorithm {
 
     /**
      * Constructs a new instance of this class using the ZIP constant of
