@@ -39,10 +39,6 @@ public class AlgorithmProgress {
      */
     private float _progressRint;
 
-    AlgorithmProgress(String fileName) {
-        this(new File(fileName));
-    }
-
     AlgorithmProgress(File... files) {
         setTotalSize(files);
     }

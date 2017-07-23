@@ -78,9 +78,9 @@ public abstract class AbstractAlgorithm implements CompressionAlgorithm {
      * @param readBytes the amount of bytes read so far.
      */
     protected void updateProgress(long readBytes) {
-        float progress = _algorithmProgress.getProgressRint(),
-                newProgress = _algorithmProgress.updateProgress(readBytes);
-        if (newProgress > progress) {
+        float progress = _algorithmProgress.getProgressRint();
+        float newProgress = _algorithmProgress.updateProgress(readBytes);
+        if (newProgress > progress && newProgress % 5 == 0) { // only show 5 percent steps
             Log.i(I18N.getString("progress.text"), Float.toString(newProgress), true);
         }
     }
