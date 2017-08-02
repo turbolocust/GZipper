@@ -28,7 +28,7 @@ public interface Notifier<T> {
      * Each notifier should provide a unique identifier so it can be easier
      * recognized by any listener.
      *
-     * This is mainly used to avoid recalculations using the {@link #hashCode()}
+     * This is mainly used to avoid recalculations using the {@code hashCode()}
      * method, which provides a hash code for this object.
      *
      * @return the unique identifier of this instance.
@@ -55,7 +55,7 @@ public interface Notifier<T> {
      *
      * To be more detailed, this default implementation first calls
      * {@link #setValue(java.lang.Object)}, then {@link #setChanged()} and last
-     * but not least {@link #notifyListeners(java.lang.Object)}.
+     * but not least {@link #notifyListeners()}.
      *
      * @param value the value to be changed.
      */
