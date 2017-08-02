@@ -83,57 +83,57 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
 
         File archive = new File(fullname);
         initAlgorithmProgress(archive);
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive));
-        CompressorInputStream cis = makeCompressorInputStream(bis);
 
-        try (ArchiveInputStream ais = cis != null
-                ? makeArchiveInputStream(cis)
-                : makeArchiveInputStream(bis)) {
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive))) {
+            try (CompressorInputStream cis = makeCompressorInputStream(bis)) {
+                try (ArchiveInputStream ais = cis != null
+                        ? makeArchiveInputStream(cis)
+                        : makeArchiveInputStream(bis)) {
 
-            ArchiveEntry entry = ais.getNextEntry();
+                    ArchiveEntry entry = ais.getNextEntry();
 
-            int startIndex = fullname.lastIndexOf(File.separator) + 1;
-            final File outputFolder = new File(location + fullname.substring(
-                    startIndex, fullname.indexOf('.', startIndex)));
+                    final int startIndex = fullname.lastIndexOf(File.separator) + 1;
+                    final File outputFolder = new File(location + fullname.substring(
+                            startIndex, fullname.indexOf('.', startIndex)));
 
-            if (!outputFolder.exists()) {
-                outputFolder.mkdir(); // create output folder of archive
-            }
-
-            while (!_interrupt && entry != null) {
-
-                final String entryName = entry.getName();
-                final File newFile = new File(outputFolder.getAbsolutePath()
-                        + File.separator + entryName);
-
-                // check if entry contains a directory
-                if (entryName.indexOf('/') > -1) {
-                    if (!newFile.getParentFile().exists()) {
-                        newFile.getParentFile().mkdirs(); // also creates parent directories
+                    if (!outputFolder.exists()) {
+                        outputFolder.mkdir(); // create output folder of archive
                     }
-                }
 
-                if (!entry.isDirectory()) {
-                    // create new output stream and write bytes to file
-                    try (BufferedOutputStream bos = new BufferedOutputStream(
-                            new FileOutputStream(newFile))) {
-                        final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                        int readBytes;
-                        while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
-                            bos.write(buffer, 0, readBytes);
-                            updateProgress(readBytes);
+                    while (!_interrupt && entry != null) {
+                        final String entryName = entry.getName();
+                        final File newFile = new File(outputFolder.getAbsolutePath()
+                                + File.separator + entryName);
+                        // check if entry contains a directory
+                        if (entryName.indexOf('/') > -1) {
+                            if (!newFile.getParentFile().exists()) {
+                                // also creates parent directories
+                                newFile.getParentFile().mkdirs();
+                            }
                         }
-                    } catch (IOException ex) {
+                        if (!entry.isDirectory()) {
+                            // create new output stream and write bytes to file
+                            try (BufferedOutputStream bos = new BufferedOutputStream(
+                                    new FileOutputStream(newFile))) {
+                                final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                                int readBytes;
+                                while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
+                                    bos.write(buffer, 0, readBytes);
+                                    updateProgress(readBytes);
+                                }
+                            } catch (IOException ex) {
+                                if (!_interrupt) {
+                                    Log.e(ex.getLocalizedMessage(), ex);
+                                    Log.e("{0}\n{1}", new Object[]{
+                                        I18N.getString("errorWritingFile.text"), newFile.getPath()
+                                    });
+                                }
+                            }
+                        }
                         if (!_interrupt) {
-                            Log.e(ex.getLocalizedMessage(), ex);
-                            Log.e("{0}\n{1}", new Object[]{
-                                I18N.getString("errorWritingFile.text"), newFile.getPath()
-                            });
+                            entry = ais.getNextEntry();
                         }
                     }
-                }
-                if (!_interrupt) {
-                    entry = ais.getNextEntry();
                 }
             }
         }
@@ -145,13 +145,15 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
 
         initAlgorithmProgress(files);
         String fullname = FileUtils.combinePathAndFilename(location, name);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname));
 
-        CompressorOutputStream cos = makeCompressorOutputStream(bos);
-        try (ArchiveOutputStream aos = cos != null
-                ? makeArchiveOutputStream(cos)
-                : makeArchiveOutputStream(bos)) {
-            compress(files, "", aos);
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname))) {
+            try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
+                try (ArchiveOutputStream aos = cos != null
+                        ? makeArchiveOutputStream(cos)
+                        : makeArchiveOutputStream(bos)) {
+                    compress(files, "", aos);
+                }
+            }
         }
     }
 
