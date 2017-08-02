@@ -17,6 +17,7 @@
 package org.gzipper.java.application.algorithm;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  *
@@ -35,11 +36,12 @@ public class AlgorithmProgress {
     private long _totalBytesRead;
 
     /**
-     * The progress as float that is equal to a mathematical integer.
+     * The current progress.
      */
-    private float _progressRint;
+    private double _progress;
 
     AlgorithmProgress(File... files) {
+        Objects.requireNonNull(files);
         setTotalSize(files);
     }
 
@@ -50,10 +52,8 @@ public class AlgorithmProgress {
      * @param files the files which are used to calculate {@link #_totalSize}.
      */
     private void setTotalSize(File... files) {
-        if (files != null && files.length > 0) {
-            for (File file : files) {
-                _totalSize += file.length();
-            }
+        for (File file : files) {
+            _totalSize += file.length();
         }
     }
 
@@ -62,24 +62,20 @@ public class AlgorithmProgress {
      *
      * @return the current progress.
      */
-    float getProgressRint() {
-        return _progressRint;
+    double getProgress() {
+        return _progress;
     }
 
     /**
      * Updates the current progress and returns it. The progress is only updated
-     * if a threshold has been exceeded. Otherwise the return parameter of this
-     * method is the same as of {@link #getProgressRint()}.
+     * if it is less or equal {@code 100d}.
      *
      * @param readBytes the amount of bytes read so far.
      * @return the current progress.
      */
-    float updateProgress(long readBytes) {
+    double updateProgress(long readBytes) {
         _totalBytesRead += readBytes;
-        float percentage = ((float) _totalBytesRead / (float) _totalSize) * 100;
-        if (Math.rint(percentage) > _progressRint && _progressRint < 100L) {
-            ++_progressRint;
-        }
-        return _progressRint;
+        double percentage = ((double) _totalBytesRead / (double) _totalSize) * 100;
+        return _progress <= 100d ? _progress = percentage : _progress;
     }
 }

@@ -17,6 +17,7 @@
 package org.gzipper.java.application;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
@@ -27,6 +28,7 @@ import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.application.algorithm.CompressionAlgorithm;
+import org.gzipper.java.application.observer.Listener;
 
 /**
  * Object that represents an archiving operation.
@@ -54,7 +56,12 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     /**
      * True if a request for interruption has been received.
      */
-    private boolean _interrupt;
+    private boolean _interrupt = false;
+
+    /**
+     * True if operation is completed, false otherwise.
+     */
+    private boolean _completed = false;
 
     /**
      * The elapsed time of the operation which will be stored after its end.
@@ -76,6 +83,38 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
         if ((_algorithm = init(info)) == null) {
             throw new GZipperException();
         }
+    }
+
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param info the {@link ArchiveInfo} to be aggregated.
+     * @param compressionMode the {@link CompressionMode} for this operation.
+     * @param listener listener to be attached with this algorithm instance.
+     * @throws org.gzipper.java.exceptions.GZipperException if determination of
+     * archiving algorithm has failed.
+     */
+    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
+            Listener<Double> listener) throws GZipperException {
+        this(info, compressionMode);
+        _algorithm.attach(listener);
+    }
+
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param info the {@link ArchiveInfo} to be aggregated.
+     * @param compressionMode the {@link CompressionMode} for this operation.
+     * @param listeners listeners to be attached with this algorithm instance.
+     * @throws org.gzipper.java.exceptions.GZipperException if determination of
+     * archiving algorithm has failed.
+     */
+    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
+            Set<Listener<Double>> listeners) throws GZipperException {
+        this(info, compressionMode);
+        listeners.forEach((listener) -> {
+            _algorithm.attach(listener);
+        });
     }
 
     /**
@@ -109,6 +148,15 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
         return _archiveInfo;
     }
 
+    /**
+     * Returns true if this operation is completed, false otherwise.
+     *
+     * @return true if this operation is completed, false otherwise.
+     */
+    public boolean isCompleted() {
+        return _completed;
+    }
+
     @Override
     public Boolean call() throws Exception {
         boolean success = false;
@@ -133,8 +181,12 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
                 }
             } catch (CompressorException | ArchiveException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
+                Log.w(I18N.getString("wrongFormat.text"), true);
+            } finally {
+                _elapsedTime = System.nanoTime() - startTime;
+                _completed = true;
+                _algorithm.clearListeners();
             }
-            _elapsedTime = System.nanoTime() - startTime;
         }
         return success;
     }
@@ -142,6 +194,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     @Override
     public void interrupt() {
         _interrupt = true;
+        _algorithm.clearListeners();
         _algorithm.interrupt();
     }
 }

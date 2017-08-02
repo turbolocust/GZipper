@@ -20,9 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.observer.NotifierImpl;
 import org.gzipper.java.application.pojo.ArchiveInfo;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.util.Log;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -31,7 +30,7 @@ import org.gzipper.java.util.Log;
  *
  * @author Matthias Fussenegger
  */
-public abstract class AbstractAlgorithm implements CompressionAlgorithm {
+public abstract class AbstractAlgorithm extends NotifierImpl<Double> implements CompressionAlgorithm {
 
     /**
      * True if this algorithm is performing an operation, false otherwise.
@@ -55,7 +54,7 @@ public abstract class AbstractAlgorithm implements CompressionAlgorithm {
      * @return an array of files from the specified path.
      * @throws IOException if an I/O error occurs.
      */
-    protected File[] getFiles(String path) throws IOException {
+    protected final File[] getFiles(String path) throws IOException {
         final File dir = new File(path);
         File[] files = dir.listFiles();
         return files;
@@ -66,22 +65,23 @@ public abstract class AbstractAlgorithm implements CompressionAlgorithm {
      *
      * @param files the files to be used for initialization.
      */
-    protected void initAlgorithmProgress(File... files) {
+    protected final void initAlgorithmProgress(File... files) {
         _algorithmProgress = new AlgorithmProgress(files);
     }
 
     /**
-     * Updates the progress of the current operation and logs an informational
-     * message to the UI if a threshold has been exceeded. This will prevent the
-     * UI from being flooded.
+     * Updates the progress of the current operation and notifies all attached
+     * listeners if the new progress using {@code Math.rint(double)} is greater
+     * than the previous one. This behavior may be changed by overriding this
+     * method.
      *
      * @param readBytes the amount of bytes read so far.
      */
     protected void updateProgress(long readBytes) {
-        float progress = _algorithmProgress.getProgressRint();
-        float newProgress = _algorithmProgress.updateProgress(readBytes);
-        if (newProgress > progress && newProgress % 5 == 0) { // only show 5 percent steps
-            Log.i(I18N.getString("progress.text"), Float.toString(newProgress), true);
+        final double progress = _algorithmProgress.getProgress();
+        double newProgress = _algorithmProgress.updateProgress(readBytes);
+        if (Math.rint(newProgress) > progress) {
+            changeValue(newProgress);
         }
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractAlgorithm implements CompressionAlgorithm {
     }
 
     @Override
-    public void interrupt() {
+    public final void interrupt() {
         _interrupt = true;
     }
 }

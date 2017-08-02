@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.concurrency.Interruptable;
+import org.gzipper.java.application.observer.Notifier;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 
 /**
@@ -29,10 +30,10 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
  *
  * @author Matthias Fussenegger
  */
-public interface CompressionAlgorithm extends Interruptable {
+public interface CompressionAlgorithm extends Interruptable, Notifier<Double> {
 
     /**
-     * The default size of the buffer.
+     * The default buffer size for chunks.
      */
     int DEFAULT_BUFFER_SIZE = 8192;
 
