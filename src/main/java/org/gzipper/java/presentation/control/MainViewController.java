@@ -45,6 +45,7 @@ import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.AlertDialog;
+import org.gzipper.java.presentation.Progress;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
@@ -216,9 +217,8 @@ public class MainViewController extends BaseController {
         Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
-            Log.i("{0}{1}", true,
-                    new Object[]{I18N.getString("compressionLevelChange.text"),
-                        selectedItem.getText()});
+            Log.i("{0}{1}", true, I18N.getString("compressionLevelChange.text"),
+                    selectedItem.getText());
         }
     }
 
@@ -254,7 +254,7 @@ public class MainViewController extends BaseController {
                     _selectedFiles.add(new File(filePath));
                     return filePath;
                 }).forEachOrdered((filePath) -> {
-                    Log.i("{0}: {1}", true, new Object[]{I18N.getString("fileSelected.text"), filePath});
+                    Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath);
                 });
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
@@ -318,7 +318,7 @@ public class MainViewController extends BaseController {
             if (_activeTasks != null && !_activeTasks.isEmpty()) {
                 _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
                         .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                    // log warning message when cancellation of task has failed
+                    // log warning message when cancellation failed
                     Log.e("Task cancellation failed for {0}", task.toString());
                 });
             }
@@ -356,9 +356,8 @@ public class MainViewController extends BaseController {
                 message = message.replace("{0}", Integer.toString(selectionCount));
                 // log the path of each selected file
                 selectedFiles.forEach((file) -> {
-                    Log.i("{0}: {1}", true,
-                            new Object[]{I18N.getString("fileSelected.text"),
-                                file.getAbsolutePath()});
+                    Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"),
+                            file.getAbsolutePath());
                 });
                 _selectedFiles = selectedFiles;
             } else {
@@ -491,28 +490,24 @@ public class MainViewController extends BaseController {
             final String infoText = I18N.getString("info.text");
             AlertDialog.showDialog(Alert.AlertType.INFORMATION, infoText, infoText,
                     I18N.getString("gzipCompressionInfo.text") + "\n\n"
-                    + I18N.getString("dialogWontShowAgain.text"), _theme);
+                    + I18N.getString("dialogWontShowAgain.text"),
+                    _theme);
             settings.setProperty(propertyKey, false);
         }
-        resetSelections();
+        if (_selectedFiles.size() > 1) {
+            resetSelections();
+        }
     }
 
     /**
-     * Toggles both, the start and the abort button.
+     * Toggles the start and abort button.
+     *
+     * @param start true to disable start button and enable abort button, false
+     * to enable start button and disable abort button.
      */
-    private void toggleStartAndAbortButton() {
-        // toggle start button
-        if (_startButton.isDisabled()) {
-            _startButton.setDisable(false);
-        } else {
-            _startButton.setDisable(true);
-        }
-        // toggle abort button
-        if (_abortButton.isDisabled()) {
-            _abortButton.setDisable(false);
-        } else {
-            _abortButton.setDisable(true);
-        }
+    private void toggleStartAbortButton(boolean start) {
+        _startButton.setDisable(start);
+        _abortButton.setDisable(!start);
     }
 
     /**
@@ -560,7 +555,7 @@ public class MainViewController extends BaseController {
      * archiving operation.
      */
     @SuppressWarnings("SleepWhileInLoop")
-    private Task<Boolean> initArchivingJob(ArchiveOperation operation) {
+    private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
@@ -576,31 +571,31 @@ public class MainViewController extends BaseController {
                         Log.w(ex.getLocalizedMessage(), false);
                         operation.interrupt();
                         if (futureTask.cancel(true)) {
-                            Log.i(I18N.getString("operationCancel.text"), true);
+                            Log.i(I18N.getString("operationCancel.text"), true, operation);
                         }
                     }
                 }
                 try { // check for cancellation
                     return futureTask.get();
                 } catch (CancellationException ex) {
-                    Log.w(ex.getLocalizedMessage(), false);
                     return false;
                 }
             }
         };
-        // show success message and finalize archiving job when task has succeeded
+        // show success message and finalize archiving job when task has
+        // succeeded
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
-                Log.i(I18N.getString("operationSuccess.text"), true);
+                Log.i(I18N.getString("operationSuccess.text"), true, operation);
             } else {
-                Log.w(I18N.getString("operationNoSuccess.text"), true);
+                Log.w(I18N.getString("operationNoSuccess.text"), true, operation);
             }
             finalizeArchivingJob(operation, task);
         });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
-            Log.i(I18N.getString("operationFail.text"), true);
+            Log.i(I18N.getString("operationFail.text"), true, operation);
             Throwable thrown = e.getSource().getException();
             if (thrown != null) {
                 Log.e(thrown.getLocalizedMessage(), thrown);
@@ -619,14 +614,14 @@ public class MainViewController extends BaseController {
      * @param task the task that will be removed from {@link #_activeTasks}.
      */
     private void finalizeArchivingJob(ArchiveOperation operation, Task<?> task) {
-        Log.i("{0}{1} seconds.", true,
-                new Object[]{I18N.getString("elapsedTime.text"), operation.calculateElapsedTime()});
+        Log.i(I18N.getString("elapsedTime.text"), true,
+                operation.calculateElapsedTime());
         _activeTasks.remove(task.toString());
         if (_activeTasks.isEmpty()) {
             _progressBar.setProgress(0d); // reset
             _progressText.setText(StringUtils.EMPTY);
+            toggleStartAbortButton(false);
         }
-        toggleStartAndAbortButton();
     }
 
     /**
@@ -695,13 +690,22 @@ public class MainViewController extends BaseController {
          * {@link Notifier}. Using the holder it is possible to avoid put
          * operations on the map if a mapping already exists.
          */
-        private final Map<Number, ProgressValueHolder> _progress = new HashMap<>();
+        private final Map<Number, ProgressValueHolder> _progressMap = new HashMap<>();
 
         /**
          * Converts percentage values to string objects. See method
          * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Double)}.
          */
         private final PercentageStringConverter _converter = new PercentageStringConverter();
+
+        /**
+         * Holds the current progress or {@code -1d}. The current progress is
+         * retrieved by the JavaFX thread to update the progress in the UI. A
+         * new task is only submitted to the JavaFX thread if the value is
+         * {@code -1d}. This avoids an unresponsive UI since the JavaFX thread
+         * is not flooded with new tasks.
+         */
+        private final Progress _progress = new Progress();
 
         /**
          * Validates the output path for the concrete strategy.
@@ -750,13 +754,13 @@ public class MainViewController extends BaseController {
             if (operation != null) {
                 Task<Boolean> task = initArchivingJob(operation);
                 ArchiveInfo info = operation.getArchiveInfo();
-                Log.i("{0}{1}", true, new Object[]{I18N.getString("outputPath.text"), info.getOutputPath()});
-                Log.i(I18N.getString("operationStarted.text"), true,
-                        new Object[]{info.getArchiveType().getDisplayName(), info.getOutputPath()});
+                Log.i("{0}{1}", true, I18N.getString("outputPath.text"), info.getOutputPath());
+                Log.i(I18N.getString("operationStarted.text"), true, operation,
+                        info.getArchiveType().getDisplayName(), info.getOutputPath());
                 _progressBar.visibleProperty().bind(task.runningProperty());
                 _progressText.visibleProperty().bind(task.runningProperty());
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
-                toggleStartAndAbortButton();
+                toggleStartAbortButton(true);
             }
         }
 
@@ -764,34 +768,35 @@ public class MainViewController extends BaseController {
         public synchronized void update(Notifier<Double> notifier, Double value) {
             if (value >= 100d) {
                 notifier.detach(this);
-                _progress.remove(notifier.getId());
+                _progressMap.remove(notifier.getId());
             } else {
                 final double totalProgress;
-                if (_progress.size() > 1) {
-                    ProgressValueHolder holder = _progress.get(notifier.getId());
+                if (_progressMap.size() > 1) {
+                    ProgressValueHolder holder = _progressMap.get(notifier.getId());
                     if (holder == null) { // put
                         holder = new ProgressValueHolder(value);
-                        _progress.put(notifier.getId(), holder);
+                        _progressMap.put(notifier.getId(), holder);
                     } else {
                         holder._progress = value;
                     }
 
                     double progress = 0d;
-                    for (ProgressValueHolder curHolder : _progress.values()) {
+                    for (ProgressValueHolder curHolder : _progressMap.values()) {
                         progress += curHolder._progress;
                     }
-                    progress /= _progress.size();
-                    totalProgress = progress / 100;
+                    progress /= _progressMap.size();
+                    totalProgress = progress / 100d;
                 } else {
-                    totalProgress = value / 100;
+                    totalProgress = value / 100d;
                 }
 
-                Platform.runLater(() -> { // execute on JavaFX thread
-                    if (totalProgress > _progressBar.getProgress()) {
-                        _progressBar.setProgress(totalProgress);
-                        _progressText.setText(_converter.toString(totalProgress));
-                    }
-                });
+                if (_progress.getAndSetProgress(totalProgress) == Progress.SENTINEL) {
+                    Platform.runLater(() -> { // execute on JavaFX thread
+                        double progress = _progress.getAndSetProgress(Progress.SENTINEL);
+                        _progressBar.setProgress(progress);
+                        _progressText.setText(_converter.toString(progress));
+                    });
+                }
             }
         }
 

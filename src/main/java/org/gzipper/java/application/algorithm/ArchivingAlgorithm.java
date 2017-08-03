@@ -124,9 +124,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                             } catch (IOException ex) {
                                 if (!_interrupt) {
                                     Log.e(ex.getLocalizedMessage(), ex);
-                                    Log.e("{0}\n{1}", new Object[]{
-                                        I18N.getString("errorWritingFile.text"), newFile.getPath()
-                                    });
+                                    Log.e("{0}\n{1}", 
+                                    		I18N.getString("errorWritingFile.text"), newFile.getPath()
+                                    );
                                 }
                             }
                         }
@@ -191,9 +191,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                     } catch (IOException ex) {
                         if (!_interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
-                            Log.e("{0}\n{1}", new Object[]{
+                            Log.e("{0}\n{1}", 
                                 I18N.getString("errorReadingFile.text"), newFile.getPath()
-                            });
+                            );
                         }
                     }
                 } else { // child is a directory
