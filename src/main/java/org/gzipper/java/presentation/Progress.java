@@ -30,17 +30,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * Technically this class provides the {@link #getAndSetProgress(double)} method
  * to get a new value while setting another one with the same call.
  * </p>
- * <p>
- * <b>Example:</b>
+ *
  * <blockquote><pre>
- * if (progress.getAndSetProgress(newValue) == Progress.SENTINEL) {
- *      Platform.runLater(() -> {
+ * <b>Example:</b>
+ *    if (progress.getAndSetProgress(newValue) == Progress.SENTINEL) {
+ *      Platform.runLater((){@literal ->} {
  *          double value = progress.getAndSetProgress(Progress.SENTINEL);
  *          // perform UI update
  *      });
- * }
+ *    }
  * </pre></blockquote>
- * </p>
  *
  * @author Matthias Fussenegger
  */
