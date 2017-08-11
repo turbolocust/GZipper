@@ -18,6 +18,7 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.util.Objects;
+import org.gzipper.java.application.util.FileUtils;
 
 /**
  *
@@ -53,7 +54,9 @@ public class AlgorithmProgress {
      */
     private void setTotalSize(File... files) {
         for (File file : files) {
-            _totalSize += file.length();
+            _totalSize += file.isDirectory()
+                    ? FileUtils.fileSizes(file.toPath())
+                    : file.length();
         }
     }
 

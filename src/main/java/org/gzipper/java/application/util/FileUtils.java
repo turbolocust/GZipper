@@ -19,10 +19,14 @@ package org.gzipper.java.application.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.CopyOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import org.gzipper.java.util.Log;
 
 /**
  * Utility class that provides methods for different kinds of file operations.
@@ -161,6 +165,45 @@ public final class FileUtils {
     }
 
     /**
+     * Traverses the specified path and returns the size of all children.
+     *
+     * @param path the path to be traversed.
+     * @return the size of all children.
+     */
+    public static long fileSizes(Path path) {
+
+        final SizeValueHolder holder = new SizeValueHolder(0);
+
+        try {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    holder._size = attrs.size();
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException ex) {
+                    Log.e(file + " skipped. Progress may be inaccurate.", ex);
+                    return FileVisitResult.CONTINUE; // skip folder if can't be traversed
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException ex) {
+                    if (ex != null) {
+                        Log.e(dir + " could not be traversed. Progress may be inaccurate.", ex);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException ex) {
+            throw new AssertionError(ex);
+        }
+
+        return holder._size;
+    }
+
+    /**
      * Generates a unique file name using the specified parameters.
      *
      * @param path the file path including only the directory.
@@ -199,5 +242,14 @@ public final class FileUtils {
         } while (FileUtils.isValidFile(uniqueFilename));
 
         return uniqueFilename;
+    }
+
+    private static class SizeValueHolder {
+
+        private long _size;
+
+        SizeValueHolder(long size) {
+            _size = size;
+        }
     }
 }
