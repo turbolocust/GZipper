@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
@@ -65,6 +67,11 @@ public class Zip extends ArchivingAlgorithm {
         zaos.setLevel(_compressionLevel);
         zaos.setUseZip64(Zip64Mode.AsNeeded);
         return zaos;
+    }
+
+    @Override
+    protected ArchiveInputStream makeArchiveInputStream(InputStream stream) throws ArchiveException {
+        return new ZipArchiveInputStream(stream, null, false, true);
     }
 
     @Override
