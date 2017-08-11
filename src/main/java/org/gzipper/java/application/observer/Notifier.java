@@ -89,7 +89,7 @@ public interface Notifier<T> {
     void clearChanged();
 
     /**
-     * Attaches a new listener.
+     * Attaches a new listener if it is not yet attached.
      *
      * @param listener the listener to be attached.
      */

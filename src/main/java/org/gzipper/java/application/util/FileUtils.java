@@ -185,7 +185,7 @@ public final class FileUtils {
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException ex) {
                     Log.e(file + " skipped. Progress may be inaccurate.", ex);
-                    return FileVisitResult.CONTINUE; // skip folder if can't be traversed
+                    return FileVisitResult.CONTINUE; // skip folder that can't be traversed
                 }
 
                 @Override

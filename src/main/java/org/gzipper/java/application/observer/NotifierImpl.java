@@ -90,7 +90,9 @@ public class NotifierImpl<T> implements Notifier<T> {
     @Override
     public final void attach(Listener<T> listener) {
         Objects.requireNonNull(listener);
-        _listeners.add(listener);
+        if (!_listeners.contains(listener)) {
+            _listeners.add(listener);
+        }
     }
 
     @Override

@@ -45,7 +45,7 @@ import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.AlertDialog;
-import org.gzipper.java.presentation.Progress;
+import org.gzipper.java.presentation.ProgressManager;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
@@ -686,26 +686,19 @@ public class MainViewController extends BaseController {
     private abstract class ArchivingStrategy implements Listener<Double> {
 
         /**
-         * Maps the progress using {@link ProgressValueHolder} of each
-         * {@link Notifier}. Using the holder it is possible to avoid put
-         * operations on the map if a mapping already exists.
+         * Holds the current progress or {@code -1d}. The current progress is
+         * retrieved by the JavaFX thread to update the progress in the UI. A
+         * new task is only submitted to the JavaFX thread if the value is
+         * {@code -1d}. This avoids an unresponsive UI since the JavaFX thread
+         * will not be flooded with new tasks.
          */
-        private final Map<Number, ProgressValueHolder> _progressMap = new HashMap<>();
+        private final ProgressManager _progressManager = new ProgressManager();
 
         /**
          * Converts percentage values to string objects. See method
          * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Double)}.
          */
         private final PercentageStringConverter _converter = new PercentageStringConverter();
-
-        /**
-         * Holds the current progress or {@code -1d}. The current progress is
-         * retrieved by the JavaFX thread to update the progress in the UI. A
-         * new task is only submitted to the JavaFX thread if the value is
-         * {@code -1d}. This avoids an unresponsive UI since the JavaFX thread
-         * is not flooded with new tasks.
-         */
-        private final Progress _progress = new Progress();
 
         /**
          * Validates the output path for the concrete strategy.
@@ -768,44 +761,19 @@ public class MainViewController extends BaseController {
         public synchronized void update(Notifier<Double> notifier, Double value) {
             if (value >= 100d) {
                 notifier.detach(this);
-                _progressMap.remove(notifier.getId());
             } else {
-                final double totalProgress;
-                if (_progressMap.size() > 1) {
-                    ProgressValueHolder holder = _progressMap.get(notifier.getId());
-                    if (holder == null) { // put
-                        holder = new ProgressValueHolder(value);
-                        _progressMap.put(notifier.getId(), holder);
-                    } else {
-                        holder._progress = value;
-                    }
-
-                    double progress = 0d;
-                    for (ProgressValueHolder curHolder : _progressMap.values()) {
-                        progress += curHolder._progress;
-                    }
-                    progress /= _progressMap.size();
-                    totalProgress = progress / 100d;
-                } else {
-                    totalProgress = value / 100d;
-                }
-
-                if (_progress.getAndSetProgress(totalProgress) == Progress.SENTINEL) {
-                    Platform.runLater(() -> { // execute on JavaFX thread
-                        double progress = _progress.getAndSetProgress(Progress.SENTINEL);
-                        _progressBar.setProgress(progress);
-                        _progressText.setText(_converter.toString(progress));
+                double progress = _progressManager.updateProgress(notifier.getId(), value);
+                // update progress and execute on JavaFX thread if it's not busy
+                if (_progressManager.getAndSetProgress(progress) == ProgressManager.SENTINEL) {
+                    Platform.runLater(() -> {
+                        double totalProgress = _progressManager
+                                .getAndSetProgress(ProgressManager.SENTINEL);
+                        if (totalProgress > _progressBar.getProgress()) {
+                            _progressBar.setProgress(totalProgress);
+                            _progressText.setText(_converter.toString(totalProgress));
+                        }
                     });
                 }
-            }
-        }
-
-        private class ProgressValueHolder {
-
-            private double _progress;
-
-            ProgressValueHolder(double progress) {
-                _progress = progress;
             }
         }
     }
