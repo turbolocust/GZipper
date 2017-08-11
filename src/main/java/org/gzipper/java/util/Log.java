@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.control.MainViewController;
+import org.gzipper.java.presentation.controller.MainViewController;
 
 /**
  * Convenience class for application wide logging.

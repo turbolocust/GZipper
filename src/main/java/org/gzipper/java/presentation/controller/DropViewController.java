@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation.control;
+package org.gzipper.java.presentation.controller;
 
 import java.net.URL;
 import java.util.LinkedHashSet;
