@@ -591,7 +591,7 @@ public class MainViewController extends BaseController {
             } else {
                 Log.w(I18N.getString("operationNoSuccess.text"), true, operation);
             }
-            finalizeArchivingJob(operation, task);
+            finishArchivingJob(operation, task);
         });
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
@@ -600,7 +600,7 @@ public class MainViewController extends BaseController {
             if (thrown != null) {
                 Log.e(thrown.getLocalizedMessage(), thrown);
             }
-            finalizeArchivingJob(operation, task);
+            finishArchivingJob(operation, task);
         });
         return task;
     }
@@ -613,7 +613,7 @@ public class MainViewController extends BaseController {
      * @param operation {@link ArchiveOperation} that holds elapsed time.
      * @param task the task that will be removed from {@link #_activeTasks}.
      */
-    private void finalizeArchivingJob(ArchiveOperation operation, Task<?> task) {
+    private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
         Log.i(I18N.getString("elapsedTime.text"), true,
                 operation.calculateElapsedTime());
         _activeTasks.remove(task.toString());
