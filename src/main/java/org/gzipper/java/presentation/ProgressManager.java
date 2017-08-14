@@ -21,14 +21,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Object that manages progress values and calculates the total progress on an
- * update. This object also holds the current progress or a sentinel value.
- * Besides the calculation of the total progress, the purpose of this class is
- * to provide a solution for the flooding of the UI thread, which can be caused
- * by many frequent updates of the progress value itself. With this solution,
- * the UI may only be updated if the current progress is set to the sentinel
- * value. The UI thread should then update the progress visually and reset the
- * progress value to the sentinel value.
+ * Manages progress values and calculates the total progress on an update. Also
+ * holds the current progress, which can be a sentinel value. Besides the
+ * calculation of the total progress, the purpose of this class is to provide a
+ * solution for the flooding of the UI thread, which can be caused by too many
+ * frequent updates of the progress value itself. With this solution, the UI may
+ * only be updated if the current progress is set to the sentinel value. The UI
+ * thread should then update the progress visually and reset the progress value
+ * to the sentinel value. Basically, this behavior is similar to a lock.
  *
  * <p>
  * To achieve the latter of the above explanation this class provides the
@@ -131,7 +131,7 @@ public class ProgressManager {
         return totalProgress;
     }
 
-    private class ProgressValueHolder {
+    private static class ProgressValueHolder {
 
         private double _progress;
 
