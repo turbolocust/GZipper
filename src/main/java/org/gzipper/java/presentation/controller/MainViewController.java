@@ -758,7 +758,7 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public synchronized void update(Notifier<Double> notifier, Double value) {
+        public void update(Notifier<Double> notifier, Double value) {
             if (value >= 100d) {
                 notifier.detach(this);
             } else {

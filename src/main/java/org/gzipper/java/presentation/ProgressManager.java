@@ -16,8 +16,8 @@
  */
 package org.gzipper.java.presentation;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -61,9 +61,9 @@ public class ProgressManager {
     private final AtomicLong _progress;
 
     /**
-     * Maps the progress using {@link ProgressValueHolder}.
+     * Maps progress values to identifiers (keys).
      */
-    private final Map<Number, ProgressValueHolder> _progressMap = new HashMap<>();
+    private final ConcurrentMap<Integer, Double> _progressMap = new ConcurrentHashMap<>();
 
     /**
      * Constructs a new instance of this class and initializes the progress with
@@ -96,47 +96,29 @@ public class ProgressManager {
     }
 
     /**
-     * Updates the progress with the specified identifier using the specified
-     * value and also calculates and then returns the total progress of all
-     * previously added identifiers. If an identifier does not yet exist it will
-     * be created and mapped to the specified value.
+     * Atomically updates the progress with the specified identifier using the
+     * specified value and also calculates and then returns the total progress
+     * of all previously added identifiers. If an identifier does not yet exist
+     * it will be created and mapped to the specified id.
      *
      * @param id the identifier for the progress.
      * @param value the updated progress value.
-     * @return the total progress of all stored progress identifiers.
+     * @return the total progress of all stored progress values.
      */
-    public double updateProgress(Number id, double value) {
-
-        double totalProgress;
-
-        if (_progressMap.size() > 1) {
-            ProgressValueHolder holder = _progressMap.get(id);
-            if (holder == null) { // put
-                holder = new ProgressValueHolder(value);
-                _progressMap.put(id, holder);
-            } else { // update
-                holder._progress = value;
-            }
-
-            double progress = 0d;
-            for (ProgressValueHolder curHolder : _progressMap.values()) {
-                progress += curHolder._progress;
-            }
-            progress /= _progressMap.size();
-            totalProgress = progress / 100d;
-        } else {
-            totalProgress = value / 100d;
-        }
-
-        return totalProgress;
+    public double updateProgress(Integer id, double value) {
+        return _progressMap.size() > 1
+                ? calculateProgress(id, value) : value / 100d;
     }
 
-    private static class ProgressValueHolder {
+    private double calculateProgress(Integer id, double value) {
+        _progressMap.merge(id, value, (oldValue, newValue) -> newValue);
 
-        private double _progress;
-
-        ProgressValueHolder(double progress) {
-            _progress = progress;
+        double totalProgress = 0d;
+        for (double progress : _progressMap.values()) {
+            totalProgress += progress;
         }
+        
+        totalProgress /= _progressMap.size();
+        return totalProgress / 100d;
     }
 }
