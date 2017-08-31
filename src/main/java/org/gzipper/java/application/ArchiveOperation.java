@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.concurrency.Interruptable;
-import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
@@ -130,8 +129,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     }
 
     private CompressionAlgorithm init(ArchiveInfo info) {
-        ArchiveType archiveType = info.getArchiveType();
-        return archiveType.determineArchivingAlgorithm();
+        return info.getArchiveType().getAlgorithm();
     }
 
     private void setElapsedTime() {

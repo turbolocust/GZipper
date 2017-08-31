@@ -26,12 +26,42 @@ import org.gzipper.java.application.algorithm.CompressionAlgorithm;
  */
 public enum ArchiveType {
 
-    ZIP("Zip", "ZIP", new String[]{"*.zip"}),
-    JAR("Jar", "JAR", new String[]{"*.jar"}),
-    GZIP("Gzip", "GZIP", new String[]{"*.gz", "*.gzip"}),
-    TAR_GZ("TarGz", "TAR+GZIP", new String[]{"*.tar.gz", "*.tar.gzip", "*.tgz"}),
-    TAR_BZ2("TarBz2", "TAR+BZIP2", new String[]{"*.tar.bz2", "*.tar.bzip2", "*.tbz2"}),
-    TAR_LZ("TarLz", "TAR+LZIP", new String[]{"*.tar.lz", "*.tar.lzip", "*.tar.lzma", "*.tlz"});
+    ZIP("Zip", "ZIP", new String[]{"*.zip"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new Zip();
+        }
+    },
+    JAR("Jar", "JAR", new String[]{"*.jar"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new Jar();
+        }
+    },
+    GZIP("Gzip", "GZIP", new String[]{"*.gz", "*.gzip"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new Gzip();
+        }
+    },
+    TAR_GZ("TarGz", "TAR+GZIP", new String[]{"*.tar.gz", "*.tar.gzip", "*.tgz"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new Tarball();
+        }
+    },
+    TAR_BZ2("TarBz2", "TAR+BZIP2", new String[]{"*.tar.bz2", "*.tar.bzip2", "*.tbz2"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new TarBzip2();
+        }
+    },
+    TAR_LZ("TarLz", "TAR+LZIP", new String[]{"*.tar.lz", "*.tar.lzip", "*.tar.lzma", "*.tlz"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new TarLzma();
+        }
+    };
 
     /**
      * The name of the archive type.
@@ -56,38 +86,11 @@ public enum ArchiveType {
     }
 
     /**
-     * Determines the correct {@link CompressionAlgorithm} to be used with this
-     * archive type.
+     * Returns the algorithm that belongs to this type.
      *
-     * @return the correct {@link CompressionAlgorithm} for this archive type.
+     * @return the algorithm that belongs to this type.
      */
-    public CompressionAlgorithm determineArchivingAlgorithm() {
-
-        final CompressionAlgorithm algorithm;
-        switch (this) {
-            case ZIP:
-                algorithm = new Zip();
-                break;
-            case JAR:
-                algorithm = new Jar();
-                break;
-            case GZIP:
-                algorithm = new Gzip();
-                break;
-            case TAR_GZ:
-                algorithm = new Tarball();
-                break;
-            case TAR_BZ2:
-                algorithm = new TarBzip2();
-                break;
-            case TAR_LZ:
-                algorithm = new TarLzma();
-                break;
-            default:
-                algorithm = null;
-        }
-        return algorithm;
-    }
+    public abstract CompressionAlgorithm getAlgorithm();
 
     /**
      * Returns the name of this archive type.

@@ -116,7 +116,7 @@ public final class FileUtils {
             return null;
         }
         // check if location ends with separator and add it if missing
-        String absolutePath = path.endsWith(File.separator)
+        final String absolutePath = path.endsWith(File.separator)
                 ? path
                 : path + File.separator;
         return absolutePath + file;
@@ -131,7 +131,7 @@ public final class FileUtils {
      */
     public static String getExtension(String filename) {
         int period = new File(filename).getName().indexOf('.');
-        return period > 0 ? filename.substring(period) : "";
+        return period > 0 ? filename.substring(period) : StringUtils.EMPTY;
     }
 
     /**
@@ -212,7 +212,7 @@ public final class FileUtils {
      * filename extension (if any).
      */
     public static String generateUniqueFilename(String path, String name) {
-        final String ext = name.contains(".") ? getExtension(name) : "";
+        final String ext = name.contains(".") ? getExtension(name) : StringUtils.EMPTY;
         return generateUniqueFilename(path, name, ext);
     }
 
