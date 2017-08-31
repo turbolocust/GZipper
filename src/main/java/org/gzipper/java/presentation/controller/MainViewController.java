@@ -99,10 +99,9 @@ public class MainViewController extends BaseController {
     private final Map<String, Future<?>> _activeTasks;
 
     /**
-     * The currently active strategy for archiving operations. This can either
-     * be a {@link CompressStrategy} or {@link DecompressStrategy}.
+     * The currently active state.
      */
-    private ArchivingStrategy _strategy;
+    private ArchivingState _state;
 
     /**
      * The output file or directory that has been selected by the user.
@@ -287,7 +286,7 @@ public class MainViewController extends BaseController {
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
             try {
-                if (_strategy.validateOutputPath()) {
+                if (_state.validateOutputPath()) {
                     final String outputPath = _outputPathTextField.getText();
                     if (!_outputFile.getAbsolutePath().equals(outputPath)) {
                         _outputFile = new File(outputPath);
@@ -297,11 +296,11 @@ public class MainViewController extends BaseController {
                     }
                     Settings.getInstance().setProperty("recentPath", outputPath);
                     ArchiveType archiveType = _archiveTypeComboBox.getValue();
-                    ArchiveOperation[] operations = _strategy.initOperation(archiveType);
+                    ArchiveOperation[] operations = _state.initOperation(archiveType);
                     for (ArchiveOperation operation : operations) {
                         Log.i("Operation started using the following archive info: {0}",
                                 operation.getArchiveInfo().toString(), false);
-                        _strategy.performOperation(operation);
+                        _state.performOperation(operation);
                     }
                 } else {
                     Log.w(I18N.getString("invalidOutputPath.text"), true);
@@ -334,7 +333,7 @@ public class MainViewController extends BaseController {
                 fc.setTitle(I18N.getString("browseForFiles.text"));
             } else {
                 fc.setTitle(I18N.getString("browseForArchive.text"));
-                _strategy.applyExtensionFilters(fc);
+                _state.applyExtensionFilters(fc);
             }
 
             List<File> selectedFiles = null;
@@ -376,7 +375,7 @@ public class MainViewController extends BaseController {
             if (_compressRadioButton.isSelected()) {
                 FileChooser fc = new FileChooser();
                 fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
-                _strategy.applyExtensionFilters(fc);
+                _state.applyExtensionFilters(fc);
                 file = fc.showSaveDialog(_primaryStage);
             } else {
                 DirectoryChooser dc = new DirectoryChooser();
@@ -466,7 +465,7 @@ public class MainViewController extends BaseController {
     /**
      * Called when the archiving mode has been changed via a radio button.
      *
-     * @param compress true for compress, false for decompress strategy.
+     * @param compress true for compress, false for decompress.
      * @param selectFilesButtonText text to display on the button which brings
      * up a dialog to select files or an archive.
      * @param saveAsButtonText text to display on the button which brings up the
@@ -474,7 +473,7 @@ public class MainViewController extends BaseController {
      */
     private void performModeRadioButtonAction(boolean compress,
             String selectFilesButtonText, String saveAsButtonText) {
-        _strategy = compress ? new CompressStrategy() : new DecompressStrategy();
+        _state = compress ? new CompressState() : new DecompressState();
         _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
         _saveAsButton.setText(I18N.getString(saveAsButtonText));
     }
@@ -673,17 +672,17 @@ public class MainViewController extends BaseController {
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
         _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
-        // set up strategy, frame image and the default text for the text area
-        _strategy = new CompressStrategy();
+        // set up initial state, frame image and the default text for the text area
+        _state = new CompressState();
         _frameImage = new Image("/images/icon_32.png");
         _textArea.setText("run:\n" + I18N.getString("changeOutputPath.text") + "\n");
     }
 
     /**
-     * Inner class that represents the currently active strategy. This can
-     * either be the {@link CompressStrategy} or {@link DecompressStrategy}.
+     * Inner class that represents the currently active state. This can either
+     * be the {@link CompressState} or {@link DecompressState}.
      */
-    private abstract class ArchivingStrategy implements Listener<Double> {
+    private abstract class ArchivingState implements Listener<Double> {
 
         /**
          * Holds the current progress or {@code -1d}. The current progress is
@@ -701,15 +700,14 @@ public class MainViewController extends BaseController {
         private final PercentageStringConverter _converter = new PercentageStringConverter();
 
         /**
-         * Validates the output path for the concrete strategy.
+         * Validates the output path.
          *
          * @return true if output path is valid, false otherwise.
          */
         abstract boolean validateOutputPath();
 
         /**
-         * Applies the required extension filters for the concrete strategy to
-         * the specified {@link FileChooser}.
+         * Applies the required extension filters to the specified file chooser.
          *
          * @param chooser the {@link FileChooser} to which the extension filters
          * will be applied to.
@@ -738,8 +736,7 @@ public class MainViewController extends BaseController {
         abstract ArchiveOperation[] initOperation(ArchiveType archiveType) throws GZipperException;
 
         /**
-         * Performs the specified {@link ArchiveOperation} using the concrete
-         * strategy.
+         * Performs the specified {@link ArchiveOperation}.
          *
          * @param operation the {@link ArchiveOperation} to be performed.
          */
@@ -778,10 +775,7 @@ public class MainViewController extends BaseController {
         }
     }
 
-    /**
-     * Strategy that will be used if user has activated the compression mode.
-     */
-    private class CompressStrategy extends ArchivingStrategy {
+    private class CompressState extends ArchivingState {
 
         @Override
         public boolean validateOutputPath() {
@@ -822,10 +816,7 @@ public class MainViewController extends BaseController {
         }
     }
 
-    /**
-     * Strategy that will be used if user has activated the decompression mode.
-     */
-    private class DecompressStrategy extends ArchivingStrategy {
+    private class DecompressState extends ArchivingState {
 
         @Override
         public boolean validateOutputPath() {
