@@ -56,7 +56,7 @@ public enum ArchiveType {
             return new TarBzip2();
         }
     },
-    TAR_LZ("TarLz", "TAR+LZIP", new String[]{"*.tar.lz", "*.tar.lzip", "*.tar.lzma", "*.tlz"}) {
+    TAR_LZ("TarLz", "TAR+LZMA", new String[]{"*.tar.lzma", "*.tar.lz", "*.tlz"}) {
         @Override
         public CompressionAlgorithm getAlgorithm() {
             return new TarLzma();
