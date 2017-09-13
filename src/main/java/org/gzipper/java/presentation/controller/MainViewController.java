@@ -294,7 +294,8 @@ public class MainViewController extends BaseController {
                             _archiveName = _outputFile.getName();
                         }
                     }
-                    Settings.getInstance().setProperty("recentPath", outputPath);
+                    String recentPath = FileUtils.getParent(outputPath);
+                    Settings.getInstance().setProperty("recentPath", recentPath);
                     ArchiveType archiveType = _archiveTypeComboBox.getValue();
                     ArchiveOperation[] operations = _state.initOperation(archiveType);
                     for (ArchiveOperation operation : operations) {

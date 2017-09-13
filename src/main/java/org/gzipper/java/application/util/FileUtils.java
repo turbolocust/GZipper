@@ -146,6 +146,19 @@ public final class FileUtils {
     }
 
     /**
+     * Returns the full name of the parent directory of the specified file name.
+     *
+     * @param filename the file name of which to receive the parent directory.
+     * @return the parent directory of the specified file name or an empty
+     * string if the specified file name does not have a parent.
+     */
+    public static String getParent(String filename) {
+        final File file = new File(filename);
+        String parent = file.getParent();
+        return parent != null ? parent : StringUtils.EMPTY;
+    }
+
+    /**
      * Copies a file from the specified source to destination. If no copy
      * options are specified, the file at the destination will not be replaced
      * in case it already exists.
