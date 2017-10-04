@@ -43,6 +43,17 @@ public final class I18N {
     }
 
     /**
+     * Returns the value that belongs to the specified key.
+     *
+     * @param key the key as string.
+     * @param args optional format arguments.
+     * @return the value that belongs to the key.
+     */
+    public static String getString(String key, Object... args) {
+        return String.format(getString(key), args);
+    }
+
+    /**
      * Returns the aggregated {@link ResourceBundle} used by this class.
      *
      * @return the aggregated {@link ResourceBundle} used by this class.
@@ -73,9 +84,7 @@ public final class I18N {
         return null;
     }
 
-    /**
-     * Holds static members only.
-     */
     private I18N() {
+        throw new AssertionError("Holds static members only.");
     }
 }
