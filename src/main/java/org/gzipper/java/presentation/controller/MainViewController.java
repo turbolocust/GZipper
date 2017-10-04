@@ -489,12 +489,11 @@ public class MainViewController extends BaseController {
         if (showDialog) {
             final String infoText = I18N.getString("info.text");
             AlertDialog.showDialog(Alert.AlertType.INFORMATION, infoText, infoText,
-                    I18N.getString("gzipCompressionInfo.text") + "\n\n"
-                    + I18N.getString("dialogWontShowAgain.text"),
-                    _theme);
+                    I18N.getString("gzipCompressionInfo.text", ArchiveType.TAR_GZ.getDisplayName())
+                    + "\n\n" + I18N.getString("dialogWontShowAgain.text"), _theme);
             settings.setProperty(propertyKey, false);
         }
-        if (_selectedFiles.size() > 1) {
+        if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
             resetSelections();
         }
     }
