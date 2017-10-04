@@ -24,9 +24,11 @@
    - `sudo apt-get install openjfx`
    
 <br /><br />
-For compression and decompression the commons-compress library by Apache Foundation is used.
-<br />Its source code and documentation can be found here: <a href>http://commons.apache.org/</a>
-<br /><br />
+For compression and decompression parts of the commons-compress library by Apache Foundation is used as well as 'XZ for Java' by Tukaani. Their source code and documentation can be found here: 
+  - <a href>http://commons.apache.org/</a>
+  - <a href>https://tukaani.org/</a>
+  
+<br />
 <b>This application requires at least Java 1.8.0_40 (Java 8 Update 40)</b>
 
 # Screenshots
