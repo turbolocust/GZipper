@@ -683,7 +683,7 @@ public class MainViewController extends BaseController {
      * Inner class that represents the currently active state. This can either
      * be the {@link CompressState} or {@link DecompressState}.
      */
-    private abstract class ArchivingState implements Listener<Double> {
+    private abstract class ArchivingState implements Listener<Integer> {
 
         /**
          * Holds the current progress or {@code -1d}. The current progress is
@@ -756,8 +756,8 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public void update(Notifier<Double> notifier, Double value) {
-            if (value >= 100d) {
+        public void update(Notifier<Integer> notifier, Integer value) {
+            if (value >= 100) {
                 notifier.detach(this);
             } else {
                 double progress = _progressManager.updateProgress(notifier.getId(), value);

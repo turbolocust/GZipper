@@ -36,11 +36,6 @@ public class AlgorithmProgress {
      */
     private long _totalBytesRead;
 
-    /**
-     * The current progress.
-     */
-    private double _progress;
-
     AlgorithmProgress(File... files) {
         Objects.requireNonNull(files);
         setTotalSize(files);
@@ -61,24 +56,31 @@ public class AlgorithmProgress {
     }
 
     /**
-     * Returns the current progress without modifying it.
+     * Returns the rounded progress.
      *
      * @return the current progress.
      */
-    double getProgress() {
-        return _progress;
+    int getProgress() {
+        return (int) Math.round(getProgressPrecise());
+    }
+
+    /**
+     * Returns the precise progress.
+     *
+     * @return the current progress.
+     */
+    double getProgressPrecise() {
+        return ((double) _totalBytesRead / _totalSize) * 100;
     }
 
     /**
      * Updates the current progress and returns it. The progress is only updated
-     * if it is less or equal {@code 100d}.
+     * if it is less or equal {@code 100}.
      *
      * @param readBytes the amount of bytes read so far.
      * @return the current progress.
      */
-    double updateProgress(long readBytes) {
+    void updateProgress(long readBytes) {
         _totalBytesRead += readBytes;
-        double percentage = ((double) _totalBytesRead / (double) _totalSize) * 100;
-        return _progress <= 100d ? _progress = percentage : _progress;
     }
 }

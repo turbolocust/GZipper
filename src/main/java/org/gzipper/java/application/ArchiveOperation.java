@@ -106,7 +106,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * archiving algorithm has failed.
      */
     public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
-            Listener<Double> listener) throws GZipperException {
+            Listener<Integer> listener) throws GZipperException {
         this(info, compressionMode);
         _algorithm.attach(listener);
     }
@@ -121,7 +121,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      * archiving algorithm has failed.
      */
     public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
-            Set<Listener<Double>> listeners) throws GZipperException {
+            Set<Listener<Integer>> listeners) throws GZipperException {
         this(info, compressionMode);
         listeners.forEach((listener) -> {
             _algorithm.attach(listener);

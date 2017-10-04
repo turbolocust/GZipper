@@ -30,7 +30,7 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
  *
  * @author Matthias Fussenegger
  */
-public interface CompressionAlgorithm extends Interruptable, Notifier<Double> {
+public interface CompressionAlgorithm extends Interruptable, Notifier<Integer> {
 
     /**
      * The default buffer size for chunks.

@@ -30,7 +30,7 @@ import org.gzipper.java.application.pojo.ArchiveInfo;
  *
  * @author Matthias Fussenegger
  */
-public abstract class AbstractAlgorithm extends NotifierImpl<Double> implements CompressionAlgorithm {
+public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements CompressionAlgorithm {
 
     /**
      * True if this algorithm is performing an operation, false otherwise.
@@ -78,11 +78,8 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Double> implements 
      * @param readBytes the amount of bytes read so far.
      */
     protected void updateProgress(long readBytes) {
-        final double progress = _algorithmProgress.getProgress();
-        double newProgress = _algorithmProgress.updateProgress(readBytes);
-        if (Math.rint(newProgress) > progress) {
-            changeValue(newProgress);
-        }
+        _algorithmProgress.updateProgress(readBytes);
+        changeValue(_algorithmProgress.getProgress());
     }
 
     @Override
