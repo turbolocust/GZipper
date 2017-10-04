@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.12-BETA</version>
+    <version>0.5.13-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -18,7 +18,7 @@
                 <!-- Maven dependency plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -54,7 +54,7 @@
                 <!-- Maven shade plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>shade</id>

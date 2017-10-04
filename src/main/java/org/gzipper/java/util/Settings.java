@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.gzipper.java.application.model.OperatingSystem;
+import org.gzipper.java.application.util.StringUtils;
 
 /**
  * Singleton that provides convenience when working with {@link Properties} and
@@ -89,7 +90,7 @@ public final class Settings {
         final Properties defaults = new Properties();
 
         defaults.setProperty("loggingEnabled", "false");
-        defaults.setProperty("recentPath", "");
+        defaults.setProperty("recentPath", StringUtils.EMPTY);
         defaults.setProperty("darkThemeEnabled", "false");
         defaults.setProperty("showGzipInfoDialog", "true");
 
