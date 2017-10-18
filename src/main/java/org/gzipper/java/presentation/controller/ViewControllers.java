@@ -47,8 +47,8 @@ public class ViewControllers {
     /**
      * Shows the about view in a separate window.
      *
-     * @param theme the theme to apply.
-     * @param hostServices the host services to aggregate.
+     * @param theme the theme to be applied.
+     * @param hostServices the host services to be aggregated.
      * @return the controller for the view.
      */
     static AboutViewController showAboutView(CSS.Theme theme, HostServices hostServices) {
@@ -79,7 +79,7 @@ public class ViewControllers {
     /**
      * Shows the drop view in a separate window.
      *
-     * @param theme the theme to apply.
+     * @param theme the theme to be applied.
      * @return the controller for the view.
      */
     static DropViewController showDropView(CSS.Theme theme) {
@@ -88,12 +88,13 @@ public class ViewControllers {
         fxmlLoader.setController(controller);
 
         final Stage dropView = new Stage();
+        dropView.setAlwaysOnTop(true);
         dropView.initModality(Modality.APPLICATION_MODAL);
         controller.setPrimaryStage(dropView);
 
         try {
             dropView.getIcons().add(BaseController._frameImage);
-            dropView.setTitle("Address Dropper");
+            dropView.setTitle("Address Dropper"); // no internationalization required
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {
@@ -120,8 +121,8 @@ public class ViewControllers {
      * Loads a scene by using the specified {@link FXMLLoader} and then applies
      * the correct theme.
      *
-     * @param loader the {@link FXMLLoader} to use.
-     * @param theme the CSS theme to apply.
+     * @param loader the {@link FXMLLoader} to be used.
+     * @param theme the CSS theme to be applied.
      * @return the loaded {@link Scene}.
      * @throws IOException if an I/O error occurs.
      */
