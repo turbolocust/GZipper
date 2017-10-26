@@ -1,6 +1,6 @@
 # GZipper
 
-<img href src="https://travis-ci.org/turbolocust/GZipper.svg?branch=master" alt="CI build passed"/>
+<a href="https://travis-ci.org/turbolocust/GZipper"><img href src="https://travis-ci.org/turbolocust/GZipper.svg?branch=master" alt="CI build passed"/></a>
 
 <b>Features:</b><br />
 
