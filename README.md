@@ -1,5 +1,7 @@
 # GZipper
 
+<img href src="https://travis-ci.org/turbolocust/GZipper.svg?branch=master" alt="CI build passed"/>
+
 <b>Features:</b><br />
 
 * Create and extract the following archive types:
