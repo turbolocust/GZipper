@@ -297,8 +297,7 @@ public class MainViewController extends BaseController {
                     String recentPath = FileUtils.getParent(outputPath);
                     Settings.getInstance().setProperty("recentPath", recentPath);
                     ArchiveType archiveType = _archiveTypeComboBox.getValue();
-                    ArchiveOperation[] operations = _state.initOperation(archiveType);
-                    for (ArchiveOperation operation : operations) {
+                    for (ArchiveOperation operation : _state.initOperation(archiveType)) {
                         Log.i("Operation started using the following archive info: {0}",
                                 operation.getArchiveInfo().toString(), false);
                         _state.performOperation(operation);
@@ -337,16 +336,7 @@ public class MainViewController extends BaseController {
                 _state.applyExtensionFilters(fc);
             }
 
-            List<File> selectedFiles = null;
-            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP) {
-                File selectedFile = fc.showOpenDialog(_primaryStage);
-                if (selectedFile != null) {
-                    selectedFiles = new ArrayList<>(1);
-                    selectedFiles.add(selectedFile);
-                }
-            } else {
-                selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
-            }
+            List<File> selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
 
             String message;
             if (selectedFiles != null) {
@@ -411,9 +401,7 @@ public class MainViewController extends BaseController {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
             ArchiveType type = _archiveTypeComboBox.getValue();
             Log.i("Archive type selection change to: {0}", type, false);
-            boolean isGzipType = type == ArchiveType.GZIP;
-            _dropAddressesMenuItem.setDisable(isGzipType);
-            if (isGzipType) {
+            if (type == ArchiveType.GZIP) {
                 performGzipSelectionAction();
             }
             if (_decompressRadioButton.isSelected()) {
@@ -492,9 +480,6 @@ public class MainViewController extends BaseController {
                     I18N.getString("gzipCompressionInfo.text", ArchiveType.TAR_GZ.getDisplayName())
                     + "\n\n" + I18N.getString("dialogWontShowAgain.text"), _theme);
             settings.setProperty(propertyKey, false);
-        }
-        if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
-            resetSelections();
         }
     }
 
@@ -729,11 +714,11 @@ public class MainViewController extends BaseController {
          * Initializes the archiving operation.
          *
          * @param archiveType the type of the archive, see {@link ArchiveType}.
-         * @return an array consisting of {@link ArchiveOperation} objects.
+         * @return list consisting of {@link ArchiveOperation}.
          * @throws GZipperException if the archive type could not have been
          * determined.
          */
-        abstract ArchiveOperation[] initOperation(ArchiveType archiveType) throws GZipperException;
+        abstract List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException;
 
         /**
          * Performs the specified {@link ArchiveOperation}.
@@ -807,12 +792,26 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation[] initOperation(ArchiveType archiveType)
+        public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {
-            ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                    _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
-            return new ArchiveOperation[]{new ArchiveOperation(info,
-                CompressionMode.COMPRESS, this)};
+            List<ArchiveOperation> operations;
+            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP) {
+                // put each file into a separate archive
+                operations = new ArrayList<>(_selectedFiles.size());
+                List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(
+                        archiveType, _archiveName, _compressionLevel,
+                        _selectedFiles, _outputFile.getParent());
+                for (int i = 0; i < infos.size(); ++i) {
+                    operations.add(new ArchiveOperation(
+                            infos.get(i), CompressionMode.COMPRESS, this));
+                }
+            } else {
+                operations = new ArrayList<>(1);
+                ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+                        _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
+                operations.add(new ArchiveOperation(info, CompressionMode.COMPRESS, this));
+            }
+            return operations;
         }
     }
 
@@ -835,16 +834,16 @@ public class MainViewController extends BaseController {
         }
 
         @Override
-        public ArchiveOperation[] initOperation(ArchiveType archiveType)
+        public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {
-            // array consisting of operations for each selected archive
-            ArchiveOperation[] operations = new ArchiveOperation[_selectedFiles.size()];
+            // list consisting of operations for each selected archive
+            List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
             // create new operation for each archive to be extracted
             for (int i = 0; i < _selectedFiles.size(); ++i) {
                 final File file = _selectedFiles.get(i);
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         file.getAbsolutePath(), _outputFile + File.separator);
-                operations[i] = new ArchiveOperation(info, CompressionMode.DECOMPRESS, this);
+                operations.add(new ArchiveOperation(info, CompressionMode.DECOMPRESS, this));
             }
             return operations;
         }

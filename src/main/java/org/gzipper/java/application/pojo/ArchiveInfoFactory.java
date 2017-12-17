@@ -17,9 +17,14 @@
 package org.gzipper.java.application.pojo;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.exceptions.GZipperException;
 
 /**
@@ -33,8 +38,8 @@ public final class ArchiveInfoFactory {
      * Creates a new {@link ArchiveInfo} for compression operation.
      *
      * @param archiveType the type of the archive, see {@link ArchiveType}.
+     * @param archiveName the name of the archive to be created.
      * @param level the compression level of the archive.
-     * @param archiveName the name of the archive to create.
      * @param files the files to be compressed.
      * @param outputPath the path where to save the archive.
      * @return {@link ArchiveInfo} that may be used for an operation.
@@ -67,10 +72,45 @@ public final class ArchiveInfoFactory {
     }
 
     /**
+     * Creates a new {@link ArchiveInfo} for compression operation. This will
+     * generate a unique archive name for each file provided.
+     *
+     * @param archiveType the type of the archive, see {@link ArchiveType}.
+     * @param archiveName the name of the archive to be created.
+     * @param level the compression level of the archive.
+     * @param files the files to be compressed.
+     * @param outputPath the path where to save the archive.
+     * @return List consisting of {@link ArchiveInfo} objects.
+     * @throws GZipperException if archive type could not be determined.
+     */
+    public static List<ArchiveInfo> createArchiveInfos(ArchiveType archiveType, String archiveName,
+            int level, List<File> files, String outputPath) throws GZipperException {
+        List<ArchiveInfo> infos = new ArrayList<>(files.size());
+        List<File> fileList; // used to be compatible with API
+        Set<String> names = new HashSet<>(); // to avoid name collisions
+        String name; // holds the name of the archive
+        int nameSuffix = -1; // will be appended if necessary
+        for (File next : files) {
+            fileList = new LinkedList<>();
+            fileList.add(next);
+            do {
+                ++nameSuffix;
+                name = new File(FileUtils.generateUniqueFilename(
+                        outputPath, archiveName, nameSuffix)).getName();
+            } while (names.contains(name));
+            names.add(name);
+            ArchiveInfo info = createArchiveInfo(
+                    archiveType, name, level, fileList, outputPath);
+            infos.add(info);
+        }
+        return infos;
+    }
+
+    /**
      * Creates a new {@link ArchiveInfo} for decompression operation.
      *
      * @param archiveType the type of the archive, see {@link ArchiveType}.
-     * @param archiveName the name of the archive to extract.
+     * @param archiveName the name of the archive to be extracted.
      * @param outputPath the path where to extract the archive.
      * @return {@link ArchiveInfo} that may be used for an operation.
      * @throws GZipperException if archive type could not be determined.

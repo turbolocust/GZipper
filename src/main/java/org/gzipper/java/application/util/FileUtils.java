@@ -225,8 +225,25 @@ public final class FileUtils {
      * filename extension (if any).
      */
     public static String generateUniqueFilename(String path, String name) {
-        final String ext = name.contains(".") ? getExtension(name) : StringUtils.EMPTY;
-        return generateUniqueFilename(path, name, ext);
+        return generateUniqueFilename(path, name, 1);
+    }
+
+    /**
+     * Generates a unique file name using the specified parameters.
+     *
+     * @param path the file path including only the directory.
+     * @param name the name of the file of which to generate a unique version.
+     * @param beginSuffix the suffix to begin with (will be incremented).
+     * @return a unique filename that consists of the path, name, suffix and
+     * filename extension (if any).
+     */
+    public static String generateUniqueFilename(String path, String name, int beginSuffix) {
+        final String ext = name.contains(".")
+                ? getExtension(name) : StringUtils.EMPTY;
+        if (!ext.isEmpty()) {
+            name = getDisplayName(name);
+        }
+        return generateUniqueFilename(path, name, ext, beginSuffix);
     }
 
     /**
@@ -239,17 +256,39 @@ public final class FileUtils {
      * filename extension.
      */
     public static String generateUniqueFilename(String path, String name, String ext) {
+        return generateUniqueFilename(path, name, ext, 1);
+    }
+
+    /**
+     * Generates a unique file name using the specified parameters.
+     *
+     * @param path the file path including only the directory.
+     * @param name the name of the file of which to generate a unique version.
+     * @param ext the name of the file extension.
+     * @param beginSuffix the suffix to begin with (will be incremented). This
+     * parameter will be ignored if its value is less or equal zero.
+     * @return a unique filename that consists of the path, name, suffix and
+     * filename extension.
+     */
+    public static String generateUniqueFilename(String path, String name, String ext, int beginSuffix) {
         String uniqueFilename;
-        int suffix = 0; // will be appended to file name
+        int suffix = beginSuffix > 0 ? beginSuffix : 1; // will be appended
+        boolean isFirst = true; // to ignore suffix on first check
         final StringBuilder filename = new StringBuilder();
 
         if (ext.startsWith("*")) { // ignore asterisk if any
             ext = ext.substring(1);
         }
 
-        do {
-            ++suffix;
-            filename.append(name).append(suffix).append(ext);
+        do { // as long as file exists
+            if (isFirst && beginSuffix <= 0) {
+                filename.append(name).append(ext);
+                isFirst = false;
+            } else {
+                filename.append(name).append(suffix).append(ext);
+                ++suffix;
+                isFirst = false;
+            }
             uniqueFilename = FileUtils.combinePathAndFilename(path, filename.toString());
             filename.setLength(0); // clear
         } while (FileUtils.isValidFile(uniqueFilename));
