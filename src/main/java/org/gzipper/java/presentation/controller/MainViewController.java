@@ -128,70 +128,70 @@ public class MainViewController extends BaseController {
      * The compression level. Initialized with default compression level.
      */
     private int _compressionLevel;
-
+    
     @FXML
     private MenuItem _noCompressionMenuItem;
-
+    
     @FXML
     private MenuItem _bestSpeedCompressionMenuItem;
-
+    
     @FXML
     private MenuItem _defaultCompressionMenuItem;
-
+    
     @FXML
     private MenuItem _bestCompressionMenuItem;
-
+    
     @FXML
     private MenuItem _closeMenuItem;
-
+    
     @FXML
     private MenuItem _deleteMenuItem;
-
+    
     @FXML
     private MenuItem _dropAddressesMenuItem;
-
+    
     @FXML
     private MenuItem _resetAppMenuItem;
-
+    
     @FXML
     private MenuItem _aboutMenuItem;
-
+    
     @FXML
     private RadioButton _compressRadioButton;
-
+    
     @FXML
     private RadioButton _decompressRadioButton;
-
+    
     @FXML
     private TextArea _textArea;
-
+    
     @FXML
     private CheckMenuItem _enableLoggingCheckMenuItem;
-
+    
     @FXML
     private CheckMenuItem _enableDarkThemeCheckMenuItem;
-
+    
     @FXML
     private TextField _outputPathTextField;
-
+    
     @FXML
     private ComboBox<ArchiveType> _archiveTypeComboBox;
-
+    
     @FXML
     private Button _startButton;
-
+    
     @FXML
     private Button _abortButton;
-
+    
     @FXML
     private Button _selectFilesButton;
-
+    
     @FXML
     private Button _saveAsButton;
-
+    
     @FXML
     private ProgressBar _progressBar;
-
+    
     @FXML
     private Text _progressText;
 
@@ -210,6 +210,19 @@ public class MainViewController extends BaseController {
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 
+    /**
+     * Cancels all currently active tasks.
+     */
+    public void cancelActiveTasks() {
+        if (_activeTasks != null && !_activeTasks.isEmpty()) {
+            _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
+                    .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
+                // log warning message when cancellation failed
+                Log.e("Task cancellation failed for {0}", task.toString());
+            });
+        }
+    }
+    
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
@@ -220,14 +233,15 @@ public class MainViewController extends BaseController {
                     selectedItem.getText());
         }
     }
-
+    
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
+            cancelActiveTasks();
             exit();
         }
     }
-
+    
     @FXML
     void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
@@ -241,7 +255,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleDropAddressesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_dropAddressesMenuItem)) {
@@ -261,7 +275,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleResetAppMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_resetAppMenuItem)) {
@@ -274,14 +288,14 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
             ViewControllers.showAboutView(_theme, _hostServices);
         }
     }
-
+    
     @FXML
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
@@ -310,24 +324,18 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            if (_activeTasks != null && !_activeTasks.isEmpty()) {
-                _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
-                        .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                    // log warning message when cancellation failed
-                    Log.e("Task cancellation failed for {0}", task.toString());
-                });
-            }
+            cancelActiveTasks();
         }
     }
-
+    
     @FXML
     void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
-
+            
             FileChooser fc = new FileChooser();
             if (_compressRadioButton.isSelected()) {
                 fc.setTitle(I18N.getString("browseForFiles.text"));
@@ -335,9 +343,9 @@ public class MainViewController extends BaseController {
                 fc.setTitle(I18N.getString("browseForArchive.text"));
                 _state.applyExtensionFilters(fc);
             }
-
+            
             List<File> selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
-
+            
             String message;
             if (selectedFiles != null) {
                 _startButton.setDisable(false);
@@ -357,11 +365,11 @@ public class MainViewController extends BaseController {
             Log.i(message, true);
         }
     }
-
+    
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
-
+            
             final File file;
             if (_compressRadioButton.isSelected()) {
                 FileChooser fc = new FileChooser();
@@ -373,7 +381,7 @@ public class MainViewController extends BaseController {
                 dc.setTitle(I18N.getString("saveAsPathTitle.text"));
                 file = dc.showDialog(_primaryStage);
             }
-
+            
             if (file != null) {
                 updateSelectedFile(file);
                 String absolutePath = file.getAbsolutePath();
@@ -385,7 +393,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleModeRadioButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_compressRadioButton)) {
@@ -395,7 +403,7 @@ public class MainViewController extends BaseController {
         }
         resetSelections();
     }
-
+    
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
@@ -422,7 +430,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
@@ -432,7 +440,7 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     @FXML
     void handleEnableLoggingCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
@@ -441,7 +449,7 @@ public class MainViewController extends BaseController {
             Log.setVerboseUiLogging(enableLogging);
         }
     }
-
+    
     @FXML
     void handleEnableDarkThemeCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableDarkThemeCheckMenuItem)) {
@@ -484,14 +492,19 @@ public class MainViewController extends BaseController {
     }
 
     /**
-     * Toggles the start and abort button.
+     * Toggles UI controls which react to user input.
      *
-     * @param start true to disable start button and enable abort button, false
-     * to enable start button and disable abort button.
+     * @param start true to disable controls, false to enable them.
      */
-    private void toggleStartAbortButton(boolean start) {
+    private void toggleUIcontrols(boolean start) {
         _startButton.setDisable(start);
         _abortButton.setDisable(!start);
+        _compressRadioButton.setDisable(start);
+        _decompressRadioButton.setDisable(start);
+        _archiveTypeComboBox.setDisable(start);
+        _saveAsButton.setDisable(start);
+        _selectFilesButton.setDisable(start);
+        _dropAddressesMenuItem.setDisable(start);
     }
 
     /**
@@ -543,9 +556,9 @@ public class MainViewController extends BaseController {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
-
+                
                 Future<Boolean> futureTask = TaskHandler.submit(operation);
-
+                
                 while (!futureTask.isDone()) {
                     try {
                         Thread.sleep(10); // check for interruption
@@ -604,7 +617,7 @@ public class MainViewController extends BaseController {
         if (_activeTasks.isEmpty()) {
             _progressBar.setProgress(0d); // reset
             _progressText.setText(StringUtils.EMPTY);
-            toggleStartAbortButton(false);
+            toggleUIcontrols(false);
         }
     }
 
@@ -618,12 +631,12 @@ public class MainViewController extends BaseController {
         logger.setUseParentHandlers(false);
         logger.addHandler(handler);
     }
-
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Settings settings = Settings.getInstance();
         OperatingSystem os = settings.getOs();
-
+        
         initLogger();
 
         // set recently used path from settings if valid
@@ -735,10 +748,10 @@ public class MainViewController extends BaseController {
                 _progressBar.visibleProperty().bind(task.runningProperty());
                 _progressText.visibleProperty().bind(task.runningProperty());
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
-                toggleStartAbortButton(true);
+                toggleUIcontrols(true);
             }
         }
-
+        
         @Override
         public void update(Notifier<Integer> notifier, Integer value) {
             if (value >= 100) {
@@ -759,15 +772,15 @@ public class MainViewController extends BaseController {
             }
         }
     }
-
+    
     private class CompressState extends ArchivingState {
-
+        
         @Override
         public boolean validateOutputPath() {
-
+            
             String outputPath = _outputPathTextField.getText();
             String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
-
+            
             if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
                 outputPath = FileUtils.generateUniqueFilename(outputPath,
@@ -780,7 +793,7 @@ public class MainViewController extends BaseController {
             }
             return false;
         }
-
+        
         @Override
         public void performOperation(ArchiveOperation operation) {
             if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
@@ -790,7 +803,7 @@ public class MainViewController extends BaseController {
                 Log.i(I18N.getString("noFilesSelectedWarning.text"), true);
             }
         }
-
+        
         @Override
         public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {
@@ -814,14 +827,14 @@ public class MainViewController extends BaseController {
             return operations;
         }
     }
-
+    
     private class DecompressState extends ArchivingState {
-
+        
         @Override
         public boolean validateOutputPath() {
             return FileUtils.isValidDirectory(_outputPathTextField.getText());
         }
-
+        
         @Override
         public void performOperation(ArchiveOperation operation) {
             if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
@@ -832,7 +845,7 @@ public class MainViewController extends BaseController {
                 _outputPathTextField.requestFocus();
             }
         }
-
+        
         @Override
         public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {

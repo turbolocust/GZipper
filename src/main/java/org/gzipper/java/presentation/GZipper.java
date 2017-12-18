@@ -69,7 +69,7 @@ public class GZipper extends Application {
                 ? CSS.Theme.DARK_THEME : CSS.Theme.MODENA;
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
-        BaseController controller = new MainViewController(theme, getHostServices());
+        MainViewController controller = new MainViewController(theme, getHostServices());
 
         fxmlLoader.setResources(ResourceBundle.getBundle("i18n/gzipperMainView"));
         fxmlLoader.setController(controller);
@@ -85,6 +85,7 @@ public class GZipper extends Application {
         // properly shut down application when closing window
         stage.setOnCloseRequest((WindowEvent evt) -> {
             evt.consume();
+            controller.cancelActiveTasks();
             Platform.exit();
             System.exit(0);
         });
