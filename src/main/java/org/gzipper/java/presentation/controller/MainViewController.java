@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -259,16 +259,26 @@ public class MainViewController extends BaseController {
     @FXML
     void handleDropAddressesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_dropAddressesMenuItem)) {
-            List<String> filePaths = ViewControllers.showDropView(_theme).getAddresses();
+            final List<String> filePaths = ViewControllers
+                    .showDropView(_theme).getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
-                _selectedFiles = new ArrayList<>(filePaths.size());
+                final int size = filePaths.size();
+                _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
-                filePaths.stream().map((filePath) -> {
-                    _selectedFiles.add(new File(filePath));
-                    return filePath;
-                }).forEachOrdered((filePath) -> {
-                    Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath);
-                });
+
+                if (size > 10) { // threshold, to avoid flooding text area
+                    filePaths.forEach((filePath) -> {
+                        _selectedFiles.add(new File(filePath));
+                    });
+                    Log.i(I18N.getString("manyFilesSelected.text"), true, size);
+                } else { // log files in detail
+                    filePaths.stream().map((filePath) -> {
+                        _selectedFiles.add(new File(filePath));
+                        return filePath;
+                    }).forEachOrdered((filePath) -> {
+                        Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath);
+                    });
+                }
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
                 _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
