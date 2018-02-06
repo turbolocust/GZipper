@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.16-BETA</version>
+    <version>0.5.17-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -86,7 +86,7 @@
             <!-- XZ for Java -->
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
-            <version>1.6</version>
+            <version>1.8</version>
         </dependency>
     </dependencies>
     <properties>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,37 +49,37 @@ public class AboutViewController extends BaseController {
     /**
      * The name of the image to be displayed in the about view.
      */
-    private final static String IMG_NAME = "images/icon_256.png";
+    private static final String IMG_NAME = "images/icon_256.png";
+
+    /**
+     * The name of this application.
+     */
+    private static final String APP_NAME = "GZipper";
+
+    /**
+     * The version of this application.
+     */
+    private static final String APP_VERSION = "0.5.17 BETA";
+
+    /**
+     * The build date of this application.
+     */
+    private static final String APP_BUILD_DATE = "02/06/2018";
+
+    /**
+     * The author of this application.
+     */
+    private static final String APP_COPYRIGHT = "Matthias Fussenegger";
+
+    /**
+     * The home page of this project.
+     */
+    private static final String APP_HOME_PAGE = "https://github.com/turbolocust/GZipper";
 
     /**
      * The image file as a static reference in case it has already been loaded.
      */
     private static File _imageFile;
-
-    /**
-     * The name of this application.
-     */
-    private final String _appName = "GZipper";
-
-    /**
-     * The version of this application.
-     */
-    private final String _appVersion = "0.5.16 BETA";
-
-    /**
-     * The build date of this application.
-     */
-    private final String _appBuildDate = "12/18/2017";
-
-    /**
-     * The author of this application.
-     */
-    private final String _appCopyright = "Matthias Fussenegger";
-
-    /**
-     * The home page of this project.
-     */
-    private final String _appHomePage = "https://github.com/turbolocust/GZipper";
 
     @FXML
     private ImageView _imageView;
@@ -131,27 +131,27 @@ public class AboutViewController extends BaseController {
 
         _imageView.setImage(new Image(_imageFile.toURI().toString()));
 
-        final Text appName = new Text(_appName + "\n"),
+        final Text appName = new Text(APP_NAME + "\n"),
                 appVersion = new Text(
                         "Version"
                         + ": "
-                        + _appVersion
+                        + APP_VERSION
                         + "\n"),
                 appBuildDate = new Text(
                         resources.getString("buildDate.text")
                         + ": "
-                        + _appBuildDate
+                        + APP_BUILD_DATE
                         + "\n"),
                 appCopyright = new Text(
                         resources.getString("author.text")
                         + ": "
-                        + _appCopyright
+                        + APP_COPYRIGHT
                         + "\n\r"),
                 appLicense = new Text(
                         resources.getString("license.text")
                         + "\n\r");
 
-        final Hyperlink appHomePage = new Hyperlink(_appHomePage);
+        final Hyperlink appHomePage = new Hyperlink(APP_HOME_PAGE);
         appHomePage.setId("aboutViewAppHomePage");
         appHomePage.setOnAction((ActionEvent evt) -> {
             if (evt.getSource().equals(appHomePage)) {
