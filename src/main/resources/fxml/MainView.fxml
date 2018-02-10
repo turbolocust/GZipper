@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 34em; -fx-pref-width: 52em;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 34em; -fx-pref-width: 52em;" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane fx:id="_borderPane" layoutX="146.0" layoutY="85.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <bottom>
@@ -85,6 +85,11 @@
                                                 <MenuItem fx:id="_bestCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestCompression.text" />
                                             </items>
                                         </Menu>
+                              <MenuItem fx:id="_applyFilterMenuItem" mnemonicParsing="false" onAction="#handleApplyFilterMenuItemAction" text="%applyFilterMenuItem.text">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                 </accelerator>
+                              </MenuItem>
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableLoggingCheckMenuItemAction" text="%enableLoggingMenuItem.text" />
                                         <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />

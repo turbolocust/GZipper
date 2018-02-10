@@ -33,6 +33,11 @@ import org.gzipper.java.presentation.style.CSS;
 public abstract class BaseController implements Initializable {
 
     /**
+     * The default archive name of an archive if not explicitly specified.
+     */
+    protected static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
+
+    /**
      * A set with all the stages currently open.
      */
     private static Set<Stage> _stages = new HashSet<>();
@@ -42,12 +47,12 @@ public abstract class BaseController implements Initializable {
     }
 
     /**
-     * The frame image used for each scene.
+     * The icon image used for each stage.
      */
-    protected static Image _frameImage;
+    protected static Image _iconImage;
 
-    public static Image getFrameImage() {
-        return _frameImage;
+    public static Image getIconImage() {
+        return _iconImage;
     }
 
     /**

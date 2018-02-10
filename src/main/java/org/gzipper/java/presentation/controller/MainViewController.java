@@ -27,8 +27,10 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 
 import org.gzipper.java.application.ArchiveOperation;
@@ -44,7 +46,7 @@ import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.AlertDialog;
+import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.ProgressManager;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.presentation.style.CSS;
@@ -73,6 +75,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.converter.PercentageStringConverter;
+import org.gzipper.java.application.predicates.PatternPredicate;
 import org.gzipper.java.application.util.StringUtils;
 
 /**
@@ -86,11 +89,6 @@ public class MainViewController extends BaseController {
      * Key constant used to access the properties map for menu items.
      */
     private static final String COMPRESSION_LEVEL_KEY = "compressionLevel";
-
-    /**
-     * The default archive name of an archive if not explicitly specified.
-     */
-    private static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
 
     /**
      * Map consisting of {@link Future} objects representing the currently
@@ -128,6 +126,9 @@ public class MainViewController extends BaseController {
      * The compression level. Initialized with default compression level.
      */
     private int _compressionLevel;
+
+    @FXML
+    private MenuItem _applyFilterMenuItem;
 
     @FXML
     private MenuItem _noCompressionMenuItem;
@@ -224,6 +225,23 @@ public class MainViewController extends BaseController {
     }
 
     @FXML
+    void handleApplyFilterMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_applyFilterMenuItem)) {
+            Optional<String> result = Dialogs.showPatternInputDialog(_theme, getIconImage());
+            if (result.isPresent()) {
+                if (!result.get().isEmpty()) {
+                    final Pattern pattern = Pattern.compile(result.get());
+                    _state.setFilterPredicate(new PatternPredicate(pattern));
+                    Log.i(I18N.getString("filterApplied.text", result.get()), true);
+                } else { // reset filter
+                    _state.setFilterPredicate(null);
+                    Log.i(I18N.getString("filterReset.text", result.get()), true);
+                }
+            }
+        }
+    }
+
+    @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
         Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
@@ -245,10 +263,10 @@ public class MainViewController extends BaseController {
     @FXML
     void handleDeleteMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_deleteMenuItem)) {
-            final Optional<ButtonType> result = AlertDialog
+            final Optional<ButtonType> result = Dialogs
                     .showConfirmationDialog(I18N.getString("clearText.text"),
                             I18N.getString("clearTextConfirmation.text"),
-                            I18N.getString("confirmation.text"), _theme);
+                            I18N.getString("confirmation.text"), _theme, getIconImage());
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -289,10 +307,10 @@ public class MainViewController extends BaseController {
     @FXML
     void handleResetAppMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_resetAppMenuItem)) {
-            final Optional<ButtonType> result = AlertDialog
+            final Optional<ButtonType> result = Dialogs
                     .showConfirmationDialog(I18N.getString("resetApp.text"),
                             I18N.getString("resetAppConfirmation.text"),
-                            I18N.getString("confirmation.text"), _theme);
+                            I18N.getString("confirmation.text"), _theme, getIconImage());
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 Settings.getInstance().restoreDefaults();
             }
@@ -346,7 +364,7 @@ public class MainViewController extends BaseController {
     void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
 
-            FileChooser fc = new FileChooser();
+            final FileChooser fc = new FileChooser();
             if (_compressRadioButton.isSelected()) {
                 fc.setTitle(I18N.getString("browseForFiles.text"));
             } else {
@@ -382,12 +400,12 @@ public class MainViewController extends BaseController {
 
             final File file;
             if (_compressRadioButton.isSelected()) {
-                FileChooser fc = new FileChooser();
+                final FileChooser fc = new FileChooser();
                 fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
                 _state.applyExtensionFilters(fc);
                 file = fc.showSaveDialog(_primaryStage);
             } else {
-                DirectoryChooser dc = new DirectoryChooser();
+                final DirectoryChooser dc = new DirectoryChooser();
                 dc.setTitle(I18N.getString("saveAsPathTitle.text"));
                 file = dc.showDialog(_primaryStage);
             }
@@ -489,14 +507,17 @@ public class MainViewController extends BaseController {
      * Called when the GZIP type has been selected in the combo box of types.
      */
     private void performGzipSelectionAction() {
-        Settings settings = Settings.getInstance();
+        final Settings settings = Settings.getInstance();
         final String propertyKey = "showGzipInfoDialog";
         boolean showDialog = settings.evaluateProperty(propertyKey);
         if (showDialog) {
-            final String infoText = I18N.getString("info.text");
-            AlertDialog.showDialog(Alert.AlertType.INFORMATION, infoText, infoText,
-                    I18N.getString("gzipCompressionInfo.text", ArchiveType.TAR_GZ.getDisplayName())
-                    + "\n\n" + I18N.getString("dialogWontShowAgain.text"), _theme);
+            final String infoTitle = I18N.getString("info.text");
+            final String infoText = I18N.getString("gzipCompressionInfo.text",
+                    ArchiveType.TAR_GZ.getDisplayName());
+            final StringBuilder infoContent = new StringBuilder(infoText);
+            infoContent.append("\n\n").append(I18N.getString("dialogWontShowAgain.text"));
+            Dialogs.showDialog(Alert.AlertType.INFORMATION, infoTitle, infoTitle,
+                    infoContent.toString(), _theme, getIconImage());
             settings.setProperty(propertyKey, false);
         }
     }
@@ -644,8 +665,8 @@ public class MainViewController extends BaseController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Settings settings = Settings.getInstance();
-        OperatingSystem os = settings.getOs();
+        final Settings settings = Settings.getInstance();
+        final OperatingSystem os = settings.getOs();
 
         initLogger();
 
@@ -682,7 +703,7 @@ public class MainViewController extends BaseController {
 
         // set up initial state, frame image and the default text for the text area
         _state = new CompressState();
-        _frameImage = new Image("/images/icon_32.png");
+        _iconImage = new Image("/images/icon_32.png");
         _textArea.setText("run:\n" + I18N.getString("changeOutputPath.text") + "\n");
     }
 
@@ -708,11 +729,18 @@ public class MainViewController extends BaseController {
         private final PercentageStringConverter _converter = new PercentageStringConverter();
 
         /**
-         * Validates the output path.
-         *
-         * @return true if output path is valid, false otherwise.
+         * Used to filter files or archive entries when processing archives.
          */
-        abstract boolean validateOutputPath();
+        protected Predicate<String> _filterPredicate = null;
+
+        /**
+         * Set the filter to be used when processing archives.
+         *
+         * @param filterPredicate the filter or {@code null} to reset it.
+         */
+        void setFilterPredicate(Predicate<String> filterPredicate) {
+            _filterPredicate = filterPredicate;
+        }
 
         /**
          * Applies the required extension filters to the specified file chooser.
@@ -734,6 +762,13 @@ public class MainViewController extends BaseController {
         }
 
         /**
+         * Validates the output path specified in user control.
+         *
+         * @return true if output path is valid, false otherwise.
+         */
+        abstract boolean validateOutputPath();
+
+        /**
          * Initializes the archiving operation.
          *
          * @param archiveType the type of the archive, see {@link ArchiveType}.
@@ -752,9 +787,9 @@ public class MainViewController extends BaseController {
             if (operation != null) {
                 Task<Boolean> task = initArchivingJob(operation);
                 ArchiveInfo info = operation.getArchiveInfo();
-                Log.i("{0}{1}", true, I18N.getString("outputPath.text"), info.getOutputPath());
                 Log.i(I18N.getString("operationStarted.text"), true, operation,
-                        info.getArchiveType().getDisplayName(), info.getOutputPath());
+                        info.getArchiveType().getDisplayName());
+                Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
                 _progressBar.visibleProperty().bind(task.runningProperty());
                 _progressText.visibleProperty().bind(task.runningProperty());
                 _activeTasks.put(task.toString(), TaskHandler.submit(task));
@@ -787,9 +822,9 @@ public class MainViewController extends BaseController {
 
         @Override
         public boolean validateOutputPath() {
-
             String outputPath = _outputPathTextField.getText();
-            String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
+            final String extName = _archiveTypeComboBox.getValue()
+                    .getDefaultExtensionName(false);
 
             if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
@@ -825,14 +860,21 @@ public class MainViewController extends BaseController {
                         archiveType, _archiveName, _compressionLevel,
                         _selectedFiles, _outputFile.getParent());
                 for (int i = 0; i < infos.size(); ++i) {
-                    operations.add(new ArchiveOperation(
-                            infos.get(i), CompressionMode.COMPRESS, this));
+                    final ArchiveOperation.Builder builder
+                            = new ArchiveOperation.Builder(
+                                    infos.get(i), CompressionMode.COMPRESS);
+                    builder.addListener(this).filterPredicate(_filterPredicate);
+                    operations.add(builder.build());
                 }
             } else {
                 operations = new ArrayList<>(1);
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
-                operations.add(new ArchiveOperation(info, CompressionMode.COMPRESS, this));
+                final ArchiveOperation.Builder builder
+                        = new ArchiveOperation.Builder(
+                                info, CompressionMode.COMPRESS);
+                builder.addListener(this).filterPredicate(_filterPredicate);
+                operations.add(builder.build());
             }
             return operations;
         }
@@ -859,14 +901,17 @@ public class MainViewController extends BaseController {
         @Override
         public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {
-            // list consisting of operations for each selected archive
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
             // create new operation for each archive to be extracted
             for (int i = 0; i < _selectedFiles.size(); ++i) {
                 final File file = _selectedFiles.get(i);
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         file.getAbsolutePath(), _outputFile + File.separator);
-                operations.add(new ArchiveOperation(info, CompressionMode.DECOMPRESS, this));
+                final ArchiveOperation.Builder builder
+                        = new ArchiveOperation.Builder(
+                                info, CompressionMode.DECOMPRESS);
+                builder.addListener(this).filterPredicate(_filterPredicate);
+                operations.add(builder.build());
             }
             return operations;
         }

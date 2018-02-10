@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,10 +26,8 @@ import javafx.scene.Scene;
  */
 public class CSS {
 
-    /**
-     * Holds static members only.
-     */
     private CSS() {
+        throw new AssertionError("Holds static members only.");
     }
 
     /**

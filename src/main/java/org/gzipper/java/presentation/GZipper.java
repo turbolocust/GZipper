@@ -91,7 +91,7 @@ public class GZipper extends Application {
         });
 
         stage.setTitle("GZipper");
-        stage.getIcons().add(BaseController.getFrameImage());
+        stage.getIcons().add(BaseController.getIconImage());
         stage.setScene(scene);
         stage.show();
     }

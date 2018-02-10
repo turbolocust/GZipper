@@ -113,7 +113,7 @@ public class DropViewController extends BaseController {
 
     @FXML
     void handleTextAreaOnDragDropped(DragEvent evt) {
-        Dragboard dragboard = evt.getDragboard();
+        final Dragboard dragboard = evt.getDragboard();
         boolean success = false;
         if (dragboard.hasFiles()) {
             if (!_appendAddressesCheckBox.isSelected()

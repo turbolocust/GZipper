@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Class that allows global access to the internationalization files, which will
- * be accessed through a {@link ResourceBundle}.
+ * Class that allows global access to the internationalization files, which are
+ * accessed through a {@link ResourceBundle}.
  *
  * @author Matthias Fussenegger
  */
@@ -75,7 +75,7 @@ public final class I18N {
      * @return the {@link Locale} of the system. May be {@code null}.
      */
     private static Locale determineLocale() {
-        String userLang = System.getProperty("user.language");
+        final String userLang = System.getProperty("user.language");
         for (Locale locale : Locale.getAvailableLocales()) {
             if (locale.getLanguage().equals(userLang)) {
                 return locale;

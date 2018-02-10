@@ -21,10 +21,11 @@ import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.AlertDialog;
+import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
 
@@ -57,21 +58,22 @@ public class ViewControllers {
             throw new NullPointerException("Host services must not be null.");
         }
 
-        FXMLLoader fxmlLoader = initFXMLLoader(ABOUT_VIEW_RES);
+        final FXMLLoader fxmlLoader = initFXMLLoader(ABOUT_VIEW_RES);
         AboutViewController controller = new AboutViewController(theme, hostServices);
         fxmlLoader.setController(controller);
 
+        final Image icon = BaseController._iconImage;
         final Stage aboutView = new Stage();
         aboutView.initModality(Modality.APPLICATION_MODAL);
         controller.setPrimaryStage(aboutView);
 
         try {
-            aboutView.getIcons().add(BaseController._frameImage);
+            aboutView.getIcons().add(icon);
             aboutView.setTitle(I18N.getString("aboutViewTitle.text"));
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
         } catch (IOException ex) {
-            handleErrorLoadingView(ex, theme);
+            handleErrorLoadingView(ex, theme, icon);
         }
         return controller;
     }
@@ -83,22 +85,23 @@ public class ViewControllers {
      * @return the controller for the view.
      */
     static DropViewController showDropView(CSS.Theme theme) {
-        FXMLLoader fxmlLoader = initFXMLLoader(DROP_VIEW_RES);
+        final FXMLLoader fxmlLoader = initFXMLLoader(DROP_VIEW_RES);
         DropViewController controller = new DropViewController(theme);
         fxmlLoader.setController(controller);
 
+        final Image icon = BaseController._iconImage;
         final Stage dropView = new Stage();
         dropView.setAlwaysOnTop(true);
         dropView.initModality(Modality.APPLICATION_MODAL);
         controller.setPrimaryStage(dropView);
 
         try {
-            dropView.getIcons().add(BaseController._frameImage);
+            dropView.getIcons().add(icon);
             dropView.setTitle("Address Dropper"); // no internationalization required
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         } catch (IOException ex) {
-            handleErrorLoadingView(ex, theme);
+            handleErrorLoadingView(ex, theme, icon);
         }
         return controller;
     }
@@ -111,7 +114,7 @@ public class ViewControllers {
      * @return the initialized {@link FXMLLoader}.
      */
     private static FXMLLoader initFXMLLoader(String resource) {
-        Class<ViewControllers> clazz = ViewControllers.class;
+        final Class<ViewControllers> clazz = ViewControllers.class;
         FXMLLoader loader = new FXMLLoader(clazz.getResource(resource));
         loader.setResources(I18N.getBundle());
         return loader;
@@ -139,11 +142,12 @@ public class ViewControllers {
      *
      * @param ex the {@link Exception} to be logged.
      * @param theme the theme to be applied to the error dialog.
+     * @param icon the icon to be shown in the title.
      */
-    private static void handleErrorLoadingView(Exception ex, CSS.Theme theme) {
+    private static void handleErrorLoadingView(Exception ex, CSS.Theme theme, Image icon) {
         Log.e(ex.getLocalizedMessage(), ex);
         final String errorText = I18N.getString("error.text");
-        AlertDialog.showDialog(AlertType.ERROR, errorText, errorText,
-                I18N.getString("errorOpeningWindow.text"), theme);
+        Dialogs.showDialog(AlertType.ERROR, errorText, errorText,
+                I18N.getString("errorOpeningWindow.text"), theme, icon);
     }
 }
