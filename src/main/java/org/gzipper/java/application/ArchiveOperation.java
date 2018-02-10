@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,9 @@ package org.gzipper.java.application;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
@@ -56,6 +56,12 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     private final CompressionMode _compressionMode;
 
     /**
+     * {@link Predicate} that may be used to filter files/entries when
+     * processing archives.
+     */
+    private final Predicate<String> _filterPredicate;
+
+    /**
      * The elapsed time of the operation which will be stored after its end.
      */
     private final AtomicLong _elapsedTime = new AtomicLong();
@@ -75,61 +81,12 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
      */
     private boolean _completed = false;
 
-    /**
-     * Constructs a new instance of this class using the specified values.
-     *
-     * @param info the {@link ArchiveInfo} to be aggregated.
-     * @param compressionMode the {@link CompressionMode} for this operation.
-     * @throws org.gzipper.java.exceptions.GZipperException if determination of
-     * archiving algorithm has failed.
-     */
-    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode)
-            throws GZipperException {
-        // check parameters first
-        Objects.requireNonNull(info);
-        Objects.requireNonNull(compressionMode);
-        // set fields and initialize algorithm
-        _archiveInfo = info;
-        _compressionMode = compressionMode;
-        if ((_algorithm = init(info)) == null) {
-            throw new GZipperException(new NullPointerException("Algorithm determination failed."));
-        }
-    }
-
-    /**
-     * Constructs a new instance of this class using the specified values.
-     *
-     * @param info the {@link ArchiveInfo} to be aggregated.
-     * @param compressionMode the {@link CompressionMode} for this operation.
-     * @param listener listener to be attached with this algorithm instance.
-     * @throws org.gzipper.java.exceptions.GZipperException if determination of
-     * archiving algorithm has failed.
-     */
-    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
-            Listener<Integer> listener) throws GZipperException {
-        this(info, compressionMode);
-        _algorithm.attach(listener);
-    }
-
-    /**
-     * Constructs a new instance of this class using the specified values.
-     *
-     * @param info the {@link ArchiveInfo} to be aggregated.
-     * @param compressionMode the {@link CompressionMode} for this operation.
-     * @param listeners listeners to be attached with this algorithm instance.
-     * @throws org.gzipper.java.exceptions.GZipperException if determination of
-     * archiving algorithm has failed.
-     */
-    public ArchiveOperation(ArchiveInfo info, CompressionMode compressionMode,
-            Set<Listener<Integer>> listeners) throws GZipperException {
-        this(info, compressionMode);
-        listeners.forEach((listener) -> {
-            _algorithm.attach(listener);
-        });
-    }
-
-    private CompressionAlgorithm init(ArchiveInfo info) {
-        return info.getArchiveType().getAlgorithm();
+    private ArchiveOperation(ArchiveOperation.Builder builder) {
+        _archiveInfo = builder._archiveInfo;
+        _algorithm = builder._algorithm;
+        _compressionMode = builder._compressionMode;
+        _filterPredicate = builder._filterPredicate;
+        _algorithm.setPredicate(_filterPredicate);
     }
 
     private void setElapsedTime() {
@@ -213,5 +170,79 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
     @Override
     public String toString() {
         return Integer.toString(hashCode());
+    }
+
+    /**
+     * Builder class for {@link ArchiveOperation}.
+     */
+    public static class Builder {
+
+        // required parameters
+        private final ArchiveInfo _archiveInfo;
+
+        private final CompressionAlgorithm _algorithm;
+
+        private final CompressionMode _compressionMode;
+
+        // optional parameters
+        private Predicate<String> _filterPredicate = null;
+
+        /**
+         * Constructs a new instance of this class using the specified values.
+         *
+         * @param info the {@link ArchiveInfo} to be aggregated.
+         * @param compressionMode the {@link CompressionMode} for this
+         * operation.
+         * @throws org.gzipper.java.exceptions.GZipperException if determination
+         * of archiving algorithm has failed.
+         */
+        public Builder(ArchiveInfo info, CompressionMode compressionMode)
+                throws GZipperException {
+            // check parameters first
+            Objects.requireNonNull(info);
+            Objects.requireNonNull(compressionMode);
+            // set fields and initialize algorithm
+            _archiveInfo = info;
+            _compressionMode = compressionMode;
+            if ((_algorithm = init(info)) == null) {
+                throw new GZipperException(new NullPointerException(
+                        "Algorithm could not be determined."));
+            }
+        }
+
+        private CompressionAlgorithm init(ArchiveInfo info) {
+            return info.getArchiveType().getAlgorithm();
+        }
+
+        /**
+         * Sets the predicate to be used by the operation.
+         *
+         * @param predicate the {@link Predicate} to be used.
+         * @return a reference to this to allow method chaining.
+         */
+        public Builder filterPredicate(Predicate<String> predicate) {
+            _filterPredicate = predicate;
+            return this;
+        }
+
+        /**
+         * Attaches a new listener to the algorithm instance of the operation.
+         *
+         * @param listener listener to be attached to this algorithm instance.
+         * @return a reference to this to allow method chaining.
+         */
+        public Builder addListener(Listener<Integer> listener) {
+            _algorithm.attach(listener);
+            return this;
+        }
+
+        /**
+         * Builds a new instance of {@link ArchiveOperation}.
+         *
+         * @return a new instance of {@link ArchiveOperation}.
+         */
+        public ArchiveOperation build() {
+            return new ArchiveOperation(this);
+        }
     }
 }

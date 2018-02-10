@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,10 +28,10 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
-import static org.gzipper.java.application.algorithm.CompressionAlgorithm.DEFAULT_BUFFER_SIZE;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
+import static org.gzipper.java.application.algorithm.CompressionAlgorithm.DEFAULT_BUFFER_SIZE;
 
 /**
  *
@@ -44,22 +44,29 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             throws IOException, ArchiveException, CompressorException {
 
         initAlgorithmProgress(files);
-        String fullname = FileUtils.combinePathAndFilename(location, name);
+        final String fullname = FileUtils
+                .combinePathAndFilename(location, name);
 
         if (files.length > 0 && files[0].isFile()) {
+            // handling first file only, this way the current
+            // API does not need to be changed/more complicated
             final File file = files[0];
+            // check predicate first
+            if (!_filterPredicate.test(file.getName())) {
+                return; // ignore file
+            }
             final CompressorOptions options = new CompressorOptions(
                     file.getName(), _compressionLevel);
-            try (BufferedInputStream bis
-                    = new BufferedInputStream(new FileInputStream(file))) {
-                try (CompressorOutputStream cos = makeCompressorOutputStream(
-                        new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
-                    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                    int readBytes = 0;
-                    while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
-                        cos.write(buffer, 0, readBytes);
-                        updateProgress(readBytes);
-                    }
+
+            try (final FileInputStream fis = new FileInputStream(file);
+                    final BufferedInputStream bis = new BufferedInputStream(fis);
+                    final CompressorOutputStream cos = makeCompressorOutputStream(
+                            new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
+                final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                int readBytes = 0;
+                while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
+                    cos.write(buffer, 0, readBytes);
+                    updateProgress(readBytes);
                 }
             }
         } else {
@@ -72,10 +79,16 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             throws IOException, ArchiveException, CompressorException {
 
         final File archive = new File(fullname);
+
+        // check predicate first
+        if (!_filterPredicate.test(archive.getName())) {
+            return; // ignore file
+        }
+
         initAlgorithmProgress(archive);
         CompressorOptions options = new CompressorOptions();
 
-        try (CompressorInputStream gcis = makeCompressorInputStream(
+        try (final CompressorInputStream gcis = makeCompressorInputStream(
                 new BufferedInputStream(new FileInputStream(archive)), options)) {
 
             final File outputFile;
@@ -87,7 +100,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                 outputFile = new File(FileUtils.generateUniqueFilename(
                         location, options._name));
             }
-            try (BufferedOutputStream bos = new BufferedOutputStream(
+            try (final BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(outputFile))) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                 int readBytes = 0;

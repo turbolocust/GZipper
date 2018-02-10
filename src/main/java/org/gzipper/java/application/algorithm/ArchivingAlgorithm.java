@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,60 +81,62 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     public void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException {
 
-        File archive = new File(fullname);
+        final File archive = new File(fullname);
         initAlgorithmProgress(archive);
 
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(archive))) {
-            try (CompressorInputStream cis = makeCompressorInputStream(bis)) {
-                try (ArchiveInputStream ais = cis != null
+        try (final FileInputStream fis = new FileInputStream(archive);
+                final BufferedInputStream bis = new BufferedInputStream(fis);
+                final CompressorInputStream cis = makeCompressorInputStream(bis);
+                final ArchiveInputStream ais = cis != null
                         ? makeArchiveInputStream(cis)
                         : makeArchiveInputStream(bis)) {
 
-                    ArchiveEntry entry = ais.getNextEntry();
+            ArchiveEntry entry = ais.getNextEntry();
 
-                    final int startIndex = fullname.lastIndexOf(File.separator) + 1;
-                    final File outputFolder = new File(location + fullname.substring(
-                            startIndex, fullname.indexOf('.', startIndex)));
+            final int startIndex = fullname.lastIndexOf(File.separator) + 1;
+            final File outputFolder = new File(location + fullname.substring(
+                    startIndex, fullname.indexOf('.', startIndex)));
 
-                    if (!outputFolder.exists()) {
-                        outputFolder.mkdir(); // create output folder of archive
-                    }
+            if (!outputFolder.exists()) {
+                outputFolder.mkdir(); // create output folder of archive
+            }
 
-                    while (!_interrupt && entry != null) {
-                        final String entryName = entry.getName();
-                        final File newFile = new File(outputFolder.getAbsolutePath()
-                                + File.separator + entryName);
-                        // check if entry contains a directory
-                        if (entryName.indexOf('/') > -1) {
-                            if (!newFile.getParentFile().exists()) {
-                                // also creates parent directories
-                                newFile.getParentFile().mkdirs();
-                            }
-                        }
-                        if (!entry.isDirectory()) {
-                            // create new output stream and write bytes to file
-                            try (BufferedOutputStream bos = new BufferedOutputStream(
-                                    new FileOutputStream(newFile))) {
-                                final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                                int readBytes;
-                                while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
-                                    bos.write(buffer, 0, readBytes);
-                                    updateProgress(readBytes);
-                                }
-                            } catch (IOException ex) {
-                                if (!_interrupt) {
-                                    Log.e(ex.getLocalizedMessage(), ex);
-                                    Log.e("{0}\n{1}",
-                                            I18N.getString("errorWritingFile.text"), newFile.getPath()
-                                    );
-                                }
-                                throw ex; // re-throw
-                            }
-                        }
-                        if (!_interrupt) {
-                            entry = ais.getNextEntry();
+            while (!_interrupt && entry != null) {
+                final String entryName = entry.getName();
+                if (_filterPredicate.test(entryName)) { // check predicate first
+                    final File newFile = new File(outputFolder.getAbsolutePath()
+                            + File.separator + entryName);
+                    // check if entry contains a directory
+                    if (entryName.indexOf('/') > -1) {
+                        if (!newFile.getParentFile().exists()) {
+                            // also creates parent directories
+                            newFile.getParentFile().mkdirs();
                         }
                     }
+                    if (!entry.isDirectory()) {
+                        // create new output stream and write bytes to file
+                        try (BufferedOutputStream bos = new BufferedOutputStream(
+                                new FileOutputStream(newFile))) {
+                            final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                            int readBytes;
+                            while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
+                                bos.write(buffer, 0, readBytes);
+                                updateProgress(readBytes);
+                            }
+                        } catch (IOException ex) {
+                            if (!_interrupt) {
+                                Log.e(ex.getLocalizedMessage(), ex);
+                                Log.e("{0}\n{1}",
+                                        I18N.getString("errorWritingFile.text"),
+                                        newFile.getPath()
+                                );
+                            }
+                            throw ex; // re-throw
+                        }
+                    }
+                }
+                if (!_interrupt) {
+                    entry = ais.getNextEntry();
                 }
             }
         }
@@ -144,17 +146,17 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     public void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
+        final String fullname = FileUtils
+                .combinePathAndFilename(location, name);
         initAlgorithmProgress(files);
-        String fullname = FileUtils.combinePathAndFilename(location, name);
 
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fullname))) {
-            try (CompressorOutputStream cos = makeCompressorOutputStream(bos)) {
-                try (ArchiveOutputStream aos = cos != null
+        try (final FileOutputStream fos = new FileOutputStream(fullname);
+                final BufferedOutputStream bos = new BufferedOutputStream(fos);
+                final CompressorOutputStream cos = makeCompressorOutputStream(bos);
+                final ArchiveOutputStream aos = cos != null
                         ? makeArchiveOutputStream(cos)
                         : makeArchiveOutputStream(bos)) {
-                    compress(files, "", aos);
-                }
-            }
+            compress(files, "", aos);
         }
     }
 
@@ -175,9 +177,13 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
             for (int i = 0; !_interrupt && i < files.length; ++i) {
                 // create next file and define entry name based on folder level
                 final File newFile = files[i];
-                String entryName = base + newFile.getName();
-                // start compressing the file
+                final String entryName = base + newFile.getName();
                 if (newFile.isFile()) {
+                    // check predicate first
+                    if (!_filterPredicate.test(newFile.getName())) {
+                        continue; // skip entry
+                    }
+                    // read and compress the file
                     try (BufferedInputStream buf = new BufferedInputStream(
                             new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
@@ -193,13 +199,14 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                         if (!_interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
                             Log.e("{0}\n{1}",
-                                    I18N.getString("errorReadingFile.text"), newFile.getPath()
+                                    I18N.getString("errorReadingFile.text"),
+                                    newFile.getPath()
                             );
                             throw ex; // re-throw
                         }
                     }
                 } else { // child is a directory
-                    File[] children = getFiles(newFile.getAbsolutePath());
+                    final File[] children = getFiles(newFile.getAbsolutePath());
                     compress(children, entryName + "/", aos);
                 }
             }

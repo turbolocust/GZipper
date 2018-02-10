@@ -18,6 +18,7 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Predicate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
@@ -88,4 +89,14 @@ public interface CompressionAlgorithm extends Interruptable, Notifier<Integer> {
      */
     void extract(ArchiveInfo info)
             throws IOException, ArchiveException, CompressorException;
+
+    /**
+     * Sets the specified {@link Predicate} which will be used as a filter when
+     * compressing files or decompressing archive entries by evaluating the name
+     * of the file or entry.
+     *
+     * @param predicate the {@link Predicate} to be used.
+     */
+    void setPredicate(Predicate<String> predicate);
+
 }

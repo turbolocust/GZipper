@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,7 +55,7 @@ public final class ArchiveInfoFactory {
         }
 
         boolean hasExtension = false;
-        String[] extNames = archiveType.getExtensionNames(false);
+        final String[] extNames = archiveType.getExtensionNames(false);
         for (String extName : extNames) {
             if (archiveName.endsWith(extName)) {
                 hasExtension = true;
@@ -85,11 +85,13 @@ public final class ArchiveInfoFactory {
      */
     public static List<ArchiveInfo> createArchiveInfos(ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
+
+        final Set<String> names = new HashSet<>(); // to avoid name collisions
         List<ArchiveInfo> infos = new ArrayList<>(files.size());
-        List<File> fileList; // used to be compatible with API
-        Set<String> names = new HashSet<>(); // to avoid name collisions
+        List<File> fileList; // used to be compatible with current API
         String name; // holds the name of the archive
         int nameSuffix = -1; // will be appended if necessary
+
         for (File next : files) {
             fileList = new LinkedList<>();
             fileList.add(next);

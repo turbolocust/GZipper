@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,12 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Predicate;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.observer.NotifierImpl;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.predicates.Predicates;
 
 /**
  * Abstract class that offers generally used attributes and methods for
@@ -46,6 +48,19 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      * Object used to update the progress of the algorithm.
      */
     protected AlgorithmProgress _algorithmProgress;
+
+    /**
+     * Predicate used to filter files or entries when processing archives.
+     */
+    protected Predicate<? super String> _filterPredicate;
+
+    /**
+     * The default constructor of this class.
+     */
+    public AbstractAlgorithm() {
+        // accepts all files/entries since the test result is never false
+        _filterPredicate = Predicates.ALWAY_TRUE.getPredicate();
+    }
 
     /**
      * Retrieves files from a specific directory; mandatory for compression.
@@ -83,15 +98,25 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     }
 
     @Override
-    public void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
+    public void compress(ArchiveInfo info) throws IOException,
+            ArchiveException, CompressorException {
         final File[] files = new File[info.getFiles().size()];
         _compressionLevel = info.getLevel();
-        compress(info.getFiles().toArray(files), info.getOutputPath(), info.getArchiveName());
+        compress(info.getFiles().toArray(files),
+                info.getOutputPath(), info.getArchiveName());
     }
 
     @Override
-    public void extract(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
+    public void extract(ArchiveInfo info) throws IOException,
+            ArchiveException, CompressorException {
         extract(info.getOutputPath(), info.getArchiveName());
+    }
+
+    @Override
+    public void setPredicate(Predicate<String> predicate) {
+        if (predicate != null) {
+            _filterPredicate = predicate;
+        }
     }
 
     @Override

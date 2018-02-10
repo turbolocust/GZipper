@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,10 +37,8 @@ public final class TaskHandler {
         EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     }
 
-    /**
-     * Holds static members only.
-     */
     private TaskHandler() {
+        throw new AssertionError("Holds static members only.");
     }
 
     /**
