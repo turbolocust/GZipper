@@ -13,8 +13,9 @@
 * Compress and decompress GZIP.
 * Compression levels can be adjusted.
   - if supported by compressor
+* Support for regular expressions
+  - allows filtering of files/entries
 * Supports a dark theme (CSS style).
-  - More styles may be added in the future.
 * Languages which are supported:
   - English
   - German
