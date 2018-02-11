@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,9 +101,9 @@ public final class FileUtils {
 
     /**
      * Concatenates a file path and file name. Before doing so, a check will be
-     * performed whether the path ends with an separator. If the separator is
+     * performed whether the path ends with a separator. If the separator is
      * missing it will be added. As a result, a valid absolute path is returned,
-     * although it is not guaranteed that this file exists.
+     * although it is not guaranteed that the file exists.
      *
      * @param path location of a folder as string.
      * @param file the file name as string.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,23 +60,25 @@ public final class Settings {
     }
 
     /**
-     * Initializes this singleton class. This should only be called once after a
-     * call of the {@link #getInstance()} method.
+     * Initializes this singleton class. This may only be called once.
      *
      * @param props the properties file to initialize this class with.
      * @param os the current operating system.
      */
     public void init(File props, OperatingSystem os) {
+        if (_props == null) {
+            _os = os; // to receive environment variables
+            if (props != null) {
+                _propsFile = props;
+                _props = new Properties(_defaults);
 
-        _propsFile = props;
-
-        _os = os; // to receive environment variables
-        _props = new Properties(_defaults);
-
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(props))) {
-            _props.load(bis);
-        } catch (IOException ex) {
-            Log.e(ex.getLocalizedMessage(), ex);
+                try (final FileInputStream fis = new FileInputStream(props);
+                        final BufferedInputStream bis = new BufferedInputStream(fis)) {
+                    _props.load(bis);
+                } catch (IOException ex) {
+                    Log.e(ex.getLocalizedMessage(), ex);
+                }
+            }
         }
     }
 
@@ -137,7 +139,7 @@ public final class Settings {
      * @return true if property equals "true", false otherwise.
      */
     public boolean evaluateProperty(String key) {
-        String property = _props.getProperty(key);
+        final String property = _props.getProperty(key);
         return property != null && property.equals("true");
     }
 

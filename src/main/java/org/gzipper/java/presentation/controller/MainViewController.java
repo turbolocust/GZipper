@@ -129,70 +129,48 @@ public class MainViewController extends BaseController {
 
     @FXML
     private MenuItem _applyFilterMenuItem;
-
     @FXML
     private MenuItem _noCompressionMenuItem;
-
     @FXML
     private MenuItem _bestSpeedCompressionMenuItem;
-
     @FXML
     private MenuItem _defaultCompressionMenuItem;
-
     @FXML
     private MenuItem _bestCompressionMenuItem;
-
     @FXML
     private MenuItem _closeMenuItem;
-
     @FXML
     private MenuItem _deleteMenuItem;
-
     @FXML
     private MenuItem _dropAddressesMenuItem;
-
     @FXML
     private MenuItem _resetAppMenuItem;
-
     @FXML
     private MenuItem _aboutMenuItem;
-
     @FXML
     private RadioButton _compressRadioButton;
-
     @FXML
     private RadioButton _decompressRadioButton;
-
     @FXML
     private TextArea _textArea;
-
     @FXML
     private CheckMenuItem _enableLoggingCheckMenuItem;
-
     @FXML
     private CheckMenuItem _enableDarkThemeCheckMenuItem;
-
     @FXML
     private TextField _outputPathTextField;
-
     @FXML
     private ComboBox<ArchiveType> _archiveTypeComboBox;
-
     @FXML
     private Button _startButton;
-
     @FXML
     private Button _abortButton;
-
     @FXML
     private Button _selectFilesButton;
-
     @FXML
     private Button _saveAsButton;
-
     @FXML
     private ProgressBar _progressBar;
-
     @FXML
     private Text _progressText;
 
@@ -218,7 +196,7 @@ public class MainViewController extends BaseController {
         if (_activeTasks != null && !_activeTasks.isEmpty()) {
             _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
                     .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                // log warning message when cancellation failed
+                // log warning message only when cancellation failed
                 Log.e("Task cancellation failed for {0}", task.toString());
             });
         }
@@ -227,7 +205,8 @@ public class MainViewController extends BaseController {
     @FXML
     void handleApplyFilterMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_applyFilterMenuItem)) {
-            Optional<String> result = Dialogs.showPatternInputDialog(_theme, getIconImage());
+            final Optional<String> result = Dialogs
+                    .showPatternInputDialog(_theme, getIconImage());
             if (result.isPresent()) {
                 if (!result.get().isEmpty()) {
                     final Pattern pattern = Pattern.compile(result.get());
@@ -244,7 +223,8 @@ public class MainViewController extends BaseController {
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
-        Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
+        final Object compressionStrength = selectedItem
+                .getProperties().get(COMPRESSION_LEVEL_KEY);
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
             Log.i("{0}{1}", true, I18N.getString("compressionLevelChange.text"),
@@ -283,7 +263,6 @@ public class MainViewController extends BaseController {
                 final int size = filePaths.size();
                 _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
-
                 if (size > 10) { // threshold, to avoid flooding text area
                     filePaths.forEach((filePath) -> {
                         _selectedFiles.add(new File(filePath));
@@ -336,9 +315,9 @@ public class MainViewController extends BaseController {
                             _archiveName = _outputFile.getName();
                         }
                     }
-                    String recentPath = FileUtils.getParent(outputPath);
+                    final String recentPath = FileUtils.getParent(outputPath);
                     Settings.getInstance().setProperty("recentPath", recentPath);
-                    ArchiveType archiveType = _archiveTypeComboBox.getValue();
+                    final ArchiveType archiveType = _archiveTypeComboBox.getValue();
                     for (ArchiveOperation operation : _state.initOperation(archiveType)) {
                         Log.i("Operation started using the following archive info: {0}",
                                 operation.getArchiveInfo().toString(), false);
@@ -372,19 +351,23 @@ public class MainViewController extends BaseController {
                 _state.applyExtensionFilters(fc);
             }
 
-            List<File> selectedFiles = fc.showOpenMultipleDialog(_primaryStage);
+            final List<File> selectedFiles
+                    = fc.showOpenMultipleDialog(_primaryStage);
 
             String message;
             if (selectedFiles != null) {
                 _startButton.setDisable(false);
-                int selectionCount = selectedFiles.size();
-                message = I18N.getString("filesSelected.text");
-                message = message.replace("{0}", Integer.toString(selectionCount));
-                // log the path of each selected file
-                selectedFiles.forEach((file) -> {
-                    Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"),
-                            file.getAbsolutePath());
-                });
+                int size = selectedFiles.size();
+                message = I18N.getString("filesSelected.text", size);
+                if (size > 10) {
+                    Log.i(I18N.getString("manyFilesSelected.text"), true, size);
+                } else {
+                    selectedFiles.forEach((file) -> { // log the path of each selected file
+                        Log.i("{0}: \"{1}\"", true,
+                                I18N.getString("fileSelected.text"),
+                                file.getAbsolutePath());
+                    });
+                }
                 _selectedFiles = selectedFiles;
             } else {
                 message = I18N.getString("noFilesSelected.text");
@@ -624,7 +607,7 @@ public class MainViewController extends BaseController {
         // show error message when task has failed and finalize archiving job
         task.setOnFailed(e -> {
             Log.i(I18N.getString("operationFail.text"), true, operation);
-            Throwable thrown = e.getSource().getException();
+            final Throwable thrown = e.getSource().getException();
             if (thrown != null) {
                 Log.e(thrown.getLocalizedMessage(), thrown);
             }
@@ -697,14 +680,15 @@ public class MainViewController extends BaseController {
         _archiveFileExtension = selectedType.getDefaultExtensionName(false);
 
         // set menu item for logging as selected if logging has been enabled
-        // before
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
         _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
-        // set up initial state, frame image and the default text for the text area
+        // set up initial state, window icon and the default text for the text area
         _state = new CompressState();
         _iconImage = new Image("/images/icon_32.png");
-        _textArea.setText("run:\n" + I18N.getString("changeOutputPath.text") + "\n");
+        final String formattedText = String.format("run:\n%s\n",
+                I18N.getString("changeOutputPath.text"));
+        _textArea.setText(formattedText);
     }
 
     /**
@@ -803,7 +787,7 @@ public class MainViewController extends BaseController {
                 notifier.detach(this);
             } else {
                 double progress = _progressManager.updateProgress(notifier.getId(), value);
-                // update progress and execute on JavaFX thread if it's not busy
+                // update progress and execute on JavaFX thread if not busy
                 if (_progressManager.getAndSetProgress(progress) == ProgressManager.SENTINEL) {
                     Platform.runLater(() -> {
                         double totalProgress = _progressManager

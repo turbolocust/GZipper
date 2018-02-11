@@ -53,16 +53,12 @@ public class DropViewController extends BaseController {
 
     @FXML
     private TextArea _textArea;
-
     @FXML
     private Button _cancelButton;
-
     @FXML
     private Button _submitButton;
-
     @FXML
     private CheckBox _appendAddressesCheckBox;
-
     @FXML
     private Text _titleText;
 
