@@ -59,12 +59,12 @@ public class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private static final String APP_VERSION = "0.5.17 BETA";
+    private static final String APP_VERSION = "0.5.18 BETA";
 
     /**
      * The build date of this application.
      */
-    private static final String APP_BUILD_DATE = "02/06/2018";
+    private static final String APP_BUILD_DATE = "02/11/2018";
 
     /**
      * The author of this application.
@@ -83,10 +83,8 @@ public class AboutViewController extends BaseController {
 
     @FXML
     private ImageView _imageView;
-
     @FXML
     private TextFlow _textFlow;
-
     @FXML
     private Button _closeButton;
 

@@ -359,9 +359,7 @@ public class MainViewController extends BaseController {
                 _startButton.setDisable(false);
                 int size = selectedFiles.size();
                 message = I18N.getString("filesSelected.text", size);
-                if (size > 10) {
-                    Log.i(I18N.getString("manyFilesSelected.text"), true, size);
-                } else {
+                if (size <= 10) {
                     selectedFiles.forEach((file) -> { // log the path of each selected file
                         Log.i("{0}: \"{1}\"", true,
                                 I18N.getString("fileSelected.text"),
