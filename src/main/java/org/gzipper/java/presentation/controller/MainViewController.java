@@ -130,6 +130,8 @@ public class MainViewController extends BaseController {
     @FXML
     private MenuItem _applyFilterMenuItem;
     @FXML
+    private MenuItem _resetFilterMenuItem;
+    @FXML
     private MenuItem _noCompressionMenuItem;
     @FXML
     private MenuItem _bestSpeedCompressionMenuItem;
@@ -212,11 +214,17 @@ public class MainViewController extends BaseController {
                     final Pattern pattern = Pattern.compile(result.get());
                     _state.setFilterPredicate(new PatternPredicate(pattern));
                     Log.i(I18N.getString("filterApplied.text", result.get()), true);
-                } else { // reset filter
-                    _state.setFilterPredicate(null);
-                    Log.i(I18N.getString("filterReset.text", result.get()), true);
+                } else {
+                    resetFilter();
                 }
             }
+        }
+    }
+
+    @FXML
+    void handleResetFilterMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_resetFilterMenuItem)) {
+            resetFilter();
         }
     }
 
@@ -326,7 +334,8 @@ public class MainViewController extends BaseController {
                 } else {
                     Log.w(I18N.getString("invalidOutputPath.text"), true);
                 }
-            } catch (GZipperException ex) {
+            }
+            catch (GZipperException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }
         }
@@ -410,7 +419,7 @@ public class MainViewController extends BaseController {
         } else if (evt.getSource().equals(_decompressRadioButton)) {
             performModeRadioButtonAction(false, "browseForArchive.text", "saveAsFiles.text");
         }
-        resetSelections();
+        resetSelectedFiles();
     }
 
     @FXML
@@ -422,7 +431,7 @@ public class MainViewController extends BaseController {
                 performGzipSelectionAction();
             }
             if (_decompressRadioButton.isSelected()) {
-                resetSelections();
+                resetSelectedFiles();
             } else { // update file extension
                 String outputPathText = _outputPathTextField.getText(),
                         fileExtension = type.getDefaultExtensionName(false);
@@ -468,15 +477,6 @@ public class MainViewController extends BaseController {
         }
     }
 
-    /**
-     * Called when the archiving mode has been changed via a radio button.
-     *
-     * @param compress true for compress, false for decompress.
-     * @param selectFilesButtonText text to display on the button which brings
-     * up a dialog to select files or an archive.
-     * @param saveAsButtonText text to display on the button which brings up the
-     * "Save as..." dialog.
-     */
     private void performModeRadioButtonAction(boolean compress,
             String selectFilesButtonText, String saveAsButtonText) {
         _state = compress ? new CompressState() : new DecompressState();
@@ -484,9 +484,6 @@ public class MainViewController extends BaseController {
         _saveAsButton.setText(I18N.getString(saveAsButtonText));
     }
 
-    /**
-     * Called when the GZIP type has been selected in the combo box of types.
-     */
     private void performGzipSelectionAction() {
         final Settings settings = Settings.getInstance();
         final String propertyKey = "showGzipInfoDialog";
@@ -503,46 +500,41 @@ public class MainViewController extends BaseController {
         }
     }
 
-    /**
-     * Toggles UI controls which react to user input.
-     *
-     * @param start true to disable controls, false to enable them.
-     */
-    private void toggleUIcontrols(boolean start) {
-        _startButton.setDisable(start);
-        _abortButton.setDisable(!start);
-        _compressRadioButton.setDisable(start);
-        _decompressRadioButton.setDisable(start);
-        _archiveTypeComboBox.setDisable(start);
-        _saveAsButton.setDisable(start);
-        _selectFilesButton.setDisable(start);
-        _dropAddressesMenuItem.setDisable(start);
+    private void toggleUIcontrols(boolean disable) {
+        _startButton.setDisable(disable);
+        _abortButton.setDisable(!disable);
+        _compressRadioButton.setDisable(disable);
+        _decompressRadioButton.setDisable(disable);
+        _archiveTypeComboBox.setDisable(disable);
+        _saveAsButton.setDisable(disable);
+        _selectFilesButton.setDisable(disable);
+        _dropAddressesMenuItem.setDisable(disable);
     }
 
-    /**
-     * Resets the selected files.
-     */
-    private void resetSelections() {
+    private void resetFilter() {
+        boolean wasApplied = _state.getFilterPredicate() != null;
+        _state.setFilterPredicate(null);
+        if (wasApplied) {
+            Log.i(I18N.getString("filterReset.text"), true);
+        }
+    }
+
+    private void resetSelectedFiles() {
         if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
             Log.i(I18N.getString("selectionReset.text"), true);
         }
-        _selectedFiles = Collections.<File>emptyList();
+        _selectedFiles = Collections.emptyList();
         _startButton.setDisable(true);
     }
 
-    /**
-     * Updates the selected file, the archive name and the file name extension
-     * of the archive if it is not a directory.
-     *
-     * @param file the updated file.
-     */
     private void updateSelectedFile(File file) {
         if (file != null) {
             if (!file.isDirectory()) {
                 String archiveName = _archiveName = file.getName(),
                         fileExtension = FileUtils.getExtension(archiveName);
                 if (fileExtension.isEmpty()) { // update file extension
-                    fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
+                    fileExtension = _archiveTypeComboBox.getValue()
+                            .getDefaultExtensionName(false);
                 }
                 _archiveFileExtension = fileExtension;
             }
@@ -574,7 +566,8 @@ public class MainViewController extends BaseController {
                 while (!futureTask.isDone()) {
                     try {
                         Thread.sleep(10); // check for interruption
-                    } catch (InterruptedException ex) {
+                    }
+                    catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
                         Log.i(I18N.getString("interrupt.text"), true);
                         Log.w(ex.getLocalizedMessage(), false);
@@ -586,13 +579,13 @@ public class MainViewController extends BaseController {
                 }
                 try { // check for cancellation
                     return futureTask.get();
-                } catch (CancellationException ex) {
+                }
+                catch (CancellationException ex) {
                     return false;
                 }
             }
         };
-        // show success message and finalize archiving job when task has
-        // succeeded
+        // show success message and finalize archiving job on success
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
@@ -633,9 +626,6 @@ public class MainViewController extends BaseController {
         }
     }
 
-    /**
-     * Initializes the logger that will append text to {@link #_textArea}.
-     */
     private void initLogger() {
         Logger logger = Log.UI_LOGGER;
         TextAreaHandler handler = new TextAreaHandler(_textArea);
@@ -722,6 +712,16 @@ public class MainViewController extends BaseController {
          */
         void setFilterPredicate(Predicate<String> filterPredicate) {
             _filterPredicate = filterPredicate;
+        }
+
+        /**
+         * Returns the filter to be used when processing archives.
+         *
+         * @return the filter to be used when processing archives. If no filter
+         * is set, this method will return {@code null}.
+         */
+        Predicate<String> getFilterPredicate() {
+            return _filterPredicate;
         }
 
         /**

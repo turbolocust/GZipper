@@ -90,6 +90,7 @@
                                     <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                                  </accelerator>
                               </MenuItem>
+                              <MenuItem fx:id="_resetFilterMenuItem" mnemonicParsing="false" onAction="#handleResetFilterMenuItemAction" text="%resetFilterMenuItem.text" />
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableLoggingCheckMenuItemAction" text="%enableLoggingMenuItem.text" />
                                         <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />
