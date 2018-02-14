@@ -95,7 +95,7 @@ public final class Dialogs {
     /**
      * Brings up a {@link TextInputDialog} which allows the user to enter a
      * regular expression (pattern). The pattern will also be validated. So if
-     * the returned {@link Optional<String>} holds a result, it is guaranteed
+     * the returned {@link Optional} holds a result, it is guaranteed
      * that the result is a valid regular expression.
      *
      * @param theme the CSS theme to be applied.
