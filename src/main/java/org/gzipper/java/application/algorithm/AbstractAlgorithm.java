@@ -52,14 +52,14 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     /**
      * Predicate used to filter files or entries when processing archives.
      */
-    protected Predicate<? super String> _filterPredicate;
+    protected Predicate<String> _filterPredicate;
 
     /**
      * The default constructor of this class.
      */
     public AbstractAlgorithm() {
         // accepts all files/entries since the test result is never false
-        _filterPredicate = Predicates.ALWAY_TRUE.getPredicate();
+        _filterPredicate = Predicates.createAlwaysTrue();
     }
 
     /**
@@ -71,8 +71,7 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      */
     protected final File[] getFiles(String path) throws IOException {
         final File dir = new File(path);
-        File[] files = dir.listFiles();
-        return files;
+        return dir.listFiles();
     }
 
     /**
@@ -81,7 +80,7 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      * @param files the files to be used for initialization.
      */
     protected final void initAlgorithmProgress(File... files) {
-        _algorithmProgress = new AlgorithmProgress(files);
+        _algorithmProgress = new AlgorithmProgress(_filterPredicate, files);
     }
 
     /**

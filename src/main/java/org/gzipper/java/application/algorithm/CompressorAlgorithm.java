@@ -70,7 +70,9 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                 }
             }
         } else {
-            throw new IOException(new GZipperException("Directories are not supported!"));
+            throw new IOException(GZipperException.createWithReason(
+                    GZipperException.Reason.NO_DIR_SUPPORTED,
+                    "Directories are not supported!"));
         }
     }
 

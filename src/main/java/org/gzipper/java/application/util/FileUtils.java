@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.function.Predicate;
 import org.gzipper.java.util.Log;
 
 /**
@@ -181,9 +182,10 @@ public final class FileUtils {
      * Traverses the specified path and returns the size of all children.
      *
      * @param path the path to be traversed.
+     * @param filter the filter to be applied.
      * @return the size of all children.
      */
-    public static long fileSizes(Path path) {
+    public static long fileSizes(Path path, Predicate<String> filter) {
 
         final SizeValueHolder holder = new SizeValueHolder(0);
 
@@ -191,7 +193,10 @@ public final class FileUtils {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    holder._size = attrs.size();
+                    String name = file.getFileName().toString();
+                    if (filter.test(name)) {
+                        holder._size = attrs.size();
+                    }
                     return FileVisitResult.CONTINUE;
                 }
 

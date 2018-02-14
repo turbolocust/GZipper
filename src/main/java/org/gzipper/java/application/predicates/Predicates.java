@@ -22,20 +22,17 @@ import java.util.function.Predicate;
  *
  * @author Matthias Fussenegger
  */
-public enum Predicates {
+public final class Predicates {
 
-    ALWAY_TRUE {
-        @Override
-        public Predicate<Object> getPredicate() {
-            return p -> true;
-        }
-    },
-    ALWAYS_FALSE {
-        @Override
-        public Predicate<Object> getPredicate() {
-            return p -> false;
-        }
-    };
+    private Predicates() {
+        throw new AssertionError();
+    }
 
-    public abstract Predicate<Object> getPredicate();
+    public static final <T> Predicate<T> createAlwaysTrue() {
+        return p -> true;
+    }
+
+    public static final <T> Predicate<T> createAlwaysFalse() {
+        return p -> false;
+    }
 }

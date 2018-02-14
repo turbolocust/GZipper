@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.function.Predicate;
+import org.gzipper.java.application.predicates.Predicates;
 import org.gzipper.java.application.util.FileUtils;
 
 /**
@@ -38,19 +40,19 @@ public class AlgorithmProgress {
 
     AlgorithmProgress(File... files) {
         Objects.requireNonNull(files);
-        setTotalSize(files);
+        setTotalSize(Predicates.createAlwaysTrue(), files);
     }
 
-    /**
-     * Sets the total file size. This method is only called once when this
-     * object is being constructed.
-     *
-     * @param files the files which are used to calculate {@link #_totalSize}.
-     */
-    private void setTotalSize(File... files) {
+    AlgorithmProgress(Predicate<String> filter, File... files) {
+        Objects.requireNonNull(filter);
+        Objects.requireNonNull(files);
+        setTotalSize(filter, files);
+    }
+
+    private void setTotalSize(Predicate<String> filter, File... files) {
         for (File file : files) {
             _totalSize += file.isDirectory()
-                    ? FileUtils.fileSizes(file.toPath())
+                    ? FileUtils.fileSizes(file.toPath(), filter)
                     : file.length();
         }
     }

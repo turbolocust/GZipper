@@ -138,18 +138,35 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
                     _algorithm.extract(_archiveInfo);
                     break;
                 default:
-                    throw new GZipperException("Mode could not be determined.");
+                    throw GZipperException.createWithReason(
+                            GZipperException.Reason.ILLEGAL_MODE,
+                            "Mode could not be determined.");
             }
             success = true;
-        } catch (IOException ex) {
-            if (!_interrupt) { // considered to be critical
+        }
+        catch (IOException ex) {
+            if (!_interrupt) {
+                Throwable cause = ex.getCause();
+                if (cause instanceof GZipperException) {
+                    GZipperException inner = (GZipperException) cause;
+                    switch (inner.getReason()) {
+                        case NO_DIR_SUPPORTED:
+                            Log.w(I18N.getString("noDirSupported.text"), true);
+                            break;
+                        default:
+                            // ignore
+                            break;
+                    }
+                }
                 Log.e(ex.getLocalizedMessage(), ex);
                 Log.w(I18N.getString("corruptArchive.text"), true);
             }
-        } catch (CompressorException | ArchiveException ex) {
+        }
+        catch (CompressorException | ArchiveException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
             Log.w(I18N.getString("wrongFormat.text"), true);
-        } finally {
+        }
+        finally {
             setElapsedTime();
             _completed = true;
             _algorithm.clearListeners();
