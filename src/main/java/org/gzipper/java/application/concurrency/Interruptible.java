@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ package org.gzipper.java.application.concurrency;
  * @author Matthias Fussenegger
  */
 @FunctionalInterface
-public interface Interruptable {
+public interface Interruptible {
 
     /**
      * Interrupts any further processing.

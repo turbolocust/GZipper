@@ -24,20 +24,20 @@ import java.util.function.Predicate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.pojo.ArchiveInfo;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.application.algorithm.CompressionAlgorithm;
 import org.gzipper.java.application.observer.Listener;
+import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
  * Object that represents an archiving operation.
  *
  * @author Matthias Fussenegger
  */
-public final class ArchiveOperation implements Callable<Boolean>, Interruptable {
+public final class ArchiveOperation implements Callable<Boolean>, Interruptible {
 
     /**
      * The aggregated {@link ArchiveInfo}.

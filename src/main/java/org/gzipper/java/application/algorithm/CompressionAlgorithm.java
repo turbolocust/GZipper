@@ -22,16 +22,16 @@ import java.util.function.Predicate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.observer.Notifier;
 import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
  * Any implementing class offers methods for compression and decompression.
  *
  * @author Matthias Fussenegger
  */
-public interface CompressionAlgorithm extends Interruptable, Notifier<Integer> {
+public interface CompressionAlgorithm extends Interruptible, Notifier<Integer> {
 
     /**
      * The default buffer size for chunks.

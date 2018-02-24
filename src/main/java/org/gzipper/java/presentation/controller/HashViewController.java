@@ -39,7 +39,6 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
-import org.gzipper.java.application.concurrency.Interruptable;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
 import org.gzipper.java.application.hashing.MessageDigestProviderImpl;
@@ -50,13 +49,14 @@ import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.model.HashViewTableModel;
 import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
+import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
  * Controller for the FXML named "HashView.fxml".
  *
  * @author Matthias Fussenegger
  */
-public final class HashViewController extends BaseController implements Interruptable {
+public final class HashViewController extends BaseController implements Interruptible {
 
     /**
      * The aggregated {@link MessageDigestProvider}.
