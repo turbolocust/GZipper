@@ -21,9 +21,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
@@ -33,8 +36,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -67,6 +75,11 @@ public final class HashViewController extends BaseController implements Interrup
      * The currently selected {@link MessageDigestAlgorithm}.
      */
     private final ObjectProperty<MessageDigestAlgorithm> _algorithm;
+
+    /**
+     * Set to remember results for {@link #_resultTable} to avoid duplicates.
+     */
+    private final Set<MessageDigestResult> _models = new HashSet<>();
 
     /**
      * Handler used to execute tasks.
@@ -134,13 +147,14 @@ public final class HashViewController extends BaseController implements Interrup
     @FXML
     void handleAlgorithmComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_algorithmComboBox)) {
-            final List<File> files = new ArrayList<>();
+            final int size = _resultTable.getItems().size();
+            final List<File> files = new ArrayList<>(size);
             _resultTable.getItems().stream()
                     .map((model) -> new File(model.getFilePath()))
                     .forEachOrdered((file) -> {
                         files.add(file);
                     });
-            _resultTable.getItems().clear();
+            clearRows();
             computeAndAppend(files);
         }
     }
@@ -180,6 +194,80 @@ public final class HashViewController extends BaseController implements Interrup
                 -> new ReadOnlyStringWrapper(data.getValue().getFilePath()));
         _hashValueColumn.setCellValueFactory(data
                 -> new ReadOnlyStringWrapper(data.getValue().getHashValue()));
+        setCellFactory(_fileNameColumn);
+        setCellFactory(_filePathColumn);
+        setCellFactory(_hashValueColumn);
+    }
+
+    private void setCellFactory(TableColumn<HashViewTableModel, String> column) {
+        column.setCellFactory((TableColumn<HashViewTableModel, String> col) -> {
+            final TableCell<HashViewTableModel, String> cell
+                    = new TableCell<HashViewTableModel, String>() {
+                @Override
+                protected void updateItem(String value, boolean empty) {
+                    super.updateItem(value, empty);
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        setText(value);
+                    }
+                }
+            };
+
+            // programmatically set up context menu
+            final ContextMenu ctxMenu = new ContextMenu();
+            final MenuItem copyMenuItem = new MenuItem(I18N.getString("copy.text"));
+            final MenuItem copyRowMenuItem = new MenuItem(I18N.getString("copyRow.text"));
+            final MenuItem copyAllMenuItem = new MenuItem(I18N.getString("copyAll.text"));
+
+            copyMenuItem.setOnAction(evt -> { // copy
+                if (evt.getSource().equals(copyMenuItem)) {
+                    final Clipboard clipboard = Clipboard.getSystemClipboard();
+                    final ClipboardContent content = new ClipboardContent();
+                    content.putString(cell.getItem());
+                    clipboard.setContent(content);
+                }
+            });
+
+            copyRowMenuItem.setOnAction(evt -> { // copy row
+                if (evt.getSource().equals(copyRowMenuItem)) {
+                    final Clipboard clipboard = Clipboard.getSystemClipboard();
+                    final ClipboardContent content = new ClipboardContent();
+                    final StringBuilder sb = new StringBuilder();
+                    final HashViewTableModel model
+                            = (HashViewTableModel) cell.getTableRow().getItem();
+                    sb.append(model.getFileName()).append("\t")
+                            .append(model.getFilePath()).append("\t")
+                            .append(model.getHashValue());
+                    content.putString(sb.toString());
+                    clipboard.setContent(content);
+                }
+            });
+
+            copyAllMenuItem.setOnAction(evt -> { // copy all
+                if (evt.getSource().equals(copyAllMenuItem)) {
+                    final Clipboard clipboard = Clipboard.getSystemClipboard();
+                    final ClipboardContent content = new ClipboardContent();
+                    final StringBuilder sb = new StringBuilder();
+                    _resultTable.getItems().forEach((model) -> {
+                        sb.append(model.getFileName()).append("\t")
+                                .append(model.getFilePath()).append("\t")
+                                .append(model.getHashValue()).append("\n");
+                    });
+                    content.putString(sb.toString());
+                    clipboard.setContent(content);
+                }
+            });
+
+            ctxMenu.getItems().addAll(copyMenuItem, copyRowMenuItem, copyAllMenuItem);
+
+            cell.contextMenuProperty().bind(Bindings
+                    .when(cell.emptyProperty())
+                    .then((ContextMenu) null)
+                    .otherwise(ctxMenu));
+
+            return cell;
+        });
     }
 
     private String setCase(String value) {
@@ -195,7 +283,7 @@ public final class HashViewController extends BaseController implements Interrup
         }
         // clear table if append is deactivated
         if (!_appendFilesCheckBox.isSelected()) {
-            _resultTable.getItems().clear();
+            clearRows();
         }
 
         Task<Boolean> task = new Task<Boolean>() {
@@ -206,9 +294,11 @@ public final class HashViewController extends BaseController implements Interrup
                         return false;
                     }
                     try {
-                        if (file.isFile() && file.exists()) { // folders are not supported
+                        // folders are not supported
+                        if (file.isFile() && file.exists()) {
                             byte[] bytes = Files.readAllBytes(file.toPath());
-                            appendColumn(_provider.computeHash(bytes, _algorithm.get()), file);
+                            appendColumn(_provider.computeHash(
+                                    bytes, _algorithm.get()), file);
                         }
                     }
                     catch (IOException ex) {
@@ -250,22 +340,30 @@ public final class HashViewController extends BaseController implements Interrup
         _lowerCaseCheckBox.disableProperty().bind(task.runningProperty());
     }
 
+    private void clearRows() {
+        _resultTable.getItems().clear();
+        _models.clear();
+    }
+
     private void appendColumn(MessageDigestResult result, File file) {
-        final HashViewTableModel model;
-        if (!result.isEmpty()) {
-            model = new HashViewTableModel(
-                    file.getName(),
-                    file.getAbsolutePath(),
-                    setCase(result.toString()));
-        } else {
-            model = new HashViewTableModel(
-                    file.getName(),
-                    file.getAbsolutePath(),
-                    I18N.getString("errorReadingFile.text"));
+        if (!_models.contains(result)) {
+            final HashViewTableModel model;
+            if (!result.isEmpty()) {
+                model = new HashViewTableModel(
+                        file.getName(),
+                        file.getAbsolutePath(),
+                        setCase(result.toString()));
+            } else {
+                model = new HashViewTableModel(
+                        file.getName(),
+                        file.getAbsolutePath(),
+                        I18N.getString("errorReadingFile.text"));
+            }
+            Platform.runLater(() -> {
+                _resultTable.getItems().add(model);
+                _models.add(result);
+            });
         }
-        Platform.runLater(() -> {
-            _resultTable.getItems().add(model);
-        });
     }
 
     @Override
