@@ -20,11 +20,12 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * Simple filter predicate that tests a string against a {@link Pattern}.
+ * Simple filter predicate which uses a regular expression to test a string
+ * against a {@link Pattern}.
  *
  * @author Matthias Fussenegger
  */
-public class PatternPredicate implements Predicate<String> {
+public final class PatternPredicate implements Predicate<String> {
 
     /**
      * The aggregated pattern (regular expression).

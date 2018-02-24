@@ -35,7 +35,7 @@ import org.gzipper.java.application.predicates.Predicates;
 public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements CompressionAlgorithm {
 
     /**
-     * True if this algorithm is performing an operation, false otherwise.
+     * If set to true the currently running operation will be interrupted.
      */
     protected volatile boolean _interrupt = false;
 

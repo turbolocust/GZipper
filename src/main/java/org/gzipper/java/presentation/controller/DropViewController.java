@@ -44,7 +44,7 @@ import org.gzipper.java.presentation.style.CSS;
  *
  * @author Matthias Fussenegger
  */
-public class DropViewController extends BaseController {
+public final class DropViewController extends BaseController {
 
     /**
      * A list consisting of the parsed file addresses.
@@ -65,7 +65,7 @@ public class DropViewController extends BaseController {
     /**
      * Constructs a controller for Address Dropper with the specified CSS theme.
      *
-     * @param theme the {@link CSS} theme to apply.
+     * @param theme the {@link CSS} theme to be applied.
      */
     public DropViewController(CSS.Theme theme) {
         super(theme);
@@ -112,8 +112,7 @@ public class DropViewController extends BaseController {
         final Dragboard dragboard = evt.getDragboard();
         boolean success = false;
         if (dragboard.hasFiles()) {
-            if (!_appendAddressesCheckBox.isSelected()
-                    && !_textArea.getText().isEmpty()) {
+            if (!_appendAddressesCheckBox.isSelected()) {
                 _textArea.clear();
             }
             // add each dropped file's path to text area

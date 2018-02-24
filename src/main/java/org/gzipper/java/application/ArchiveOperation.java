@@ -37,7 +37,7 @@ import org.gzipper.java.application.observer.Listener;
  *
  * @author Matthias Fussenegger
  */
-public class ArchiveOperation implements Callable<Boolean>, Interruptable {
+public final class ArchiveOperation implements Callable<Boolean>, Interruptable {
 
     /**
      * The aggregated {@link ArchiveInfo}.
@@ -146,7 +146,7 @@ public class ArchiveOperation implements Callable<Boolean>, Interruptable {
         }
         catch (IOException ex) {
             if (!_interrupt) {
-                Throwable cause = ex.getCause();
+                final Throwable cause = ex.getCause();
                 if (cause instanceof GZipperException) {
                     GZipperException inner = (GZipperException) cause;
                     switch (inner.getReason()) {
