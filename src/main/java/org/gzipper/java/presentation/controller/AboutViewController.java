@@ -44,7 +44,7 @@ import org.gzipper.java.util.Log;
  *
  * @author Matthias Fussenegger
  */
-public class AboutViewController extends BaseController {
+public final class AboutViewController extends BaseController {
 
     /**
      * The name of the image to be displayed in the about view.
@@ -59,12 +59,12 @@ public class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private static final String APP_VERSION = "0.5.19 BETA";
+    private static final String APP_VERSION = "0.5.20 BETA";
 
     /**
      * The build date of this application.
      */
-    private static final String APP_BUILD_DATE = "02/14/2018";
+    private static final String APP_BUILD_DATE = "02/24/2018";
 
     /**
      * The author of this application.
@@ -92,7 +92,7 @@ public class AboutViewController extends BaseController {
      * Constructs a controller for About View with the specified CSS theme and
      * host services.
      *
-     * @param theme the {@link CSS} theme to apply.
+     * @param theme the {@link CSS} theme to be applied.
      * @param hostServices the host services to aggregate.
      */
     public AboutViewController(CSS.Theme theme, HostServices hostServices) {
