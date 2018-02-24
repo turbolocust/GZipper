@@ -59,7 +59,7 @@ public class MessageDigestProviderImplTest {
      * Test of computeHash method, of class MessageDigestProviderImpl.
      */
     @Test
-    public void testComputeHash_MD5() {
+    public void testComputeHash() {
         System.out.println("computeHash");
 
         final byte[] bytes = TEST_VALUE.getBytes();
