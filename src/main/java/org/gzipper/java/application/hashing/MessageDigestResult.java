@@ -18,6 +18,7 @@ package org.gzipper.java.application.hashing;
 
 import java.util.Arrays;
 import java.util.Objects;
+import org.gzipper.java.application.util.StringUtils;
 
 /**
  * Holds result values of message digest algorithms.
@@ -29,6 +30,11 @@ public final class MessageDigestResult {
     private final byte[] _hashedBytes;
 
     private final String _hashedValue;
+
+    public MessageDigestResult() {
+        _hashedBytes = new byte[0];
+        _hashedValue = StringUtils.EMPTY;
+    }
 
     public MessageDigestResult(byte[] hashedBytes, String hashedValue) {
         _hashedBytes = hashedBytes;
@@ -51,6 +57,15 @@ public final class MessageDigestResult {
      */
     public final String getHashedValue() {
         return _hashedValue;
+    }
+
+    /**
+     * Checks whether this is result represents an empty one or not.
+     *
+     * @return true if this result represents an empty one.
+     */
+    public boolean isEmpty() {
+        return _hashedBytes.length == 0 && _hashedValue.isEmpty();
     }
 
     @Override

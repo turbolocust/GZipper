@@ -38,4 +38,9 @@ public enum MessageDigestAlgorithm {
     public final String getAlgorithmName() {
         return _algorithmName;
     }
+
+    @Override
+    public String toString() {
+        return _algorithmName;
+    }
 }

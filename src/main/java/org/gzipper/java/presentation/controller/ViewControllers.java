@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ import org.gzipper.java.util.Log;
  *
  * @author Matthias Fussenegger
  */
-public class ViewControllers {
+public final class ViewControllers {
 
     /**
      * Defines the resource for the about view.
@@ -44,6 +44,15 @@ public class ViewControllers {
      * Defines the resource for the drop view.
      */
     private static final String DROP_VIEW_RES = "/fxml/DropView.fxml";
+
+    /**
+     * Defines the resource for the hash view.
+     */
+    private static final String HASH_VIEW_RES = "/fxml/HashView.fxml";
+
+    private ViewControllers() {
+        throw new AssertionError("Holds static members only.");
+    }
 
     /**
      * Shows the about view in a separate window.
@@ -72,7 +81,8 @@ public class ViewControllers {
             aboutView.setTitle(I18N.getString("aboutViewTitle.text"));
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
         return controller;
@@ -100,7 +110,50 @@ public class ViewControllers {
             dropView.setTitle("Address Dropper"); // no internationalization required
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
+            handleErrorLoadingView(ex, theme, icon);
+        }
+        return controller;
+    }
+
+    /**
+     * Shows the hash view in a separate window.
+     *
+     * @param theme the theme to be applied.
+     * @return the controller for the view.
+     */
+    static HashViewController showHashView(CSS.Theme theme) {
+        final FXMLLoader fxmlLoader = initFXMLLoader(HASH_VIEW_RES);
+        HashViewController controller = new HashViewController(theme);
+        fxmlLoader.setController(controller);
+
+        final Image icon = BaseController._iconImage;
+        final Stage hashView = new Stage();
+        hashView.setAlwaysOnTop(false);
+        hashView.initModality(Modality.NONE);
+        controller.setPrimaryStage(hashView);
+
+        // add stage to active stages since window is not modal
+        BaseController.getStages().add(hashView);
+
+        hashView.setOnCloseRequest(evt -> {
+            Log.i("Closing hash view.", false);
+            controller.interrupt(); // cancels any active task
+        });
+
+        hashView.setOnHiding(evt -> {
+            Log.i("Hiding hash view.", false);
+            controller.interrupt(); // cancels any active task
+        });
+
+        try {
+            hashView.getIcons().add(icon);
+            hashView.setTitle(I18N.getString("hashViewTitle.text"));
+            hashView.setScene(loadScene(fxmlLoader, theme));
+            hashView.show();
+        }
+        catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
         return controller;

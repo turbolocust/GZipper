@@ -77,7 +77,7 @@ public abstract class BaseController implements Initializable {
     /**
      * Constructs a controller with the specified CSS theme.
      *
-     * @param theme the {@link CSS} theme to apply.
+     * @param theme the {@link CSS} theme to be applied.
      */
     public BaseController(CSS.Theme theme) {
         _theme = theme;
@@ -86,8 +86,8 @@ public abstract class BaseController implements Initializable {
     /**
      * Constructs a controller with the specified CSS theme and host services.
      *
-     * @param theme the {@link CSS} theme to apply.
-     * @param hostServices the host services to aggregate.
+     * @param theme the {@link CSS} theme to be applied.
+     * @param hostServices the host services to be aggregated.
      */
     public BaseController(CSS.Theme theme, HostServices hostServices) {
         _theme = theme;

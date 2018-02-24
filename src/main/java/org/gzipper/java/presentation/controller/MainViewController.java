@@ -83,12 +83,17 @@ import org.gzipper.java.application.util.StringUtils;
  *
  * @author Matthias Fussenegger
  */
-public class MainViewController extends BaseController {
+public final class MainViewController extends BaseController {
 
     /**
      * Key constant used to access the properties map for menu items.
      */
     private static final String COMPRESSION_LEVEL_KEY = "compressionLevel";
+
+    /**
+     * Handler used to execute tasks.
+     */
+    private final TaskHandler _taskHandler;
 
     /**
      * Map consisting of {@link Future} objects representing the currently
@@ -146,6 +151,8 @@ public class MainViewController extends BaseController {
     @FXML
     private MenuItem _dropAddressesMenuItem;
     @FXML
+    private MenuItem _hashingMenuItem;
+    @FXML
     private MenuItem _resetAppMenuItem;
     @FXML
     private MenuItem _aboutMenuItem;
@@ -180,7 +187,7 @@ public class MainViewController extends BaseController {
      * Constructs a controller for Main View with the specified CSS theme and
      * host services.
      *
-     * @param theme the {@link CSS} theme to apply.
+     * @param theme the {@link CSS} theme to be applied.
      * @param hostServices the host services to aggregate.
      */
     public MainViewController(CSS.Theme theme, HostServices hostServices) {
@@ -188,6 +195,7 @@ public class MainViewController extends BaseController {
         _archiveName = DEFAULT_ARCHIVE_NAME;
         _compressionLevel = Deflater.DEFAULT_COMPRESSION;
         _activeTasks = new ConcurrentHashMap<>();
+        _taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 
@@ -288,6 +296,13 @@ public class MainViewController extends BaseController {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
                 _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
             }
+        }
+    }
+
+    @FXML
+    void handleHashingMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_hashingMenuItem)) {
+            ViewControllers.showHashView(_theme);
         }
     }
 
@@ -561,7 +576,7 @@ public class MainViewController extends BaseController {
             @Override
             protected Boolean call() throws Exception {
 
-                Future<Boolean> futureTask = TaskHandler.submit(operation);
+                Future<Boolean> futureTask = _taskHandler.submit(operation);
 
                 while (!futureTask.isDone()) {
                     try {
@@ -581,6 +596,7 @@ public class MainViewController extends BaseController {
                     return futureTask.get();
                 }
                 catch (CancellationException ex) {
+                    // ignore exception
                     return false;
                 }
             }
@@ -774,7 +790,7 @@ public class MainViewController extends BaseController {
                 Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
                 _progressBar.visibleProperty().bind(task.runningProperty());
                 _progressText.visibleProperty().bind(task.runningProperty());
-                _activeTasks.put(task.toString(), TaskHandler.submit(task));
+                _activeTasks.put(task.toString(), _taskHandler.submit(task));
                 toggleUIcontrols(true);
             }
         }

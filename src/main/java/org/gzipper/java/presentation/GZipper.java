@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ public class GZipper extends Application {
         stage.setOnCloseRequest((WindowEvent evt) -> {
             evt.consume();
             controller.cancelActiveTasks();
+            Log.i("Exiting application.", false);
             Platform.exit();
             System.exit(0);
         });
@@ -109,7 +110,8 @@ public class GZipper extends Application {
                 try { // copy settings file to application folder if missing
                     String resource = AppUtils.getResource(GZipper.class, "/settings.properties");
                     FileUtils.copy(resource, decPath + "settings.properties");
-                } catch (URISyntaxException | IOException ex) {
+                }
+                catch (URISyntaxException | IOException ex) {
                     Log.e(ex.getLocalizedMessage(), ex);
                 }
             }
@@ -121,7 +123,8 @@ public class GZipper extends Application {
 
             Settings.getInstance().init(settings, os);
 
-        } catch (UnsupportedEncodingException ex) {
+        }
+        catch (UnsupportedEncodingException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
         }
     }
@@ -139,9 +142,11 @@ public class GZipper extends Application {
             handler.setFormatter(new SimpleFormatter());
             logger.addHandler(handler);
             Log.setVerboseUiLogging(true);
-        } catch (UnsupportedEncodingException ex) {
+        }
+        catch (UnsupportedEncodingException ex) {
             logger.log(Level.SEVERE, null, ex);
-        } catch (IOException | SecurityException ex) {
+        }
+        catch (IOException | SecurityException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
@@ -165,7 +170,8 @@ public class GZipper extends Application {
                     for (Handler handler : logger.getHandlers()) {
                         handler.close();
                     }
-                } catch (IOException ex) {
+                }
+                catch (IOException ex) {
                     Log.e(ex.getLocalizedMessage(), ex);
                 }
             }

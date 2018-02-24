@@ -26,19 +26,16 @@ import java.util.concurrent.Future;
  *
  * @author Matthias Fussenegger
  */
-public final class TaskHandler {
+public final class TaskHandler implements AutoCloseable {
 
-    /**
-     * The executor service which executes tasks.
-     */
-    private static final ExecutorService EXECUTOR_SERVICE;
+    private final ExecutorService _executorService;
 
-    static {
-        EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+    public TaskHandler() {
+        _executorService = Executors.newCachedThreadPool();
     }
 
-    private TaskHandler() {
-        throw new AssertionError("Holds static members only.");
+    public TaskHandler(ExecutorType type) {
+        _executorService = type.getExecutorService();
     }
 
     /**
@@ -47,8 +44,8 @@ public final class TaskHandler {
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public static synchronized Future<?> submit(Runnable task) {
-        return EXECUTOR_SERVICE.submit(task);
+    public synchronized Future<?> submit(Runnable task) {
+        return _executorService.submit(task);
     }
 
     /**
@@ -58,7 +55,28 @@ public final class TaskHandler {
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public static synchronized <T> Future<T> submit(Callable<T> task) {
-        return EXECUTOR_SERVICE.submit(task);
+    public synchronized <T> Future<T> submit(Callable<T> task) {
+        return _executorService.submit(task);
+    }
+
+    @Override
+    public void close() throws Exception {
+        _executorService.shutdown();
+    }
+
+    public enum ExecutorType {
+        CACHED {
+            @Override
+            ExecutorService getExecutorService() {
+                return Executors.newCachedThreadPool();
+            }
+        }, QUEUED {
+            @Override
+            ExecutorService getExecutorService() {
+                return Executors.newSingleThreadExecutor();
+            }
+        };
+
+        abstract ExecutorService getExecutorService();
     }
 }
