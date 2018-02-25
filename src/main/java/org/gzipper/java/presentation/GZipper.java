@@ -80,13 +80,16 @@ public class GZipper extends Application {
         // load CSS theme
         CSS.load(theme, scene);
 
-        // properly shut down application when closing window
+        // properly shut down application when closing/hiding window
         stage.setOnCloseRequest((WindowEvent evt) -> {
             evt.consume();
             controller.cancelActiveTasks();
-            Log.i("Exiting application.", false);
-            Platform.exit();
-            System.exit(0);
+            exitApplication();
+        });
+        stage.setOnHiding((WindowEvent evt) -> {
+            evt.consume();
+            controller.cancelActiveTasks();
+            exitApplication();
         });
 
         stage.setTitle("GZipper");
@@ -146,6 +149,15 @@ public class GZipper extends Application {
         catch (IOException | SecurityException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * Exits the application properly.
+     */
+    private void exitApplication() {
+        Log.i("Exiting application.", false);
+        Platform.exit();
+        System.exit(0);
     }
 
     /**
