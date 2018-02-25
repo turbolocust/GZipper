@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 package org.gzipper.java.application.model;
 
 /**
- * Abstract class that represents an operating system. This class basically acts
- * as a wrapper for an {@link OS} enumeration while offering additional
+ * Class that represents an operating system. This class basically acts as a
+ * wrapper for an {@link OS} enumeration while offering additional
  * functionalities that may be required for archiving operations.
  *
  * @author Matthias Fussenegger
  */
-public abstract class OperatingSystem {
+public class OperatingSystem {
 
     /**
      * The aggregated enumeration which represents the operating system.
@@ -33,10 +33,10 @@ public abstract class OperatingSystem {
     /**
      * Constructs a new instance of this class using the specified enumeration.
      *
-     * @param operatingSystem the operating system to aggregate.
+     * @param operatingSystem the operating system to be aggregated.
      */
-    protected OperatingSystem(OS operatingSystem) {
-        this._operatingSystem = operatingSystem;
+    public OperatingSystem(OS operatingSystem) {
+        _operatingSystem = operatingSystem;
     }
 
     /**

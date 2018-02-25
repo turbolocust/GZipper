@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import org.gzipper.java.application.model.OS;
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.model.Unix;
-import org.gzipper.java.application.model.Windows;
 import org.gzipper.java.application.util.FileUtils;
 
 /**
@@ -70,9 +69,10 @@ public final class TestUtils {
     }
 
     static OperatingSystem getOperatingSystem() {
-        return System.getProperty("os.name").startsWith("Windows")
-                ? new Windows()
-                : new Unix();
+        return System.getProperty("os.name")
+                .toLowerCase().startsWith("windows")
+                ? new OperatingSystem(OS.WINDOWS)
+                : new OperatingSystem(OS.UNIX);
     }
 
     static class Document {

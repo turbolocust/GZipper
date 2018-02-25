@@ -35,9 +35,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.gzipper.java.application.model.OS;
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.model.Unix;
-import org.gzipper.java.application.model.Windows;
 import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.util.Settings;
@@ -97,8 +96,7 @@ public class GZipper extends Application {
     }
 
     /**
-     * Initializes the application by reading the settings file and setting the
-     * current operating system.
+     * Initializes the application.
      */
     private void initApplication() {
         try {
@@ -115,13 +113,13 @@ public class GZipper extends Application {
                 }
             }
 
-            // set operating system and instantiate settings file
-            OperatingSystem os = System.getProperty("os.name").startsWith("Windows")
-                    ? new Windows()
-                    : new Unix();
+            // determine operating system and initialize settings class
+            OperatingSystem os = System.getProperty("os.name")
+                    .toLowerCase().startsWith("windows")
+                    ? new OperatingSystem(OS.WINDOWS)
+                    : new OperatingSystem(OS.UNIX);
 
             Settings.getInstance().init(settings, os);
-
         }
         catch (UnsupportedEncodingException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
