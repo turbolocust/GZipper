@@ -49,7 +49,7 @@ import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.ProgressManager;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
-import org.gzipper.java.presentation.style.CSS;
+import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
 

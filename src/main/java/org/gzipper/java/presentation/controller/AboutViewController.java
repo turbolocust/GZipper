@@ -36,7 +36,7 @@ import javafx.scene.text.TextFlow;
 import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.style.CSS;
+import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 
 /**

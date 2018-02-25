@@ -28,7 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.style.CSS;
 
 /**
  *

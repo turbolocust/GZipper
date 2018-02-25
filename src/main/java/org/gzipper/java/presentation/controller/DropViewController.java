@@ -37,7 +37,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.style.CSS;
+import org.gzipper.java.presentation.CSS;
 
 /**
  * Controller for the FXML named "DropView.fxml".

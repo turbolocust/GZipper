@@ -55,7 +55,7 @@ import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.model.HashViewTableModel;
-import org.gzipper.java.presentation.style.CSS;
+import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.application.concurrency.Interruptible;
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation.style;
+package org.gzipper.java.presentation;
 
 import java.util.List;
 import javafx.scene.Scene;

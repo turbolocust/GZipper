@@ -23,7 +23,7 @@ import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.gzipper.java.presentation.style.CSS;
+import org.gzipper.java.presentation.CSS;
 
 /**
  * The base controller each other controller should derive from.

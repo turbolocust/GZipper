@@ -41,7 +41,6 @@ import org.gzipper.java.application.model.Windows;
 import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.util.Settings;
-import org.gzipper.java.presentation.style.CSS;
 import org.gzipper.java.util.Log;
 
 /**
