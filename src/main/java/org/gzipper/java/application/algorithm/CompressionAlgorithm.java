@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.observer.Notifier;
-import org.gzipper.java.application.pojo.ArchiveInfo;
+import org.gzipper.java.application.ArchiveInfo;
 import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
