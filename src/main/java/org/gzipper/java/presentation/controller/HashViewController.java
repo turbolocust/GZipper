@@ -276,6 +276,13 @@ public final class HashViewController extends BaseController implements Interrup
                 : value.toUpperCase();
     }
 
+    /**
+     * Starts new task if none is already active to compute the hash values for
+     * the specified list of files and to eventually append the results to
+     * {@link #_resultTable}. A task is being used to avoid a non-responsive UI.
+     *
+     * @param files list of files to be processed.
+     */
     @SuppressWarnings("SleepWhileInLoop")
     private void computeAndAppend(final List<File> files) {
         if (_isAlive || ListUtils.isNullOrEmpty(files)) {
@@ -323,6 +330,7 @@ public final class HashViewController extends BaseController implements Interrup
         _taskHandler.submit(task);
         _isAlive = true;
 
+        // wait for task to complete
         while (task.isRunning()) {
             try {
                 Thread.sleep(10);
@@ -340,6 +348,11 @@ public final class HashViewController extends BaseController implements Interrup
         _lowerCaseCheckBox.disableProperty().bind(task.runningProperty());
     }
 
+    /**
+     * Should always be called in favor of {@code table.getItems().clear()}
+     * since this method will also clear the set of added models, which exists
+     * to avoid duplicates in table view.
+     */
     private void clearRows() {
         _resultTable.getItems().clear();
         _models.clear();
