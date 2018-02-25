@@ -58,6 +58,7 @@ import org.gzipper.java.presentation.model.HashViewTableModel;
 import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.application.concurrency.Interruptible;
+import org.gzipper.java.presentation.GUIUtils;
 
 /**
  * Controller for the FXML named "HashView.fxml".
@@ -131,6 +132,7 @@ public final class HashViewController extends BaseController implements Interrup
             final List<File> selectedFiles
                     = fc.showOpenMultipleDialog(_primaryStage);
             computeAndAppend(selectedFiles); // performs null check
+            GUIUtils.autoFitTable(_resultTable);
         }
     }
 
@@ -156,6 +158,7 @@ public final class HashViewController extends BaseController implements Interrup
                     });
             clearRows();
             computeAndAppend(files);
+            GUIUtils.autoFitTable(_resultTable);
         }
     }
 
@@ -181,6 +184,7 @@ public final class HashViewController extends BaseController implements Interrup
         boolean success = false;
         if (dragboard.hasFiles()) {
             computeAndAppend(dragboard.getFiles());
+            GUIUtils.autoFitTable(_resultTable);
             success = true;
         }
         evt.setDropCompleted(success);

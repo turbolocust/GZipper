@@ -25,7 +25,7 @@
       <TableView fx:id="_resultTable" onDragDropped="#handleResultTableOnDragDropped" onDragOver="#handleResultTableOnDragOver" tableMenuButtonVisible="true" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="_fileNameColumn" editable="false" prefWidth="75.0" text="%fileName.text" />
-          <TableColumn fx:id="_filePathColumn" editable="false" prefWidth="240.0" text="%filePath.text" />
+          <TableColumn fx:id="_filePathColumn" editable="false" prefWidth="240.0" text="%filePath.text" visible="false" />
             <TableColumn fx:id="_hashValueColumn" editable="false" prefWidth="400.0" sortable="false" text="%hashValue.text" />
         </columns>
          <cursor>
