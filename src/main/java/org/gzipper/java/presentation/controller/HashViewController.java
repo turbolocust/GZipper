@@ -46,6 +46,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
@@ -394,6 +395,8 @@ public final class HashViewController extends BaseController implements Interrup
 
         // set up table
         initTableCells();
+        final String placeholderText = I18N.getString("addFilesDragDrop.text");
+        _resultTable.setPlaceholder(new Text(placeholderText));
     }
 
     @Override
