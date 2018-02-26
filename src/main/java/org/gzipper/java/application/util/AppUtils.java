@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,31 @@ import java.nio.file.Paths;
 import org.gzipper.java.util.Log;
 
 /**
- * Utility class that provides methods for e.g. receiving resources from the
- * resource path of a class.
+ * Utility class that provides application-specific methods for e.g. receiving
+ * resources from the resource path of a class.
  *
  * @author Matthias Fussenegger
  */
 public final class AppUtils {
+
+    private static final String JAVA_VERSION = determineJavaVersion();
+
+    private static String determineJavaVersion() {
+        final String version = System.getProperty("java.version");
+        int pos = version.indexOf('.');
+        pos = version.indexOf('.', pos + 1);
+        return version.substring(0, pos);
+    }
+
+    /**
+     * Determines the current Java version and returns the major version of Java
+     * as string. For e.g. Java 8, this would return {@code 1.8}.
+     *
+     * @return the major Java version as string.
+     */
+    public static String getJavaVersion() {
+        return JAVA_VERSION;
+    }
 
     /**
      * Returns the resource path of the specified class as string. The file will
@@ -71,7 +90,8 @@ public final class AppUtils {
                 resource = file.getPath();
                 file.deleteOnExit();
 
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }
         } else {
@@ -95,7 +115,7 @@ public final class AppUtils {
         final File jarFile = new File(path);
         final int cutLength = determineCutLength(jarFile);
 
-        String decPath; //to hold decoded path of JAR-file
+        String decPath; // to hold decoded path of JAR-file
 
         if (System.getProperty("os.name").startsWith("Windows")) {
             decPath = URLDecoder.decode(path.substring(
@@ -108,12 +128,6 @@ public final class AppUtils {
         return decPath;
     }
 
-    /**
-     * Determines the cut length to get the application directory.
-     *
-     * @param f the file to get cut length for.
-     * @return the cut length, that is the name of the executable or the folder.
-     */
     private static int determineCutLength(File f) {
         int cutLength = 0;
         if (!f.isDirectory()) {

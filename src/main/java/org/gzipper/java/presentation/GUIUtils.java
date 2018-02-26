@@ -39,6 +39,7 @@ public final class GUIUtils {
         Method method = null;
 
         try {
+            // does not work with Java 9
             method = com.sun.javafx.scene.control.skin.TableViewSkin.class
                     .getDeclaredMethod(methodName, TableColumn.class, int.class);
             method.setAccessible(true);
