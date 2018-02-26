@@ -29,11 +29,6 @@
     -fx-background-insets: 1, 1, 1, 1;
 }
 
-#hashViewTable:row-selection .table-row-cell:filled:hover { /* row hovered */
-    -fx-background-color: #7E7E7E;
-    -fx-text-fill: -fx-text-inner-color;
-}
-
 #aboutViewGridPane {
     -fx-background-color: rgb(180, 180, 180);
 }
