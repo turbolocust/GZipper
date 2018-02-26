@@ -13,9 +13,25 @@
     -fx-control-inner-background:  rgb(50, 50, 50); 
 }
 
-/* Color for bold text in DropView */
-#dropViewText {
+#dropViewText { /* color for bold text in DropView */
     -fx-fill: #FFFFFF;
+}
+
+#hashViewTable {
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 1 1 1 1;
+    -fx-border-color: #7E7E7E;
+    -fx-border-width: 0 0 1 0;
+}
+
+#hashViewTable:focused {
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 1, 1, 1, 1;
+}
+
+#hashViewTable:row-selection .table-row-cell:filled:hover { /* row hovered */
+    -fx-background-color: #7E7E7E;
+    -fx-text-fill: -fx-text-inner-color;
 }
 
 #aboutViewGridPane {
