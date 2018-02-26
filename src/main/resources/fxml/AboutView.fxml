@@ -20,9 +20,10 @@
     <children>
         <ImageView id="aboutViewImageView" fx:id="_imageView" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <TextFlow id="aboutViewTextFlow" fx:id="_textFlow" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets left="8.0" right="8.0" />
-         </GridPane.margin></TextFlow>
+            <GridPane.margin>
+                <Insets left="8.0" right="8.0" />
+            </GridPane.margin>
+        </TextFlow>
         <Button fx:id="_closeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCloseButtonAction" text="%close.text" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER" />
     </children>
 </GridPane>

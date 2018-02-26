@@ -25,145 +25,145 @@
 <?import javafx.scene.text.Text?>
 
 
-  <BorderPane fx:id="_borderPane" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 34em; -fx-pref-width: 52em;" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
-      <bottom>
-          <GridPane BorderPane.alignment="CENTER">
-              <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                  <RowConstraints minHeight="32.0" prefHeight="36.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-              <children>
-                  <Button fx:id="_startButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleStartButtonAction" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                      <GridPane.margin>
-                          <Insets />
-                      </GridPane.margin>
-                  </Button>
-                  <Button fx:id="_abortButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleAbortButtonAction" prefWidth="300.0" text="%abort.text" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                      <GridPane.margin>
-                          <Insets />
-                      </GridPane.margin>
-                  </Button>
-              </children>
-          </GridPane>
-      </bottom>
-      <top>
-          <GridPane vgap="2.0" BorderPane.alignment="CENTER">
-              <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-              <children>
-                  <MenuBar>
-                      <menus>
-                          <Menu mnemonicParsing="false" text="%fileMenu.text">
-                              <items>
-                                  <MenuItem fx:id="_closeMenuItem" mnemonicParsing="false" onAction="#handleCloseMenuItemAction" text="%closeMenuItem.text">
-                                      <accelerator>
-                                          <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                                      </accelerator>
-                                  </MenuItem>
-                              </items>
-                          </Menu>
-                          <Menu mnemonicParsing="false" text="%editMenu.text">
-                              <items>
-                                  <MenuItem fx:id="_deleteMenuItem" mnemonicParsing="false" onAction="#handleDeleteMenuItemAction" text="%deleteMenuItem.text" />
-                                  <Menu mnemonicParsing="false" text="%compressionLevelMenuItem.text">
-                                      <items>
-                                          <MenuItem fx:id="_noCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%noCompression.text" />
-                                          <MenuItem fx:id="_bestSpeedCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestSpeedCompression.text" />
-                                          <MenuItem fx:id="_defaultCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%defaultCompression.text" />
-                                          <MenuItem fx:id="_bestCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestCompression.text" />
-                                      </items>
-                                  </Menu>
-                        <MenuItem fx:id="_applyFilterMenuItem" mnemonicParsing="false" onAction="#handleApplyFilterMenuItemAction" text="%applyFilterMenuItem.text">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator>
-                        </MenuItem>
-                        <MenuItem fx:id="_resetFilterMenuItem" mnemonicParsing="false" onAction="#handleResetFilterMenuItemAction" text="%resetFilterMenuItem.text" />
-                                  <SeparatorMenuItem mnemonicParsing="false" />
-                                  <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableLoggingCheckMenuItemAction" text="%enableLoggingMenuItem.text" />
-                                  <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />
-                              </items>
-                          </Menu>
-                          <Menu mnemonicParsing="false" text="Tools">
-                              <items>
-                                  <MenuItem fx:id="_dropAddressesMenuItem" mnemonicParsing="false" onAction="#handleDropAddressesMenuItemAction" text="Address Dropper">
-                                      <accelerator>
-                                          <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                                      </accelerator>
-                                  </MenuItem>
-                        <MenuItem fx:id="_hashingMenuItem" mnemonicParsing="false" onAction="#handleHashingMenuItemAction" text="Hashing">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator>
-                        </MenuItem>
-                              </items>
-                          </Menu>
-                          <Menu mnemonicParsing="false" text="%helpMenu.text">
-                              <items>
-                                  <MenuItem fx:id="_resetAppMenuItem" mnemonicParsing="false" onAction="#handleResetAppMenuItemAction" text="%resetApp.text" />
-                                  <MenuItem fx:id="_aboutMenuItem" mnemonicParsing="false" onAction="#handleAboutMenuItemAction" text="%aboutMenuItem.text">
-                                      <accelerator>
-                                          <KeyCodeCombination alt="UP" code="F1" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                                      </accelerator>
-                                  </MenuItem>
-                              </items>
-                          </Menu>
-                      </menus>
-                  </MenuBar>
-                  <HBox alignment="CENTER_LEFT" spacing="16.0" GridPane.rowIndex="1">
-                      <children>
-                          <Label text="%mode.text" />
-                          <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" selected="true" text="%compress.text">
-                              <toggleGroup>
-                                  <ToggleGroup fx:id="_compressionType" />
-                              </toggleGroup>
-                          </RadioButton>
-                          <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
-                      </children>
-                      <GridPane.margin>
-                          <Insets left="16.0" />
-                      </GridPane.margin>
-                  </HBox>
-            <StackPane GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="4.0" right="4.0" />
-               </GridPane.margin>
-               <children>
+<BorderPane fx:id="_borderPane" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 34em; -fx-pref-width: 52em;" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
+    <bottom>
+        <GridPane BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="32.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Button fx:id="_startButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleStartButtonAction" prefWidth="300.0" text="%start.text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                    <GridPane.margin>
+                        <Insets />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="_abortButton" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleAbortButtonAction" prefWidth="300.0" text="%abort.text" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                    <GridPane.margin>
+                        <Insets />
+                    </GridPane.margin>
+                </Button>
+            </children>
+        </GridPane>
+    </bottom>
+    <top>
+        <GridPane vgap="2.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <MenuBar>
+                    <menus>
+                        <Menu mnemonicParsing="false" text="%fileMenu.text">
+                            <items>
+                                <MenuItem fx:id="_closeMenuItem" mnemonicParsing="false" onAction="#handleCloseMenuItemAction" text="%closeMenuItem.text">
+                                    <accelerator>
+                                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                    </accelerator>
+                                </MenuItem>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="%editMenu.text">
+                            <items>
+                                <MenuItem fx:id="_deleteMenuItem" mnemonicParsing="false" onAction="#handleDeleteMenuItemAction" text="%deleteMenuItem.text" />
+                                <Menu mnemonicParsing="false" text="%compressionLevelMenuItem.text">
+                                    <items>
+                                        <MenuItem fx:id="_noCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%noCompression.text" />
+                                        <MenuItem fx:id="_bestSpeedCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestSpeedCompression.text" />
+                                        <MenuItem fx:id="_defaultCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%defaultCompression.text" />
+                                        <MenuItem fx:id="_bestCompressionMenuItem" mnemonicParsing="false" onAction="#handleCompressionLevelMenuItemAction" text="%bestCompression.text" />
+                                    </items>
+                                </Menu>
+                                <MenuItem fx:id="_applyFilterMenuItem" mnemonicParsing="false" onAction="#handleApplyFilterMenuItemAction" text="%applyFilterMenuItem.text">
+                                    <accelerator>
+                                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                    </accelerator>
+                                </MenuItem>
+                                <MenuItem fx:id="_resetFilterMenuItem" mnemonicParsing="false" onAction="#handleResetFilterMenuItemAction" text="%resetFilterMenuItem.text" />
+                                <SeparatorMenuItem mnemonicParsing="false" />
+                                <CheckMenuItem fx:id="_enableLoggingCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableLoggingCheckMenuItemAction" text="%enableLoggingMenuItem.text" />
+                                <CheckMenuItem fx:id="_enableDarkThemeCheckMenuItem" mnemonicParsing="false" onAction="#handleEnableDarkThemeCheckMenuItemAction" text="%enableDarkThemeMenuItem.text" />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Tools">
+                            <items>
+                                <MenuItem fx:id="_dropAddressesMenuItem" mnemonicParsing="false" onAction="#handleDropAddressesMenuItemAction" text="Address Dropper">
+                                    <accelerator>
+                                        <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                    </accelerator>
+                                </MenuItem>
+                                <MenuItem fx:id="_hashingMenuItem" mnemonicParsing="false" onAction="#handleHashingMenuItemAction" text="Hashing">
+                                    <accelerator>
+                                        <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                    </accelerator>
+                                </MenuItem>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="%helpMenu.text">
+                            <items>
+                                <MenuItem fx:id="_resetAppMenuItem" mnemonicParsing="false" onAction="#handleResetAppMenuItemAction" text="%resetApp.text" />
+                                <MenuItem fx:id="_aboutMenuItem" mnemonicParsing="false" onAction="#handleAboutMenuItemAction" text="%aboutMenuItem.text">
+                                    <accelerator>
+                                        <KeyCodeCombination alt="UP" code="F1" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                    </accelerator>
+                                </MenuItem>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <HBox alignment="CENTER_LEFT" spacing="16.0" GridPane.rowIndex="1">
+                    <children>
+                        <Label text="%mode.text" />
+                        <RadioButton fx:id="_compressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" selected="true" text="%compress.text">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="_compressionType" />
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="_decompressRadioButton" mnemonicParsing="false" onAction="#handleModeRadioButtonAction" text="%decompress.text" toggleGroup="$_compressionType" />
+                    </children>
+                    <GridPane.margin>
+                        <Insets left="16.0" />
+                    </GridPane.margin>
+                </HBox>
+                <StackPane GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="4.0" right="4.0" />
+                    </GridPane.margin>
+                    <children>
                         <TextField fx:id="_outputPathTextField" onKeyTyped="#onOutputPathTextFieldKeyTyped" promptText="%outputPath.text">
                             <padding>
                                 <Insets bottom="4.0" top="2.0" />
                             </padding>
                         </TextField>
-                  <ProgressBar fx:id="_progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" visible="false" />
-                  <Text fx:id="_progressText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" visible="false" StackPane.alignment="CENTER" />
-               </children>
-            </StackPane>
-                  <HBox alignment="CENTER_LEFT" spacing="8.0" GridPane.rowIndex="2">
-                      <GridPane.margin>
-                          <Insets left="16.0" />
-                      </GridPane.margin>
-                      <children>
-                          <Label text="%archiveType.text" />
-                          <ComboBox fx:id="_archiveTypeComboBox" minHeight="28.0" onAction="#handleArchiveTypeComboBoxAction" promptText="..." />
-                          <Separator orientation="VERTICAL" prefHeight="200.0" visible="false" />
-                          <Button fx:id="_selectFilesButton" minHeight="28.0" minWidth="150.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER" />
-                          <Button fx:id="_saveAsButton" minHeight="28.0" minWidth="132.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
-                      </children>
-                  </HBox>
-              </children>
-          </GridPane>
-      </top>
-      <center>
-          <TextArea fx:id="_textArea" editable="false" wrapText="true" BorderPane.alignment="CENTER" />
-      </center>
-  </BorderPane>
+                        <ProgressBar fx:id="_progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" visible="false" />
+                        <Text fx:id="_progressText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" visible="false" StackPane.alignment="CENTER" />
+                    </children>
+                </StackPane>
+                <HBox alignment="CENTER_LEFT" spacing="8.0" GridPane.rowIndex="2">
+                    <GridPane.margin>
+                        <Insets left="16.0" />
+                    </GridPane.margin>
+                    <children>
+                        <Label text="%archiveType.text" />
+                        <ComboBox fx:id="_archiveTypeComboBox" minHeight="28.0" onAction="#handleArchiveTypeComboBoxAction" promptText="..." />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" visible="false" />
+                        <Button fx:id="_selectFilesButton" minHeight="28.0" minWidth="150.0" mnemonicParsing="false" onAction="#handleSelectFilesButtonAction" text="%browseForFiles.text" textAlignment="CENTER" />
+                        <Button fx:id="_saveAsButton" minHeight="28.0" minWidth="132.0" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="%saveAsArchive.text" />
+                    </children>
+                </HBox>
+            </children>
+        </GridPane>
+    </top>
+    <center>
+        <TextArea fx:id="_textArea" editable="false" wrapText="true" BorderPane.alignment="CENTER" />
+    </center>
+</BorderPane>
