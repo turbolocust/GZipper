@@ -637,6 +637,7 @@ public final class MainViewController extends BaseController {
         _activeTasks.remove(task.toString());
         if (_activeTasks.isEmpty()) {
             _progressBar.setProgress(0d); // reset
+            _progressBar.visibleProperty().unbind();
             _progressText.setText(StringUtils.EMPTY);
             toggleUIcontrols(false);
         }

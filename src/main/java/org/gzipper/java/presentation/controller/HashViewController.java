@@ -32,11 +32,13 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
@@ -47,7 +49,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
@@ -93,7 +94,7 @@ public final class HashViewController extends BaseController implements Interrup
      * If set to false the currently running task will be interrupted.
      */
     private volatile boolean _isAlive = false;
-    
+
     @FXML
     private TableView<HashViewTableModel> _resultTable;
     @FXML
@@ -126,20 +127,20 @@ public final class HashViewController extends BaseController implements Interrup
         _algorithm = new SimpleObjectProperty<>();
         _taskHandler = new TaskHandler(TaskHandler.ExecutorType.QUEUED);
     }
-    
+
     @FXML
     void handleAddFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_addFilesButton)) {
             final FileChooser fc = new FileChooser();
             fc.setTitle(I18N.getString("browseForFiles.text"));
-            
+
             final List<File> selectedFiles
                     = fc.showOpenMultipleDialog(_primaryStage);
             computeAndAppend(selectedFiles); // performs null check
             GUIUtils.autoFitTable(_resultTable);
         }
     }
-    
+
     @FXML
     void handleLowerCaseCheckBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_lowerCaseCheckBox)) {
@@ -149,7 +150,7 @@ public final class HashViewController extends BaseController implements Interrup
             _resultTable.refresh();
         }
     }
-    
+
     @FXML
     void handleAlgorithmComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_algorithmComboBox)) {
@@ -165,14 +166,14 @@ public final class HashViewController extends BaseController implements Interrup
             GUIUtils.autoFitTable(_resultTable);
         }
     }
-    
+
     @FXML
     void handleCloseButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeButton)) {
             close();
         }
     }
-    
+
     @FXML
     void handleResultTableOnDragOver(DragEvent evt) {
         if (evt.getGestureSource() != _resultTable
@@ -181,7 +182,7 @@ public final class HashViewController extends BaseController implements Interrup
         }
         evt.consume();
     }
-    
+
     @FXML
     void handleResultTableOnDragDropped(DragEvent evt) {
         final Dragboard dragboard = evt.getDragboard();
@@ -194,7 +195,7 @@ public final class HashViewController extends BaseController implements Interrup
         evt.setDropCompleted(success);
         evt.consume();
     }
-    
+
     private void initTableCells() {
         _fileNameColumn.setCellValueFactory(data
                 -> new ReadOnlyStringWrapper(data.getValue().getFileName()));
@@ -206,7 +207,7 @@ public final class HashViewController extends BaseController implements Interrup
         setCellFactory(_filePathColumn);
         setCellFactory(_hashValueColumn);
     }
-    
+
     private void setCellFactory(TableColumn<HashViewTableModel, String> column) {
         column.setCellFactory((TableColumn<HashViewTableModel, String> col) -> {
             final TableCell<HashViewTableModel, String> cell
@@ -227,7 +228,7 @@ public final class HashViewController extends BaseController implements Interrup
             final MenuItem copyMenuItem = new MenuItem(I18N.getString("copy.text"));
             final MenuItem copyRowMenuItem = new MenuItem(I18N.getString("copyRow.text"));
             final MenuItem copyAllMenuItem = new MenuItem(I18N.getString("copyAll.text"));
-            
+
             copyMenuItem.setOnAction(evt -> { // copy
                 if (evt.getSource().equals(copyMenuItem)) {
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -236,7 +237,7 @@ public final class HashViewController extends BaseController implements Interrup
                     clipboard.setContent(content);
                 }
             });
-            
+
             copyRowMenuItem.setOnAction(evt -> { // copy row
                 if (evt.getSource().equals(copyRowMenuItem)) {
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -251,7 +252,7 @@ public final class HashViewController extends BaseController implements Interrup
                     clipboard.setContent(content);
                 }
             });
-            
+
             copyAllMenuItem.setOnAction(evt -> { // copy all
                 if (evt.getSource().equals(copyAllMenuItem)) {
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -266,22 +267,42 @@ public final class HashViewController extends BaseController implements Interrup
                     clipboard.setContent(content);
                 }
             });
-            
+
             ctxMenu.getItems().addAll(copyMenuItem, copyRowMenuItem, copyAllMenuItem);
-            
+
             cell.contextMenuProperty().bind(Bindings
                     .when(cell.emptyProperty())
                     .then((ContextMenu) null)
                     .otherwise(ctxMenu));
-            
+
             return cell;
         });
     }
-    
+
     private String setCase(String value) {
         return _lowerCaseCheckBox.isSelected()
                 ? value.toLowerCase()
                 : value.toUpperCase();
+    }
+
+    /**
+     * Computes the hash value of the specified file and appends the result as a
+     * row to {@link #_resultTable}.
+     *
+     * @param file the file of which to compute and append the hashing result.
+     */
+    private void computeAndAppend(File file) {
+        try {
+            if (file.isFile()) { // folders are not supported
+                byte[] bytes = Files.readAllBytes(file.toPath());
+                appendColumn(_provider.computeHash(
+                        bytes, _algorithm.get()), file);
+            }
+        }
+        catch (IOException ex) {
+            Log.e("Error reading file.", ex);
+            appendColumn(new MessageDigestResult(), file);
+        }
     }
 
     /**
@@ -300,39 +321,25 @@ public final class HashViewController extends BaseController implements Interrup
         if (!_appendFilesCheckBox.isSelected()) {
             clearRows();
         }
-        
-        Task<Boolean> task = new Task<Boolean>() {
+
+        final Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
                 for (File file : files) {
                     if (!_isAlive) {
                         return false;
-                    }
-                    try {
-                        // folders are not supported
-                        if (file.isFile() && file.exists()) {
-                            byte[] bytes = Files.readAllBytes(file.toPath());
-                            appendColumn(_provider.computeHash(
-                                    bytes, _algorithm.get()), file);
-                        }
-                    } catch (IOException ex) {
-                        Log.e("Error reading file.", ex);
-                        appendColumn(new MessageDigestResult(), file);
+                    } else {
+                        computeAndAppend(file);
                     }
                 }
                 return true;
             }
         };
+
         // set up event handlers
-        task.setOnSucceeded(e -> {
-            _isAlive = false;
-            e.consume();
-        });
-        task.setOnFailed(e -> {
-            _isAlive = false;
-            e.consume();
-        });
-        
+        task.setOnSucceeded(e -> onTaskCompleted(e));
+        task.setOnFailed(e -> onTaskCompleted(e));
+
         bindUIcontrols(task);
         _taskHandler.submit(task);
         _isAlive = true;
@@ -341,12 +348,19 @@ public final class HashViewController extends BaseController implements Interrup
         while (task.isRunning()) {
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException ex) {
+            }
+            catch (InterruptedException ex) {
                 Log.e("Task interrupted.", ex);
             }
         }
     }
-    
+
+    private void onTaskCompleted(Event evt) {
+        Platform.runLater(() -> unbindUIcontrols());
+        _isAlive = false;
+        evt.consume();
+    }
+
     private void bindUIcontrols(Task<?> task) {
         _addFilesButton.disableProperty().bind(task.runningProperty());
         _algorithmComboBox.disableProperty().bind(task.runningProperty());
@@ -354,6 +368,15 @@ public final class HashViewController extends BaseController implements Interrup
         _lowerCaseCheckBox.disableProperty().bind(task.runningProperty());
         _progressIndicator.disableProperty().bind(Bindings.not(task.runningProperty()));
         _progressIndicator.visibleProperty().bind(task.runningProperty());
+    }
+
+    private void unbindUIcontrols() {
+        _addFilesButton.disableProperty().unbind();
+        _algorithmComboBox.disableProperty().unbind();
+        _appendFilesCheckBox.disableProperty().unbind();
+        _lowerCaseCheckBox.disableProperty().unbind();
+        _progressIndicator.disableProperty().unbind();
+        _progressIndicator.visibleProperty().unbind();
     }
 
     /**
@@ -365,7 +388,7 @@ public final class HashViewController extends BaseController implements Interrup
         _resultTable.getItems().clear();
         _models.clear();
     }
-    
+
     private void appendColumn(MessageDigestResult result, File file) {
         if (!_models.contains(result)) {
             final HashViewTableModel model;
@@ -386,7 +409,7 @@ public final class HashViewController extends BaseController implements Interrup
             });
         }
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // set up combo box
@@ -399,9 +422,9 @@ public final class HashViewController extends BaseController implements Interrup
         // set up table
         initTableCells();
         final String placeholderText = I18N.getString("addFilesDragDrop.text");
-        _resultTable.setPlaceholder(new Text(placeholderText));
+        _resultTable.setPlaceholder(new Label(placeholderText));
     }
-    
+
     @Override
     public void interrupt() {
         _isAlive = false;
