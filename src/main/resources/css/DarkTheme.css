@@ -24,6 +24,11 @@
     -fx-border-width: 0 0 1 0;
 }
 
+#hashViewTable .placeholder .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
 #hashViewTable:focused {
     -fx-faint-focus-color: transparent;
     -fx-background-insets: 1, 1, 1, 1;
