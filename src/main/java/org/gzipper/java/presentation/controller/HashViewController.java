@@ -28,6 +28,7 @@ import java.util.Set;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
@@ -362,12 +363,15 @@ public final class HashViewController extends BaseController implements Interrup
     }
 
     private void bindUIcontrols(Task<?> task) {
-        _addFilesButton.disableProperty().bind(task.runningProperty());
-        _algorithmComboBox.disableProperty().bind(task.runningProperty());
-        _appendFilesCheckBox.disableProperty().bind(task.runningProperty());
-        _lowerCaseCheckBox.disableProperty().bind(task.runningProperty());
-        _progressIndicator.disableProperty().bind(Bindings.not(task.runningProperty()));
-        _progressIndicator.visibleProperty().bind(task.runningProperty());
+        
+        final ReadOnlyBooleanProperty running = task.runningProperty();
+        
+        _addFilesButton.disableProperty().bind(running);
+        _algorithmComboBox.disableProperty().bind(running);
+        _appendFilesCheckBox.disableProperty().bind(running);
+        _lowerCaseCheckBox.disableProperty().bind(running);
+        _progressIndicator.disableProperty().bind(Bindings.not(running));
+        _progressIndicator.visibleProperty().bind(running);
     }
 
     private void unbindUIcontrols() {

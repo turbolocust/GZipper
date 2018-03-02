@@ -55,6 +55,8 @@ import org.gzipper.java.util.Settings;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -515,15 +517,37 @@ public final class MainViewController extends BaseController {
         }
     }
 
-    private void toggleUIcontrols(boolean disable) {
-        _startButton.setDisable(disable);
-        _abortButton.setDisable(!disable);
-        _compressRadioButton.setDisable(disable);
-        _decompressRadioButton.setDisable(disable);
-        _archiveTypeComboBox.setDisable(disable);
-        _saveAsButton.setDisable(disable);
-        _selectFilesButton.setDisable(disable);
-        _dropAddressesMenuItem.setDisable(disable);
+    private void bindUIcontrols(Task<?> task) {
+
+        final ReadOnlyBooleanProperty running = task.runningProperty();
+
+        // controls
+        _startButton.disableProperty().bind(running);
+        _abortButton.disableProperty().bind(Bindings.not(running));
+        _compressRadioButton.disableProperty().bind(running);
+        _decompressRadioButton.disableProperty().bind(running);
+        _archiveTypeComboBox.disableProperty().bind(running);
+        _saveAsButton.disableProperty().bind(running);
+        _selectFilesButton.disableProperty().bind(running);
+        _dropAddressesMenuItem.disableProperty().bind(running);
+        // progress bar
+        _progressBar.visibleProperty().bind(running);
+        _progressText.visibleProperty().bind(running);
+    }
+
+    private void unbindUIcontrols() {
+        // controls
+        _startButton.disableProperty().unbind();
+        _abortButton.disableProperty().unbind();
+        _compressRadioButton.disableProperty().unbind();
+        _decompressRadioButton.disableProperty().unbind();
+        _archiveTypeComboBox.disableProperty().unbind();
+        _selectFilesButton.disableProperty().unbind();
+        _saveAsButton.disableProperty().unbind();
+        _dropAddressesMenuItem.disableProperty().unbind();
+        // progress bar
+        _progressBar.visibleProperty().unbind();
+        _progressText.visibleProperty().unbind();
     }
 
     private void resetFilter() {
@@ -636,10 +660,9 @@ public final class MainViewController extends BaseController {
                 operation.calculateElapsedTime());
         _activeTasks.remove(task.toString());
         if (_activeTasks.isEmpty()) {
+            unbindUIcontrols();
             _progressBar.setProgress(0d); // reset
-            _progressBar.visibleProperty().unbind();
             _progressText.setText(StringUtils.EMPTY);
-            toggleUIcontrols(false);
         }
     }
 
@@ -789,10 +812,8 @@ public final class MainViewController extends BaseController {
                 Log.i(I18N.getString("operationStarted.text"), true, operation,
                         info.getArchiveType().getDisplayName());
                 Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
-                _progressBar.visibleProperty().bind(task.runningProperty());
-                _progressText.visibleProperty().bind(task.runningProperty());
+                bindUIcontrols(task); // do this before submitting task
                 _activeTasks.put(task.toString(), _taskHandler.submit(task));
-                toggleUIcontrols(true);
             }
         }
 
