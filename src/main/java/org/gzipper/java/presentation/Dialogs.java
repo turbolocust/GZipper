@@ -118,7 +118,7 @@ public final class Dialogs {
         dialog.getEditor().setOnKeyReleased((KeyEvent event) -> {
             String text = ((TextField) event.getSource()).getText();
             try { // validate regex
-                Pattern pattern = Pattern.compile(text);
+                Pattern.compile(text);
                 confirmButton.setDisable(false);
             } catch (PatternSyntaxException ex) {
                 confirmButton.setDisable(true);

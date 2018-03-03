@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.util.Log;
 
 /**
@@ -30,7 +31,8 @@ import org.gzipper.java.util.Log;
  */
 public final class GUIUtils {
 
-// WORKAROUND based on: https://stackoverflow.com/questions/14650787/javafx-column-in-tableview-auto-fit-size
+// WORKAROUND based on: 
+// https://stackoverflow.com/questions/14650787/javafx-column-in-tableview-auto-fit-size
     private static final Method COLUMN_AUTOFIT_METHOD = initMethod();
 
     private static Method initMethod() {
@@ -39,13 +41,18 @@ public final class GUIUtils {
         Method method = null;
 
         try {
-            // does not work with Java 9
-            method = com.sun.javafx.scene.control.skin.TableViewSkin.class
-                    .getDeclaredMethod(methodName, TableColumn.class, int.class);
-            method.setAccessible(true);
+            final Class<?> clazz;
+            if (AppUtils.getJavaVersion().charAt(0) == '9') { // Java 9
+                /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
+                // does not work with Java 9 since module is not exported
+            } else {
+                clazz = Class.forName("com.sun.javafx.scene.control.skin.TableViewSkin");
+                method = clazz.getDeclaredMethod(methodName, TableColumn.class, int.class);
+                method.setAccessible(true);
+            }
         }
-        catch (NoSuchMethodException | SecurityException ex) {
-            Log.e("Error getting method via reflection.", ex);
+        catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+            Log.e("Method lookup via reflection failed.", ex);
         }
         return method;
     }
