@@ -24,7 +24,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Text?>
 
-
 <BorderPane fx:id="_borderPane" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 34em; -fx-pref-width: 52em;" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <GridPane BorderPane.alignment="CENTER">
@@ -145,7 +144,7 @@
                             </padding>
                         </TextField>
                         <ProgressBar fx:id="_progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" visible="false" />
-                        <Text fx:id="_progressText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" visible="false" StackPane.alignment="CENTER" />
+                        <Text id="progressBarText" fx:id="_progressText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" visible="false" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
                 <HBox alignment="CENTER_LEFT" spacing="8.0" GridPane.rowIndex="2">

@@ -509,10 +509,8 @@ public final class MainViewController extends BaseController {
             final String infoTitle = I18N.getString("info.text");
             final String infoText = I18N.getString("gzipCompressionInfo.text",
                     ArchiveType.TAR_GZ.getDisplayName());
-            final StringBuilder infoContent = new StringBuilder(infoText);
-            infoContent.append("\n\n").append(I18N.getString("dialogWontShowAgain.text"));
             Dialogs.showDialog(Alert.AlertType.INFORMATION, infoTitle, infoTitle,
-                    infoContent.toString(), _theme, getIconImage());
+                    infoText, _theme, getIconImage());
             settings.setProperty(propertyKey, false);
         }
     }

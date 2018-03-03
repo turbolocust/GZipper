@@ -13,8 +13,12 @@
     -fx-control-inner-background:  rgb(50, 50, 50); 
 }
 
+#progressBarText {
+    -fx-fill: white;
+}
+
 #dropViewText { /* color for bold text in DropView */
-    -fx-fill: #FFFFFF;
+    -fx-fill: white;
 }
 
 #hashViewTable {

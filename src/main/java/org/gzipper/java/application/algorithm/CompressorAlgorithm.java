@@ -31,7 +31,6 @@ import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
-import static org.gzipper.java.application.algorithm.CompressionAlgorithm.DEFAULT_BUFFER_SIZE;
 
 /**
  *

@@ -94,10 +94,10 @@ public final class FileUtils {
             return name.contains("<") || name.contains(">") || name.contains("/")
                     || name.contains("\\") || name.contains("|") || name.contains(":")
                     || name.contains("*") || name.contains("\"") || name.contains("?");
-        } else { // is directory
-            return filename.contains("<") || filename.contains(">") || filename.contains("|")
-                    || filename.contains("*") || filename.contains("\"") || filename.contains("?");
         }
+        return filename.contains("<") || filename.contains(">") || filename.contains("|")
+                || filename.contains("*") || filename.contains("\"") || filename.contains("?");
+
     }
 
     /**
@@ -214,7 +214,8 @@ public final class FileUtils {
                     return FileVisitResult.CONTINUE;
                 }
             });
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             throw new AssertionError(ex);
         }
 
