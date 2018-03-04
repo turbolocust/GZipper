@@ -10,12 +10,18 @@
   - Tarball (GZIP)
   - Tarball (BZIP2)
   - Tarball (LZMA)
-* Compress and decompress GZIP.
-* Compression levels can be adjusted.
+* Compress and decompress GZIP
+* Compression levels can be adjusted
   - if supported by compressor
 * Support for regular expressions
   - allows filtering of files/entries
-* Supports a dark theme (CSS style).
+* Supports a dark theme (CSS style)
+* Message Digest algorithms:
+  - MD5
+  - SHA-1
+  - SHA-256
+  - SHA-384
+  - SHA-512
 * Languages which are supported:
   - English
   - German
@@ -27,7 +33,7 @@
    - `sudo apt-get install openjfx`
    
 <br /><br />
-For compression and decompression parts of the commons-compress library by Apache Foundation is used as well as 'XZ for Java' by Tukaani. Their source code and documentation can be found here: 
+For compression and decompression this application uses parts of the commons-compress library by Apache Foundation as well as 'XZ for Java' by Tukaani. Their source code and documentation can be found here: 
   - <a href>http://commons.apache.org/</a>
   - <a href>https://tukaani.org/</a>
   
@@ -37,10 +43,10 @@ For compression and decompression parts of the commons-compress library by Apach
 # Screenshots
 
 <b>Main view with enabled default theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX.PNG" alt="main view with enabled default theme"/><br />
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_mainView.PNG" alt="main view with enabled default theme"/><br />
 <br /><b>Drop view with enabled default theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_dropper.PNG" alt="drop view with enabled default theme"/><br />
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_hashView.PNG" alt="hash view with enabled default theme"/><br />
 <br /><b>Main view with enabled dark theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_DARK.PNG" alt="main view with enabled dark theme"/><br />
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_mainView_dark.PNG" alt="main view with enabled dark theme"/><br />
 <br /><b>Drop view with enabled dark theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_dropper_dark.PNG" alt="drop view with enabled dark theme"/>
+<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_hashView_dark.PNG" alt="hash view with enabled dark theme"/>
