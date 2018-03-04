@@ -49,7 +49,7 @@ import org.gzipper.java.util.Log;
 public class GZipper extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public final void start(Stage stage) throws Exception {
 
         initApplication(); // has to be the first call
 

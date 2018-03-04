@@ -25,6 +25,10 @@ import java.util.List;
  */
 public final class ListUtils {
 
+    private ListUtils() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     /**
      * Checks whether the given list is {@code null} or empty.
      *

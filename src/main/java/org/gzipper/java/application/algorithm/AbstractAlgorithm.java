@@ -91,13 +91,13 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      *
      * @param readBytes the amount of bytes read so far.
      */
-    protected void updateProgress(long readBytes) {
+    protected final void updateProgress(long readBytes) {
         _algorithmProgress.updateProgress(readBytes);
         changeValue(_algorithmProgress.getProgress());
     }
 
     @Override
-    public void compress(ArchiveInfo info) throws IOException,
+    public final void compress(ArchiveInfo info) throws IOException,
             ArchiveException, CompressorException {
         final File[] files = new File[info.getFiles().size()];
         _compressionLevel = info.getLevel();
@@ -106,13 +106,13 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     }
 
     @Override
-    public void extract(ArchiveInfo info) throws IOException,
+    public final void extract(ArchiveInfo info) throws IOException,
             ArchiveException, CompressorException {
         extract(info.getOutputPath(), info.getArchiveName());
     }
 
     @Override
-    public void setPredicate(Predicate<String> predicate) {
+    public final void setPredicate(Predicate<String> predicate) {
         if (predicate != null) {
             _filterPredicate = predicate;
         }

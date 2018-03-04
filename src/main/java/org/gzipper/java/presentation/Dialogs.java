@@ -35,6 +35,10 @@ import org.gzipper.java.i18n.I18N;
  */
 public final class Dialogs {
 
+    private Dialogs() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     /**
      * Brings up a dialog that consists of the specified parameters.
      *
@@ -94,8 +98,8 @@ public final class Dialogs {
     /**
      * Brings up a {@link TextInputDialog} which allows the user to enter a
      * regular expression (pattern). The pattern will also be validated. So if
-     * the returned {@link Optional} holds a result, it is guaranteed
-     * that the result is a valid regular expression.
+     * the returned {@link Optional} holds a result, it is guaranteed that the
+     * result is a valid regular expression.
      *
      * @param theme the CSS theme to be applied.
      * @param icon the icon to be shown in the title.
@@ -120,7 +124,8 @@ public final class Dialogs {
             try { // validate regex
                 Pattern.compile(text);
                 confirmButton.setDisable(false);
-            } catch (PatternSyntaxException ex) {
+            }
+            catch (PatternSyntaxException ex) {
                 confirmButton.setDisable(true);
             }
         });

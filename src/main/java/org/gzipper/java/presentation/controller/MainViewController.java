@@ -245,8 +245,8 @@ public final class MainViewController extends BaseController {
                 .getProperties().get(COMPRESSION_LEVEL_KEY);
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
-            Log.i("{0}{1}", true, I18N.getString("compressionLevelChange.text"),
-                    selectedItem.getText());
+            final String msg = I18N.getString("compressionLevelChange.text") + " ";
+            Log.i("{0}{1}", true, msg, selectedItem.getText());
         }
     }
 

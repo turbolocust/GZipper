@@ -28,6 +28,10 @@ public final class StringUtils {
      */
     public static final String EMPTY = "";
 
+    private StringUtils() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     /**
      * Checks whether the given string is {@code null} or empty.
      *

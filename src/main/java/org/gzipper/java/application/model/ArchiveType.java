@@ -16,8 +16,13 @@
  */
 package org.gzipper.java.application.model;
 
-import org.gzipper.java.application.algorithm.type.*;
 import org.gzipper.java.application.algorithm.CompressionAlgorithm;
+import org.gzipper.java.application.algorithm.type.Gzip;
+import org.gzipper.java.application.algorithm.type.Jar;
+import org.gzipper.java.application.algorithm.type.TarBzip2;
+import org.gzipper.java.application.algorithm.type.TarLzma;
+import org.gzipper.java.application.algorithm.type.Tarball;
+import org.gzipper.java.application.algorithm.type.Zip;
 
 /**
  * Enumeration for archive types.

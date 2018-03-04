@@ -183,6 +183,6 @@ public final class Settings {
      */
     private static class SettingsHolder {
 
-        private static Settings INSTANCE = new Settings();
+        private static final Settings INSTANCE = new Settings();
     }
 }

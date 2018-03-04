@@ -80,7 +80,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
      */
     private boolean _completed = false;
 
-    private ArchiveOperation(ArchiveOperation.Builder builder) {
+    private ArchiveOperation(final ArchiveOperation.Builder builder) {
         _archiveInfo = builder._archiveInfo;
         _algorithm = builder._algorithm;
         _compressionMode = builder._compressionMode;
@@ -236,7 +236,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
          * @param predicate the {@link Predicate} to be used.
          * @return a reference to this to allow method chaining.
          */
-        public Builder filterPredicate(Predicate<String> predicate) {
+        public final Builder filterPredicate(Predicate<String> predicate) {
             _filterPredicate = predicate;
             return this;
         }
@@ -247,7 +247,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
          * @param listener listener to be attached to this algorithm instance.
          * @return a reference to this to allow method chaining.
          */
-        public Builder addListener(Listener<Integer> listener) {
+        public final Builder addListener(Listener<Integer> listener) {
             _algorithm.attach(listener);
             return this;
         }
@@ -257,7 +257,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
          *
          * @return a new instance of {@link ArchiveOperation}.
          */
-        public ArchiveOperation build() {
+        public final ArchiveOperation build() {
             return new ArchiveOperation(this);
         }
     }

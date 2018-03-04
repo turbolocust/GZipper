@@ -38,6 +38,10 @@ public final class AppUtils {
 
     private static final String JAVA_VERSION = determineJavaVersion();
 
+    private AppUtils() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     private static String determineJavaVersion() {
         final String version = System.getProperty("java.version");
         int pos = version.indexOf('.');

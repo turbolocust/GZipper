@@ -26,7 +26,7 @@ import org.gzipper.java.application.util.FileUtils;
  *
  * @author Matthias Fussenegger
  */
-public class AlgorithmProgress {
+public final class AlgorithmProgress {
 
     /**
      * Total size of the file(s).

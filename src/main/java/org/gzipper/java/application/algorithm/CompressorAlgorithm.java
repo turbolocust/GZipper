@@ -39,7 +39,7 @@ import org.gzipper.java.exceptions.GZipperException;
 public abstract class CompressorAlgorithm extends AbstractAlgorithm {
 
     @Override
-    public void compress(File[] files, String location, String name)
+    public final void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
         initAlgorithmProgress(files);
@@ -76,7 +76,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public void extract(String location, String fullname)
+    public final void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException {
 
         final File archive = new File(fullname);
@@ -168,7 +168,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
          *
          * @return the name of the archive or the file to be compressed.
          */
-        public String getName() {
+        public final String getName() {
             return _name;
         }
 
@@ -177,7 +177,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
          *
          * @param name the name of the archive or the file to be compressed.
          */
-        public void setName(String name) {
+        public final void setName(String name) {
             _name = name;
         }
 
@@ -186,7 +186,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
          *
          * @return the compression level.
          */
-        public int getLevel() {
+        public final int getLevel() {
             return _level;
         }
 
@@ -195,7 +195,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
          *
          * @param level the compression level.
          */
-        public void setLevel(int level) {
+        public final void setLevel(int level) {
             _level = level;
         }
     }

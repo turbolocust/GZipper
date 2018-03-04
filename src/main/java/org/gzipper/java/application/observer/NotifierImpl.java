@@ -58,7 +58,7 @@ public class NotifierImpl<T> implements Notifier<T> {
     }
 
     @Override
-    public synchronized final void setValue(T value) {
+    public final synchronized void setValue(T value) {
         _value = value;
     }
 
@@ -73,17 +73,17 @@ public class NotifierImpl<T> implements Notifier<T> {
     }
 
     @Override
-    public synchronized final boolean hasChanged() {
+    public final synchronized boolean hasChanged() {
         return _hasChanged;
     }
 
     @Override
-    public synchronized final void setChanged() {
+    public final synchronized void setChanged() {
         _hasChanged = true;
     }
 
     @Override
-    public synchronized final void clearChanged() {
+    public final synchronized void clearChanged() {
         _hasChanged = false;
     }
 

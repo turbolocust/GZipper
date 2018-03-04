@@ -36,6 +36,10 @@ import org.gzipper.java.util.Log;
  */
 public final class FileUtils {
 
+    private FileUtils() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     /**
      * Validates the specified path, which has to exist.
      *

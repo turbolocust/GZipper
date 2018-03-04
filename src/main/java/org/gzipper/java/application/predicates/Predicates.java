@@ -35,7 +35,7 @@ public final class Predicates {
      * and thus the type of the input to the predicate.
      * @return a new instance of {@link Predicate} with the specified type.
      */
-    public static final <T> Predicate<T> createAlwaysTrue() {
+    public static <T> Predicate<T> createAlwaysTrue() {
         return p -> true;
     }
 
@@ -46,7 +46,7 @@ public final class Predicates {
      * and thus the type of the input to the predicate.
      * @return a new instance of {@link Predicate} with the specified type.
      */
-    public static final <T> Predicate<T> createAlwaysFalse() {
+    public static <T> Predicate<T> createAlwaysFalse() {
         return p -> false;
     }
 }

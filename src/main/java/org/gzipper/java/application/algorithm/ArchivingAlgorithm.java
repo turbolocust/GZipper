@@ -78,7 +78,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public void extract(String location, String fullname)
+    public final void extract(String location, String fullname)
             throws IOException, ArchiveException, CompressorException {
 
         final File archive = new File(fullname);
@@ -143,7 +143,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public void compress(File[] files, String location, String name)
+    public final void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
         final String fullname = FileUtils

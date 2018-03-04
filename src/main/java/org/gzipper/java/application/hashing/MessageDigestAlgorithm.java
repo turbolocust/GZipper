@@ -31,7 +31,7 @@ public enum MessageDigestAlgorithm {
 
     private final String _algorithmName;
 
-    private MessageDigestAlgorithm(String providerName) {
+    MessageDigestAlgorithm(String providerName) {
         _algorithmName = providerName;
     }
 

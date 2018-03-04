@@ -363,9 +363,9 @@ public final class HashViewController extends BaseController implements Interrup
     }
 
     private void bindUIcontrols(Task<?> task) {
-        
+
         final ReadOnlyBooleanProperty running = task.runningProperty();
-        
+
         _addFilesButton.disableProperty().bind(running);
         _algorithmComboBox.disableProperty().bind(running);
         _appendFilesCheckBox.disableProperty().bind(running);

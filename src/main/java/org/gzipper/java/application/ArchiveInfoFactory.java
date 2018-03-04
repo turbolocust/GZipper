@@ -34,6 +34,10 @@ import org.gzipper.java.exceptions.GZipperException;
  */
 public final class ArchiveInfoFactory {
 
+    private ArchiveInfoFactory() {
+        throw new AssertionError("Holds static members only.");
+    }
+
     /**
      * Creates a new {@link ArchiveInfo} for compression operation.
      *
