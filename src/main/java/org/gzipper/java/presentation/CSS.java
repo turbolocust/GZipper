@@ -24,7 +24,7 @@ import javafx.scene.Scene;
  *
  * @author Matthias Fussenegger
  */
-public class CSS {
+public final class CSS {
 
     private CSS() {
         throw new AssertionError("Holds static members only.");

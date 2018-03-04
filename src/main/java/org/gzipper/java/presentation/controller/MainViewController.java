@@ -151,7 +151,7 @@ public final class MainViewController extends BaseController {
     @FXML
     private MenuItem _deleteMenuItem;
     @FXML
-    private MenuItem _dropAddressesMenuItem;
+    private MenuItem _addManyFilesMenuItem;
     @FXML
     private MenuItem _hashingMenuItem;
     @FXML
@@ -273,8 +273,8 @@ public final class MainViewController extends BaseController {
     }
 
     @FXML
-    void handleDropAddressesMenuItemAction(ActionEvent evt) {
-        if (evt.getSource().equals(_dropAddressesMenuItem)) {
+    void handleAddManyFilesMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_addManyFilesMenuItem)) {
             final List<String> filePaths = ViewControllers
                     .showDropView(_theme).getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
@@ -527,7 +527,7 @@ public final class MainViewController extends BaseController {
         _archiveTypeComboBox.disableProperty().bind(running);
         _saveAsButton.disableProperty().bind(running);
         _selectFilesButton.disableProperty().bind(running);
-        _dropAddressesMenuItem.disableProperty().bind(running);
+        _addManyFilesMenuItem.disableProperty().bind(running);
         // progress bar
         _progressBar.visibleProperty().bind(running);
         _progressText.visibleProperty().bind(running);
@@ -542,7 +542,7 @@ public final class MainViewController extends BaseController {
         _archiveTypeComboBox.disableProperty().unbind();
         _selectFilesButton.disableProperty().unbind();
         _saveAsButton.disableProperty().unbind();
-        _dropAddressesMenuItem.disableProperty().unbind();
+        _addManyFilesMenuItem.disableProperty().unbind();
         // progress bar
         _progressBar.visibleProperty().unbind();
         _progressText.visibleProperty().unbind();

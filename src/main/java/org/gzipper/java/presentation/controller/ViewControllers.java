@@ -107,7 +107,7 @@ public final class ViewControllers {
 
         try {
             dropView.getIcons().add(icon);
-            dropView.setTitle("Address Dropper"); // no internationalization required
+            dropView.setTitle(I18N.getString("addMany.text"));
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
         }

@@ -63,7 +63,7 @@ public final class DropViewController extends BaseController {
     private Text _titleText;
 
     /**
-     * Constructs a controller for Address Dropper with the specified CSS theme.
+     * Constructs a controller for Drop View with the specified CSS theme.
      *
      * @param theme the {@link CSS} theme to be applied.
      */
@@ -85,10 +85,11 @@ public final class DropViewController extends BaseController {
             final String text = _textArea.getText();
             if (!text.isEmpty()) {
                 // tokenize file paths
-                StringTokenizer tokenizer = new StringTokenizer(text, "\"\n");
+                final StringTokenizer tokenizer
+                        = new StringTokenizer(text, "\"\n");
                 while (tokenizer.hasMoreTokens()) {
                     String token = tokenizer.nextToken();
-                    // only add token if it is a valid file or directory
+                    // only add token if it's a valid file or directory
                     if (FileUtils.isValid(token)) {
                         _addresses.add(token);
                     }
@@ -127,9 +128,9 @@ public final class DropViewController extends BaseController {
 
     /**
      * Returns a list of file paths. This list may be empty if no strings have
-     * been parsed or the parsed strings were not valid files.
+     * been parsed or the parsed strings were paths of valid files.
      *
-     * @return a {@link List} consisting of file paths.
+     * @return a {@link List} consisting of valid file paths.
      */
     public List<String> getAddresses() {
         return new LinkedList<>(_addresses);
