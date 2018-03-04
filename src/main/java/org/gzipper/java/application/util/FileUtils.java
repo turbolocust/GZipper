@@ -146,7 +146,7 @@ public final class FileUtils {
      * @return the display name of the filename without its file name extension.
      */
     public static String getDisplayName(String filename) {
-        int lastSeparatorIndex = filename.lastIndexOf(File.pathSeparatorChar);
+        int lastSeparatorIndex = filename.lastIndexOf(File.separator);
         return filename.substring(lastSeparatorIndex + 1, filename.lastIndexOf('.'));
     }
 
