@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,9 +19,10 @@ package org.gzipper.java.application.model;
 import org.gzipper.java.application.algorithm.CompressionAlgorithm;
 import org.gzipper.java.application.algorithm.type.Gzip;
 import org.gzipper.java.application.algorithm.type.Jar;
+import org.gzipper.java.application.algorithm.type.Tar;
 import org.gzipper.java.application.algorithm.type.TarBzip2;
 import org.gzipper.java.application.algorithm.type.TarLzma;
-import org.gzipper.java.application.algorithm.type.Tarball;
+import org.gzipper.java.application.algorithm.type.TarGzip;
 import org.gzipper.java.application.algorithm.type.Zip;
 
 /**
@@ -49,10 +50,16 @@ public enum ArchiveType {
             return new Gzip();
         }
     },
+    TAR("Tar", "TAR", new String[]{"*.tar"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new Tar();
+        }
+    },
     TAR_GZ("TarGz", "TAR+GZIP", new String[]{"*.tar.gz", "*.tar.gzip", "*.tgz"}) {
         @Override
         public CompressionAlgorithm getAlgorithm() {
-            return new Tarball();
+            return new TarGzip();
         }
     },
     TAR_BZ2("TarBz2", "TAR+BZIP2", new String[]{"*.tar.bz2", "*.tar.bzip2", "*.tbz2"}) {

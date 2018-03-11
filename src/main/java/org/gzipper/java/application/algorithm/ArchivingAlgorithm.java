@@ -123,7 +123,8 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                                 bos.write(buffer, 0, readBytes);
                                 updateProgress(readBytes);
                             }
-                        } catch (IOException ex) {
+                        }
+                        catch (IOException ex) {
                             if (!_interrupt) {
                                 Log.e(ex.getLocalizedMessage(), ex);
                                 Log.e("{0}\n{1}",
@@ -195,7 +196,8 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                             updateProgress(readBytes);
                         }
                         aos.closeArchiveEntry();
-                    } catch (IOException ex) {
+                    }
+                    catch (IOException ex) {
                         if (!_interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
                             Log.e("{0}\n{1}",
@@ -220,10 +222,11 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * @param stream the {@link InputStream} being used when creating a new
      * {@link ArchiveInputStream}.
      * @return new instance of {@link ArchiveInputStream}.
+     * @throws java.io.IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
     protected ArchiveInputStream makeArchiveInputStream(InputStream stream)
-            throws ArchiveException {
+            throws IOException, ArchiveException {
         return _archiveStreamFactory.createArchiveInputStream(_archiveType, stream);
     }
 
@@ -234,10 +237,11 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * @param stream the {@link InputStream} being used when creating a new
      * {@link CompressorInputStream}.
      * @return new instance of {@link CompressorInputStream}.
+     * @throws java.io.IOException if an I/O error occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     protected CompressorInputStream makeCompressorInputStream(InputStream stream)
-            throws CompressorException {
+            throws IOException, CompressorException {
         return _compressorStreamFactory.createCompressorInputStream(_compressionType, stream);
     }
 

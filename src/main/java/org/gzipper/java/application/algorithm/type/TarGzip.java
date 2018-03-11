@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,17 +17,16 @@
 package org.gzipper.java.application.algorithm.type;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
-import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 
 /**
  *
@@ -35,44 +34,29 @@ import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
  *
  * @author Matthias Fussenegger
  */
-public class Tarball extends ArchivingAlgorithm {
+public class TarGzip extends Tar {
 
     /**
      * Constructs a new instance of this class using the TAR constant of
      * {@link ArchiveStreamFactory} and the GZIP constant of
      * {@link CompressorStreamFactory}.
      */
-    public Tarball() {
+    public TarGzip() {
         super(ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP);
     }
 
-    /**
-     * Constructs a new instance of this class using the specified values.
-     *
-     * @param archiveType the archive type, which has to be a constant of
-     * {@link ArchiveStreamFactory}.
-     * @param compressionType the compression type, which has to be a constant
-     * of {@link CompressorStreamFactory}.
-     */
-    public Tarball(String archiveType, String compressionType) {
-        super(archiveType, compressionType);
-    }
-
     @Override
-    public ArchiveOutputStream makeArchiveOutputStream(
-            OutputStream stream) throws IOException, ArchiveException {
-        TarArchiveOutputStream taos = new TarArchiveOutputStream(stream);
-        taos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
-        taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-        return taos;
-    }
-
-    @Override
-    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         // set additional parameters for compressor stream
         GzipParameters params = Gzip.getDefaultGzipParams(null);
         params.setCompressionLevel(_compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
+    }
+
+    @Override
+    protected CompressorInputStream makeCompressorInputStream(
+            InputStream stream) throws IOException, CompressorException {
+        return new GzipCompressorInputStream(stream);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class Zip extends ArchivingAlgorithm {
     }
 
     @Override
-    public ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
             throws IOException, ArchiveException {
         ZipArchiveOutputStream zaos = new ZipArchiveOutputStream(stream);
         zaos.setLevel(_compressionLevel);
@@ -70,17 +70,19 @@ public class Zip extends ArchivingAlgorithm {
     }
 
     @Override
-    protected ArchiveInputStream makeArchiveInputStream(InputStream stream) throws ArchiveException {
+    protected ArchiveInputStream makeArchiveInputStream(
+            InputStream stream) throws ArchiveException {
         return new ZipArchiveInputStream(stream, null, false, true);
     }
 
     @Override
-    public CompressorInputStream makeCompressorInputStream(InputStream stream) throws CompressorException {
+    protected CompressorInputStream makeCompressorInputStream(
+            InputStream stream) throws CompressorException {
         return null; // as no separate compressor stream is required
     }
 
     @Override
-    public CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
             throws IOException, CompressorException {
         return null; // as no separate compressor stream is required
     }

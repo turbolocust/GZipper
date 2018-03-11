@@ -85,7 +85,8 @@ public class CompressionAlgorithmTest {
         try {
             System.out.println("ZIP test");
             testCompressionExtraction(new Zip(), ".zip");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -96,7 +97,8 @@ public class CompressionAlgorithmTest {
         try {
             System.out.println("JAR test");
             testCompressionExtraction(new Jar(), ".jar");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -107,7 +109,20 @@ public class CompressionAlgorithmTest {
         try {
             System.out.println("GZIP test");
             testCompressionExtraction(new Gzip(), ".gzip");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testTarCompressExtract() {
+        try {
+            System.out.println("TAR test");
+            testCompressionExtraction(new Tar(), ".tar");
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -117,8 +132,9 @@ public class CompressionAlgorithmTest {
     public void testTarGzCompressExtract() {
         try {
             System.out.println("TAR+GZ test");
-            testCompressionExtraction(new Tarball(), ".tgz");
-        } catch (Exception ex) {
+            testCompressionExtraction(new TarGzip(), ".tgz");
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -129,7 +145,8 @@ public class CompressionAlgorithmTest {
         try {
             System.out.println("TAR+BZIP2 test");
             testCompressionExtraction(new TarBzip2(), ".tbz2");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -140,7 +157,8 @@ public class CompressionAlgorithmTest {
         try {
             System.out.println("TAR+LZMA test");
             testCompressionExtraction(new TarLzma(), ".tlz");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
@@ -200,13 +218,15 @@ public class CompressionAlgorithmTest {
                     }
                 }
                 System.out.println("Test successful.");
-            } finally {
+            }
+            finally {
                 extractedFile.delete();
                 if (outputFolder != null) {
                     outputFolder.delete();
                 }
             }
-        } finally {
+        }
+        finally {
             testFile.delete();
             archiveFile.delete();
         }

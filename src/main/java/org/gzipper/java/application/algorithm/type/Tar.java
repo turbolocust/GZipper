@@ -19,39 +19,62 @@ package org.gzipper.java.application.algorithm.type;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
-import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
+import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
 
 /**
- * Represents the TAR+LZMA archive type.
+ *
+ * Represents the TAR archive type.
  *
  * @author Matthias Fussenegger
  */
-public class TarLzma extends Tar {
+public class Tar extends ArchivingAlgorithm {
 
     /**
      * Constructs a new instance of this class using the TAR constant of
-     * {@link ArchiveStreamFactory} and the LZMA constant of
-     * {@link CompressorStreamFactory}.
+     * {@link ArchiveStreamFactory} and {@code null}.
      */
-    public TarLzma() {
-        super(ArchiveStreamFactory.TAR, CompressorStreamFactory.LZMA);
+    public Tar() {
+        super(ArchiveStreamFactory.TAR, null);
+    }
+
+    /**
+     * Constructs a new instance of this class using the specified values.
+     *
+     * @param archiveType the archive type, which has to be a constant of
+     * {@link ArchiveStreamFactory}.
+     * @param compressionType the compression type, which has to be a constant
+     * of {@link CompressorStreamFactory}.
+     */
+    public Tar(String archiveType, String compressionType) {
+        super(archiveType, compressionType);
+    }
+
+    @Override
+    protected ArchiveOutputStream makeArchiveOutputStream(
+            OutputStream stream) throws IOException, ArchiveException {
+        TarArchiveOutputStream taos = new TarArchiveOutputStream(stream);
+        taos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
+        taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+        return taos;
     }
 
     @Override
     protected CompressorOutputStream makeCompressorOutputStream(
             OutputStream stream) throws IOException, CompressorException {
-        return new LZMACompressorOutputStream(stream);
+        return null;
     }
 
     @Override
     protected CompressorInputStream makeCompressorInputStream(
             InputStream stream) throws IOException, CompressorException {
-        return new LZMACompressorInputStream(stream);
+        return null;
     }
 }
