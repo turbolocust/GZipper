@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.20-BETA</version>
+    <version>0.5.21-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>

@@ -59,12 +59,12 @@ public final class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private static final String APP_VERSION = "0.5.20 BETA";
+    private static final String APP_VERSION = "0.5.21 BETA";
 
     /**
      * The build date of this application.
      */
-    private static final String APP_BUILD_DATE = "03/04/2018";
+    private static final String APP_BUILD_DATE = "03/11/2018";
 
     /**
      * The author of this application.
