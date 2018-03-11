@@ -342,8 +342,8 @@ public final class HashViewController extends BaseController implements Interrup
         task.setOnFailed(e -> onTaskCompleted(e));
 
         bindUIcontrols(task);
-        _taskHandler.submit(task);
         _isAlive = true;
+        _taskHandler.submit(task);
 
         // wait for task to complete
         while (task.isRunning()) {
