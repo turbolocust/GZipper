@@ -598,7 +598,7 @@ public final class MainViewController extends BaseController {
             @Override
             protected Boolean call() throws Exception {
 
-                Future<Boolean> futureTask = _taskHandler.submit(operation);
+                final Future<Boolean> futureTask = _taskHandler.submit(operation);
 
                 while (!futureTask.isDone()) {
                     try {
@@ -659,6 +659,7 @@ public final class MainViewController extends BaseController {
         _activeTasks.remove(task.toString());
         if (_activeTasks.isEmpty()) {
             unbindUIcontrols();
+            _state.refresh();
             _progressBar.setProgress(0d); // reset
             _progressText.setText(StringUtils.EMPTY);
         }
@@ -748,7 +749,7 @@ public final class MainViewController extends BaseController {
          *
          * @param filterPredicate the filter or {@code null} to reset it.
          */
-        void setFilterPredicate(Predicate<String> filterPredicate) {
+        final void setFilterPredicate(Predicate<String> filterPredicate) {
             _filterPredicate = filterPredicate;
         }
 
@@ -758,27 +759,8 @@ public final class MainViewController extends BaseController {
          * @return the filter to be used when processing archives. If no filter
          * is set, this method will return {@code null}.
          */
-        Predicate<String> getFilterPredicate() {
+        final Predicate<String> getFilterPredicate() {
             return _filterPredicate;
-        }
-
-        /**
-         * Applies the required extension filters to the specified file chooser.
-         *
-         * @param chooser the {@link FileChooser} to which the extension filters
-         * will be applied to.
-         */
-        void applyExtensionFilters(FileChooser chooser) {
-            if (chooser != null) {
-                final ArchiveType selectedType = _archiveTypeComboBox.getSelectionModel().getSelectedItem();
-                for (ArchiveType type : ArchiveType.values()) {
-                    if (type.equals(selectedType)) {
-                        ExtensionFilter extFilter = new ExtensionFilter(type.getDisplayName(),
-                                type.getExtensionNames(true));
-                        chooser.getExtensionFilters().add(extFilter);
-                    }
-                }
-            }
         }
 
         /**
@@ -799,6 +781,33 @@ public final class MainViewController extends BaseController {
         abstract List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException;
 
         /**
+         * Applies the required extension filters to the specified file chooser.
+         *
+         * @param chooser the {@link FileChooser} to which the extension filters
+         * will be applied to.
+         */
+        void applyExtensionFilters(FileChooser chooser) {
+            if (chooser != null) {
+                final ArchiveType selectedType = _archiveTypeComboBox
+                        .getSelectionModel().getSelectedItem();
+                for (ArchiveType type : ArchiveType.values()) {
+                    if (type.equals(selectedType)) {
+                        ExtensionFilter extFilter = new ExtensionFilter(
+                                type.getDisplayName(), type.getExtensionNames(true));
+                        chooser.getExtensionFilters().add(extFilter);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Refreshes this state, e.g. clears the state of the progress manager.
+         */
+        void refresh() {
+            _progressManager.reset();
+        }
+
+        /**
          * Performs the specified {@link ArchiveOperation}.
          *
          * @param operation the {@link ArchiveOperation} to be performed.
@@ -806,7 +815,7 @@ public final class MainViewController extends BaseController {
         void performOperation(ArchiveOperation operation) {
             if (operation != null) {
                 Task<Boolean> task = initArchivingJob(operation);
-                ArchiveInfo info = operation.getArchiveInfo();
+                final ArchiveInfo info = operation.getArchiveInfo();
                 Log.i(I18N.getString("operationStarted.text"), true, operation,
                         info.getArchiveType().getDisplayName());
                 Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
@@ -816,7 +825,7 @@ public final class MainViewController extends BaseController {
         }
 
         @Override
-        public void update(Notifier<Integer> notifier, Integer value) {
+        public final void update(Notifier<Integer> notifier, Integer value) {
             if (value >= 100) {
                 notifier.detach(this);
             } else {

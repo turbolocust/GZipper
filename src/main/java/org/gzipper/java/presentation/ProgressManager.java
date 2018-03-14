@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2018 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -96,29 +96,30 @@ public class ProgressManager {
     }
 
     /**
-     * Atomically updates the progress with the specified identifier using the
+     * Atomically updates the progress of the specified identifier using the
      * specified value and also calculates and then returns the total progress
-     * of all previously added identifiers. If an identifier does not yet exist
-     * it will be created and mapped to the specified id.
+     * considering all previously added identifiers. If an identifier does not
+     * yet exist it will be created and mapped to the specified id.
      *
-     * @param id the identifier for the progress.
+     * @param id the identifier to be mapped to the progress value.
      * @param value the updated progress value.
      * @return the total progress of all stored progress values.
      */
     public double updateProgress(Integer id, double value) {
-        return _progressMap.size() > 1
-                ? calculateProgress(id, value) : value / 100d;
+        return calculateProgress(id, value);
+    }
+
+    /**
+     * Removes (clears) all progress mappings.
+     */
+    public void reset() {
+        _progressMap.clear();
     }
 
     private double calculateProgress(Integer id, double value) {
         _progressMap.merge(id, value, (oldValue, newValue) -> newValue);
-
-        double totalProgress = 0d;
-        for (double progress : _progressMap.values()) {
-            totalProgress += progress;
-        }
-        
-        totalProgress /= _progressMap.size();
-        return totalProgress / 100d;
+        double totalProgress = _progressMap.values().stream()
+                .mapToDouble(Double::doubleValue).sum();
+        return (totalProgress /= _progressMap.size()) / 100d;
     }
 }
