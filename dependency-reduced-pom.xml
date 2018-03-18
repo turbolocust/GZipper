@@ -4,7 +4,7 @@
   <groupId>org.gzipper</groupId>
   <artifactId>GZipper</artifactId>
   <name>GZipper</name>
-  <version>0.5.21-BETA</version>
+  <version>0.5.22-BETA</version>
   <url>https://github.com/turbolocust/GZipper</url>
   <build>
     <plugins>
@@ -32,6 +32,7 @@
         <version>3.0.2</version>
         <configuration>
           <archive>
+            <compress>false</compress>
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>

@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.21-BETA</version>
+    <version>0.5.22-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -42,6 +42,7 @@
                 <version>3.0.2</version>
                 <configuration>
                     <archive>
+                        <compress>false</compress>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
