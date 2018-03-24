@@ -53,7 +53,7 @@ public final class AppUtils {
      * Determines the current Java version and returns the major version of Java
      * as string. For e.g. Java 8, this would return {@code 1.8}.
      *
-     * @return the major Java version as string.
+     * @return the Java major version as string.
      */
     public static String getJavaVersion() {
         return JAVA_VERSION;

@@ -44,7 +44,7 @@ public final class GUIUtils {
             final Class<?> clazz;
             if (AppUtils.getJavaVersion().charAt(0) == '9') { // Java 9
                 /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
-                // does not work with Java 9 since module is not exported
+                // does not work with Java 9 since module is not part of public API
             } else {
                 clazz = Class.forName("com.sun.javafx.scene.control.skin.TableViewSkin");
                 method = clazz.getDeclaredMethod(methodName, TableColumn.class, int.class);

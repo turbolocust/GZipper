@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javafx.application.Platform;
@@ -42,6 +43,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -50,6 +52,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
@@ -62,7 +65,9 @@ import org.gzipper.java.presentation.model.HashViewTableModel;
 import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.application.concurrency.Interruptible;
+import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.GUIUtils;
+import org.gzipper.java.presentation.Toast;
 
 /**
  * Controller for the FXML named "HashView.fxml".
@@ -216,11 +221,7 @@ public final class HashViewController extends BaseController implements Interrup
                 @Override
                 protected void updateItem(String value, boolean empty) {
                     super.updateItem(value, empty);
-                    if (empty) {
-                        setText(null);
-                    } else {
-                        setText(value);
-                    }
+                    setText(empty ? null : value);
                 }
             };
 
@@ -229,6 +230,7 @@ public final class HashViewController extends BaseController implements Interrup
             final MenuItem copyMenuItem = new MenuItem(I18N.getString("copy.text"));
             final MenuItem copyRowMenuItem = new MenuItem(I18N.getString("copyRow.text"));
             final MenuItem copyAllMenuItem = new MenuItem(I18N.getString("copyAll.text"));
+            final MenuItem compareToMenuItem = new MenuItem(I18N.getString("compareTo.text"));
 
             copyMenuItem.setOnAction(evt -> { // copy
                 if (evt.getSource().equals(copyMenuItem)) {
@@ -269,7 +271,29 @@ public final class HashViewController extends BaseController implements Interrup
                 }
             });
 
-            ctxMenu.getItems().addAll(copyMenuItem, copyRowMenuItem, copyAllMenuItem);
+            compareToMenuItem.setOnAction(evt -> { // compare to
+                if (evt.getSource().equals(compareToMenuItem)) {
+                    final Optional<String> result = Dialogs.showTextInputDialog(
+                            I18N.getString("compareTo.text"),
+                            I18N.getString("compareToDialogHeader.text"),
+                            I18N.getString("hashValue.text"),
+                            _theme, _iconImage);
+                    if (result.isPresent()) {
+                        final String message;
+                        final int delay = 3600;
+                        if (result.get().equalsIgnoreCase(cell.getItem())) {
+                            message = I18N.getString("equal.text").toUpperCase();
+                            Toast.show(_primaryStage, message, Color.GREEN, delay);
+                        } else {
+                            message = I18N.getString("notEqual.text").toUpperCase();
+                            Toast.show(_primaryStage, message, Color.RED, delay);
+                        }
+                    }
+                }
+            });
+
+            ctxMenu.getItems().addAll(copyMenuItem, copyRowMenuItem, copyAllMenuItem,
+                    new SeparatorMenuItem(), compareToMenuItem);
 
             cell.contextMenuProperty().bind(Bindings
                     .when(cell.emptyProperty())

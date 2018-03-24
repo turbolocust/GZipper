@@ -28,6 +28,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.util.Log;
 
 /**
  *
@@ -40,7 +41,7 @@ public final class Dialogs {
     }
 
     /**
-     * Brings up a dialog that consists of the specified parameters.
+     * Brings up a dialog using the specified parameters.
      *
      * @param type the type of the alert.
      * @param title the title of the dialog.
@@ -65,8 +66,7 @@ public final class Dialogs {
     }
 
     /**
-     * Brings up a confirmation dialog that consists of the specified
-     * parameters.
+     * Brings up a confirmation dialog using the specified parameters.
      *
      * @param title the title of the dialog.
      * @param header the header text of the dialog.
@@ -96,6 +96,32 @@ public final class Dialogs {
     }
 
     /**
+     * Brings up a {@link TextInputDialog} using the specified parameters.
+     *
+     * @param title the title of the dialog.
+     * @param header the header text of the dialog.
+     * @param content the content text of the dialog.
+     * @param theme the CSS theme to be applied.
+     * @param icon the icon to be shown in the title.
+     * @return an {@link Optional} which holds the input text as string.
+     */
+    public static Optional<String> showTextInputDialog(String title,
+            String header, String content, CSS.Theme theme, Image icon) {
+
+        final TextInputDialog dialog = new TextInputDialog();
+        final Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+        stage.getIcons().add(icon);
+        dialog.setResizable(true);
+
+        CSS.load(theme, dialog.getDialogPane().getScene());
+        return dialog.showAndWait();
+    }
+
+    /**
      * Brings up a {@link TextInputDialog} which allows the user to enter a
      * regular expression (pattern). The pattern will also be validated. So if
      * the returned {@link Optional} holds a result, it is guaranteed that the
@@ -113,8 +139,8 @@ public final class Dialogs {
         final Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
 
         dialog.setTitle(I18N.getString("applyFilterMenuItem.text"));
-        dialog.setHeaderText(I18N.getString("applyFilterMenuHeader.text"));
-        dialog.setContentText(I18N.getString("applyFilterMenuContent.text"));
+        dialog.setHeaderText(I18N.getString("applyFilterDialogHeader.text"));
+        dialog.setContentText(I18N.getString("applyFilterDialogContent.text"));
         stage.getIcons().add(icon);
         dialog.setResizable(true);
 
@@ -126,6 +152,7 @@ public final class Dialogs {
                 confirmButton.setDisable(false);
             }
             catch (PatternSyntaxException ex) {
+                Log.w(ex.getMessage(), false);
                 confirmButton.setDisable(true);
             }
         });
