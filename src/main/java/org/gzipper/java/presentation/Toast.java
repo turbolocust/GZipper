@@ -74,12 +74,12 @@ public final class Toast {
         toastStage.initStyle(StageStyle.TRANSPARENT);
 
         final Text text = new Text(toastMsg);
-        text.setFont(Font.font("Verdana", 24));
+        text.setFont(Font.font("Verdana", 28));
         text.setFill(msgColor);
 
         final StackPane root = new StackPane(text);
         root.setStyle("-fx-background-radius: 16; "
-                + "-fx-background-color: rgba(0, 0, 0, 0.2); "
+                + "-fx-background-color: rgba(0, 0, 0, 0.25); "
                 + "-fx-padding: 32px;");
         root.setOpacity(0);
 
@@ -92,8 +92,7 @@ public final class Toast {
         final KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeInDelay),
                 new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
         fadeInTimeline.getKeyFrames().add(fadeInKey1);
-        fadeInTimeline.setOnFinished((ev1)
-                -> {
+        fadeInTimeline.setOnFinished((ev1) -> {
             new Thread(() -> {
                 try {
                     Thread.sleep(toastDelay);
