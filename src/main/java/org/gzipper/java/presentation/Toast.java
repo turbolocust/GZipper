@@ -68,6 +68,7 @@ public final class Toast {
      */
     public static void show(Stage ownerStage, String toastMsg, Color msgColor,
             int toastDelay, int fadeInDelay, int fadeOutDelay) {
+        
         final Stage toastStage = new Stage();
         toastStage.initOwner(ownerStage);
         toastStage.setResizable(false);
@@ -79,7 +80,7 @@ public final class Toast {
 
         final StackPane root = new StackPane(text);
         root.setStyle("-fx-background-radius: 16; "
-                + "-fx-background-color: rgba(0, 0, 0, 0.25); "
+                + "-fx-background-color: rgba(0, 0, 0, 0.2); "
                 + "-fx-padding: 32px;");
         root.setOpacity(0);
 

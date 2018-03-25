@@ -278,7 +278,7 @@ public final class HashViewController extends BaseController implements Interrup
                             I18N.getString("compareToDialogHeader.text"),
                             I18N.getString("hashValue.text"),
                             _theme, _iconImage);
-                    if (result.isPresent()) {
+                    if (result.isPresent() && !result.get().isEmpty()) {
                         final String message;
                         final int delay = 3600;
                         if (result.get().equalsIgnoreCase(cell.getItem())) {
