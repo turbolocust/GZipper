@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>0.5.22-BETA</version>
+    <version>0.5.23-BETA</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -104,7 +104,7 @@
                 <!-- Maven surefire plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20.1</version>
+                <version>2.21.0</version>
             </plugin>
         </plugins>
     </build>
