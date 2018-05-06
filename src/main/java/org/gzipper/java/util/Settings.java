@@ -35,6 +35,9 @@ import org.gzipper.java.application.util.StringUtils;
  */
 public final class Settings {
 
+    public static final String FALSE_STRING = "false";
+    public static final String TRUE_STRING = "true";
+	
     /**
      * The actual properties file. Required to store away changed properties.
      */
@@ -91,10 +94,10 @@ public final class Settings {
 
         final Properties defaults = new Properties();
 
-        defaults.setProperty("loggingEnabled", "false");
+        defaults.setProperty("loggingEnabled", FALSE_STRING);
         defaults.setProperty("recentPath", StringUtils.EMPTY);
-        defaults.setProperty("darkThemeEnabled", "false");
-        defaults.setProperty("showGzipInfoDialog", "true");
+        defaults.setProperty("darkThemeEnabled", FALSE_STRING);
+        defaults.setProperty("showGzipInfoDialog", TRUE_STRING);
 
         return defaults;
     }
@@ -118,7 +121,7 @@ public final class Settings {
      * @return the previous value of the specified key.
      */
     public synchronized Object setProperty(String key, boolean value) {
-        final String propertyValue = value ? "true" : "false";
+        final String propertyValue = value ? TRUE_STRING : FALSE_STRING;
         return _props.setProperty(key, propertyValue);
     }
 
@@ -140,7 +143,7 @@ public final class Settings {
      */
     public boolean evaluateProperty(String key) {
         final String property = _props.getProperty(key);
-        return property != null && property.equals("true");
+        return property != null && property.equals(TRUE_STRING);
     }
 
     /**

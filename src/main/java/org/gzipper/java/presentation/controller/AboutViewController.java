@@ -21,6 +21,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import org.gzipper.java.application.util.AppUtils;
+import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.CSS;
+import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.util.Log;
+
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,11 +40,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import org.gzipper.java.application.util.AppUtils;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.CSS;
-import org.gzipper.java.util.Log;
 
 /**
  * Controller for the FXML named "AboutView.fxml".
@@ -113,21 +115,23 @@ public final class AboutViewController extends BaseController {
             try {
                 // load image from JAR and display it in image view
                 imgRes = AppUtils.getResource(GZipper.class, "/" + IMG_NAME);
-            } catch (URISyntaxException ex) {
+            }
+            catch (URISyntaxException ex) {
                 Log.e(I18N.getString("error.text"), ex);
                 try {
                     imgRes = AppUtils.getDecodedRootPath(getClass()) + IMG_NAME;
-                } catch (UnsupportedEncodingException ex1) {
+                }
+                catch (UnsupportedEncodingException ex1) {
                     Log.e(I18N.getString("error.text"), ex1);
                 }
-            } finally {
+            }
+            finally {
                 if (imgRes != null) {
                     _imageFile = new File(imgRes);
+                    _imageView.setImage(new Image(_imageFile.toURI().toString()));
                 }
             }
         }
-
-        _imageView.setImage(new Image(_imageFile.toURI().toString()));
 
         final Text appName = new Text(APP_NAME + "\n"),
                 appVersion = new Text(

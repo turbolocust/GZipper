@@ -26,6 +26,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import org.gzipper.java.application.concurrency.Interruptible;
+import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
+import org.gzipper.java.application.hashing.MessageDigestProvider;
+import org.gzipper.java.application.hashing.MessageDigestProviderImpl;
+import org.gzipper.java.application.hashing.MessageDigestResult;
+import org.gzipper.java.application.util.ListUtils;
+import org.gzipper.java.application.util.TaskHandler;
+import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.CSS;
+import org.gzipper.java.presentation.Dialogs;
+import org.gzipper.java.presentation.GUIUtils;
+import org.gzipper.java.presentation.Toast;
+import org.gzipper.java.presentation.model.HashViewTableModel;
+import org.gzipper.java.util.Log;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -54,20 +70,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
-import org.gzipper.java.application.hashing.MessageDigestProvider;
-import org.gzipper.java.application.hashing.MessageDigestProviderImpl;
-import org.gzipper.java.application.hashing.MessageDigestResult;
-import org.gzipper.java.application.util.ListUtils;
-import org.gzipper.java.application.util.TaskHandler;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.model.HashViewTableModel;
-import org.gzipper.java.presentation.CSS;
-import org.gzipper.java.util.Log;
-import org.gzipper.java.application.concurrency.Interruptible;
-import org.gzipper.java.presentation.Dialogs;
-import org.gzipper.java.presentation.GUIUtils;
-import org.gzipper.java.presentation.Toast;
 
 /**
  * Controller for the FXML named "HashView.fxml".
@@ -353,9 +355,8 @@ public final class HashViewController extends BaseController implements Interrup
                 for (File file : files) {
                     if (!_isAlive) {
                         return false;
-                    } else {
-                        computeAndAppend(file);
                     }
+                    computeAndAppend(file);
                 }
                 return true;
             }
@@ -376,6 +377,7 @@ public final class HashViewController extends BaseController implements Interrup
             }
             catch (InterruptedException ex) {
                 Log.e("Task interrupted.", ex);
+                Thread.currentThread().interrupt();
             }
         }
     }

@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.presentation;
 
+import org.gzipper.java.util.Log;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -27,7 +29,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.gzipper.java.util.Log;
 
 /**
  * Class for creating and displaying toast messages.
@@ -68,7 +69,7 @@ public final class Toast {
      */
     public static void show(Stage ownerStage, String toastMsg, Color msgColor,
             int toastDelay, int fadeInDelay, int fadeOutDelay) {
-        
+
         final Stage toastStage = new Stage();
         toastStage.initOwner(ownerStage);
         toastStage.setResizable(false);
@@ -100,6 +101,7 @@ public final class Toast {
                 }
                 catch (InterruptedException ex) {
                     Log.e("Thread of toast stage interrupted.", ex);
+                    Thread.currentThread().interrupt();
                 }
                 final Timeline fadeOutTimeline = new Timeline();
                 final KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOutDelay),
