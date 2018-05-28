@@ -16,10 +16,13 @@
  */
 package org.gzipper.java.presentation.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +33,6 @@ import java.util.Set;
 import org.gzipper.java.application.concurrency.Interruptible;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
-import org.gzipper.java.application.hashing.MessageDigestProviderImpl;
 import org.gzipper.java.application.hashing.MessageDigestResult;
 import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.application.util.TaskHandler;
@@ -79,9 +81,15 @@ import javafx.stage.FileChooser;
 public final class HashViewController extends BaseController implements Interruptible {
 
     /**
-     * The aggregated {@link MessageDigestProvider}.
+     * Default buffer size when reading large files. Currently 4 mebibytes.
      */
-    private final MessageDigestProvider _provider;
+    private static final int BUFFER_SIZE = 1024 * 1024 * (1 << 2);
+
+    /**
+     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently 100
+     * mebibytes.
+     */
+    private static final int LARGE_FILE_THRESHOLD = 1024 * 1024 * 100;
 
     /**
      * The currently selected {@link MessageDigestAlgorithm}.
@@ -131,7 +139,6 @@ public final class HashViewController extends BaseController implements Interrup
      */
     public HashViewController(CSS.Theme theme) {
         super(theme);
-        _provider = new MessageDigestProviderImpl();
         _algorithm = new SimpleObjectProperty<>();
         _taskHandler = new TaskHandler(TaskHandler.ExecutorType.QUEUED);
     }
@@ -320,13 +327,28 @@ public final class HashViewController extends BaseController implements Interrup
      */
     private void computeAndAppend(File file) {
         try {
+            MessageDigestResult result;
             if (file.isFile()) { // folders are not supported
-                byte[] bytes = Files.readAllBytes(file.toPath());
-                appendColumn(_provider.computeHash(
-                        bytes, _algorithm.get()), file);
+                final MessageDigestAlgorithm algorithm = _algorithm.get();
+                if (file.length() > LARGE_FILE_THRESHOLD) {
+                    final MessageDigestProvider provider
+                            = MessageDigestProvider.createProvider(algorithm);
+                    try (FileInputStream fis = new FileInputStream(file);
+                            BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
+                        final byte[] buffer = new byte[BUFFER_SIZE];
+                        int readBytes;
+                        while ((readBytes = bis.read(buffer, 0, buffer.length)) > 0) {
+                            provider.updateHash(buffer, 0, readBytes);
+                        }
+                    }
+                    result = provider.computeHash();
+                } else {
+                    byte[] bytes = Files.readAllBytes(file.toPath());
+                    result = MessageDigestProvider.computeHash(bytes, algorithm);
+                }
+                appendColumn(result, file);
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException | NoSuchAlgorithmException ex) {
             Log.e("Error reading file.", ex);
             appendColumn(new MessageDigestResult(), file);
         }
@@ -374,8 +396,7 @@ public final class HashViewController extends BaseController implements Interrup
         while (task.isRunning()) {
             try {
                 Thread.sleep(10);
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Log.e("Task interrupted.", ex);
                 Thread.currentThread().interrupt();
             }

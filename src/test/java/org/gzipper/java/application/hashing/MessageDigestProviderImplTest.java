@@ -63,12 +63,11 @@ public class MessageDigestProviderImplTest {
         System.out.println("computeHash");
 
         final byte[] bytes = TEST_VALUE.getBytes();
-        final MessageDigestProvider instance = new MessageDigestProviderImpl();
         for (MessageDigestAlgorithm algorithm : MessageDigestAlgorithm.values()) {
             System.out.println(algorithm.name() + " start");
             // compute hash value
             String result = _resultMap.get(algorithm);
-            MessageDigestResult expResult = instance.computeHash(bytes, algorithm);
+            MessageDigestResult expResult = MessageDigestProvider.computeHash(bytes, algorithm);
             // only compare hex value since it is calculated from byte array
             assertEquals(result.toUpperCase(), expResult.toString());
             System.out.println(algorithm.name() + " end");
