@@ -53,7 +53,7 @@ public final class AlgorithmProgress {
         for (File file : files) {
             _totalSize += file.isDirectory()
                     ? FileUtils.fileSizes(file.toPath(), filter)
-                    : file.length();
+                    : FileUtils.fileSize(file, filter);
         }
     }
 

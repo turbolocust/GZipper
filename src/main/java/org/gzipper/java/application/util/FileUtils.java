@@ -183,6 +183,18 @@ public final class FileUtils {
     }
 
     /**
+     * Returns the file size of the specified file.
+     *
+     * @param file the file whose size is to be returned.
+     * @param filter the filter to be applied.
+     * @return the size of the file or {@code 0} if the specified predicate
+     * evaluates to {@code false}.
+     */
+    public static long fileSize(File file, Predicate<String> filter) {
+        return filter.test(file.getName()) ? file.length() : 0;
+    }
+
+    /**
      * Traverses the specified path and returns the size of all children.
      *
      * @param path the path to be traversed.
@@ -199,7 +211,7 @@ public final class FileUtils {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     String name = file.getFileName().toString();
                     if (filter.test(name)) {
-                        holder._size = attrs.size();
+                        holder._size += attrs.size();
                     }
                     return FileVisitResult.CONTINUE;
                 }
