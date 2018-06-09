@@ -81,9 +81,9 @@ import javafx.stage.FileChooser;
 public final class HashViewController extends BaseController implements Interruptible {
 
     /**
-     * Default buffer size when reading large files. Currently 4 mebibytes.
+     * Default buffer size when reading large files. Currently 16 mebibytes.
      */
-    private static final int BUFFER_SIZE = 1024 * 1024 * (1 << 2);
+    private static final int BUFFER_SIZE = 1024 * 1024 * (1 << 4);
 
     /**
      * Threshold at which {@link #BUFFER_SIZE} will be used. Currently 100
