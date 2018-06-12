@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+//import java.nio.ByteBuffer;
+//import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -81,9 +83,9 @@ import javafx.stage.FileChooser;
 public final class HashViewController extends BaseController implements Interruptible {
 
     /**
-     * Default buffer size when reading large files. Currently 16 mebibytes.
+     * Default buffer size when reading large files. Currently 1 mebibyte(s).
      */
-    private static final int BUFFER_SIZE = 1024 * 1024 * (1 << 4);
+    private static final int BUFFER_SIZE = 1024 * 1024;
 
     /**
      * Threshold at which {@link #BUFFER_SIZE} will be used. Currently 100
@@ -333,6 +335,16 @@ public final class HashViewController extends BaseController implements Interrup
                 if (file.length() > LARGE_FILE_THRESHOLD) {
                     final MessageDigestProvider provider
                             = MessageDigestProvider.createProvider(algorithm);
+//                    try (FileInputStream fis = new FileInputStream(file);
+//                            FileChannel ch = fis.getChannel()) {
+//                        final byte[] arrBuffer = new byte[BUFFER_SIZE];
+//                        final ByteBuffer buffer = ByteBuffer.wrap(arrBuffer);
+//                        int readBytes;
+//                        while ((readBytes = ch.read(buffer)) > 0) {
+//                            provider.updateHash(buffer.array(), 0, readBytes);
+//                            buffer.clear();
+//                        }
+//                    }
                     try (FileInputStream fis = new FileInputStream(file);
                             BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
                         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -348,7 +360,8 @@ public final class HashViewController extends BaseController implements Interrup
                 }
                 appendColumn(result, file);
             }
-        } catch (IOException | NoSuchAlgorithmException ex) {
+        }
+        catch (IOException | NoSuchAlgorithmException ex) {
             Log.e("Error reading file.", ex);
             appendColumn(new MessageDigestResult(), file);
         }
@@ -396,7 +409,8 @@ public final class HashViewController extends BaseController implements Interrup
         while (task.isRunning()) {
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException ex) {
+            }
+            catch (InterruptedException ex) {
                 Log.e("Task interrupted.", ex);
                 Thread.currentThread().interrupt();
             }
