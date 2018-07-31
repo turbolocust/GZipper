@@ -128,9 +128,12 @@ public final class AboutViewController extends BaseController {
             finally {
                 if (imgRes != null) {
                     _imageFile = new File(imgRes);
-                    _imageView.setImage(new Image(_imageFile.toURI().toString()));
                 }
             }
+        }
+
+        if (_imageFile != null) {
+            _imageView.setImage(new Image(_imageFile.toURI().toString()));
         }
 
         final Text appName = new Text(APP_NAME + "\n"),
