@@ -21,15 +21,12 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.presentation.controller.MainViewController;
 
 /**
  * Convenience class for application wide logging.
  *
  * @author Matthias Fussenegger
  */
-@SuppressWarnings("ClassWithMultipleLoggers")
 public final class Log {
 
     /**
@@ -37,15 +34,15 @@ public final class Log {
      */
     public static final Logger DEFAULT_LOGGER;
 
-    /**
-     * UI logger named {@code MainViewController.class.getName()}.
-     */
-    public static final Logger UI_LOGGER;
-
     static {
-        DEFAULT_LOGGER = Logger.getLogger(GZipper.class.getName());
-        UI_LOGGER = Logger.getLogger(MainViewController.class.getName());
+        DEFAULT_LOGGER = Logger.getLogger(Log.class.getName());
     }
+
+    /**
+     * Name of the UI logger. The logger will be retrieved via
+     * {@code java.util.logging.Logger.getLogger()}.
+     */
+    private static String LoggerNameUI;
 
     /**
      * If set to true, verbose logging is enabled. Verbose logging means that
@@ -61,6 +58,15 @@ public final class Log {
      */
     public static void setVerboseUiLogging(boolean verboseUiLogging) {
         _verboseUiLogging = verboseUiLogging;
+    }
+
+    /**
+     * Sets the name of the logger to be used for UI logging.
+     *
+     * @param loggerName the name of the logger.
+     */
+    public static void setLoggerForUI(String loggerName) {
+        LoggerNameUI = loggerName;
     }
 
     /**
@@ -202,7 +208,7 @@ public final class Log {
     private static void log(LogRecord record, boolean uiLogging) {
         DEFAULT_LOGGER.log(record);
         if (uiLogging) {
-            UI_LOGGER.log(record);
+            Logger.getLogger(LoggerNameUI).log(record);
         }
     }
 }

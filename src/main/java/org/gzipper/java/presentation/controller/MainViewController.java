@@ -93,6 +93,11 @@ public final class MainViewController extends BaseController {
     private static final String COMPRESSION_LEVEL_KEY = "compressionLevel";
 
     /**
+     * Logger for UI named {@code MainViewController.class.getName()}.
+     */
+    public static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
+
+    /**
      * Handler used to execute tasks.
      */
     private final TaskHandler _taskHandler;
@@ -666,11 +671,11 @@ public final class MainViewController extends BaseController {
     }
 
     private void initLogger() {
-        Logger logger = Log.UI_LOGGER;
         TextAreaHandler handler = new TextAreaHandler(_textArea);
         handler.setFormatter(new SimpleFormatter());
-        logger.setUseParentHandlers(false);
-        logger.addHandler(handler);
+        Log.setLoggerForUI(LOGGER.getName());
+        LOGGER.setUseParentHandlers(false);
+        LOGGER.addHandler(handler);
     }
 
     @Override

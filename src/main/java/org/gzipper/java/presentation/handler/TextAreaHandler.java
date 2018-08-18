@@ -31,9 +31,6 @@ import javafx.scene.control.TextArea;
  */
 public class TextAreaHandler extends StreamHandler {
 
-    /**
-     * The aggregated {@link TextArea} which will display any record.
-     */
     private final TextArea _textArea;
 
     /**
