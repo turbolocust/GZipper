@@ -43,8 +43,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             throws IOException, ArchiveException, CompressorException {
 
         initAlgorithmProgress(files);
-        final String fullname = FileUtils
-                .combinePathAndFilename(location, name);
+        String fullname = FileUtils.combine(location, name);
 
         if (files.length > 0 && files[0].isFile()) {
             // handling first file only, this way the current

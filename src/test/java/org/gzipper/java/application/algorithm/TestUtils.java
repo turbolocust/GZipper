@@ -50,7 +50,7 @@ public final class TestUtils {
 
     static TestObject generateTestObject(String dir, String fname) throws IOException {
 
-        String filename = FileUtils.combinePathAndFilename(dir, fname);
+        String filename = FileUtils.combine(dir, fname);
         File file = File.createTempFile(filename, null);
 
         Document document = new Document();

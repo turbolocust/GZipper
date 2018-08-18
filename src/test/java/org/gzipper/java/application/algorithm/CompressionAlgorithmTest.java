@@ -169,8 +169,7 @@ public class CompressionAlgorithmTest {
 
         final String location = _tempDirectory;
         final String name = _archiveFileNamePrefix + suffix;
-        final String fullname = FileUtils
-                .combinePathAndFilename(location, name);
+        final String fullname = FileUtils.combine(location, name);
 
         final TestObject testObj = TestUtils
                 .generateTestObject(_tempDirectory, _testFileNamePrefix);

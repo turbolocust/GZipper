@@ -105,26 +105,27 @@ public final class FileUtils {
     }
 
     /**
-     * Concatenates a file path and file name. Before doing so, a check will be
-     * performed whether the path ends with a separator. If the separator is
-     * missing it will be added. As a result, a valid absolute path is returned,
-     * although it is not guaranteed that the file exists.
+     * Concatenates two file names. Before doing so, a check will be performed
+     * whether the first filename ends with a separator. If the separator is
+     * missing it will be added.
      *
-     * @param path location of a folder as string.
-     * @param file the file name as string.
-     * @return {@code null} if either any of the parameters is {@code null} or
-     * empty. Otherwise the concatenated absolute path is returned.
+     * @param filename filename as string.
+     * @param append the filename to be appended.
+     * @return an empty string if either any of the parameters is {@code null}
+     * or empty. Otherwise the concatenated absolute path is returned.
      */
-    public static String combinePathAndFilename(String path, String file) {
-        // check if parameters are not null and not empty
-        if (StringUtils.isNullOrEmpty(path) || StringUtils.isNullOrEmpty(file)) {
-            return null;
+    public static String combine(String filename, String append) {
+        if (StringUtils.isNullOrEmpty(filename) || StringUtils.isNullOrEmpty(append)) {
+            return StringUtils.EMPTY;
         }
         // check if location ends with separator and add it if missing
-        final String absolutePath = path.endsWith(File.separator)
-                ? path
-                : path + File.separator;
-        return absolutePath + file;
+        final String absolutePath;
+        if (filename.endsWith(File.separator)) {
+            absolutePath = filename;
+        } else {
+            absolutePath = filename + File.separator;
+        }
+        return absolutePath + append;
     }
 
     /**
@@ -311,7 +312,7 @@ public final class FileUtils {
                 ++suffix;
                 isFirst = false;
             }
-            uniqueFilename = FileUtils.combinePathAndFilename(path, filename.toString());
+            uniqueFilename = FileUtils.combine(path, filename.toString());
             filename.setLength(0); // clear
         } while (FileUtils.isValidFile(uniqueFilename));
 

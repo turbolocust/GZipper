@@ -27,9 +27,6 @@ import java.util.regex.Pattern;
  */
 public final class PatternPredicate implements Predicate<String> {
 
-    /**
-     * The aggregated pattern (regular expression).
-     */
     private final Pattern _pattern;
 
     public PatternPredicate(Pattern pattern) {

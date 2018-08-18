@@ -147,8 +147,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     public final void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        final String fullname = FileUtils
-                .combinePathAndFilename(location, name);
+        String fullname = FileUtils.combine(location, name);
         initAlgorithmProgress(files);
 
         try (final FileOutputStream fos = new FileOutputStream(fullname);
