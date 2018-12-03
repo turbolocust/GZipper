@@ -106,7 +106,7 @@ public final class MainViewController extends BaseController {
      * Map consisting of {@link Future} objects representing the currently
      * active tasks.
      */
-    private final ConcurrentMap<String, Future<?>> _activeTasks;
+    private final ConcurrentMap<Integer, Future<?>> _activeTasks;
 
     /**
      * The currently active state.
@@ -214,7 +214,7 @@ public final class MainViewController extends BaseController {
             _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
                     .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
                 // log warning message only when cancellation failed
-                Log.e("Task cancellation failed for {0}", task.toString());
+                Log.e("Task cancellation failed for {0}", task.hashCode());
             });
         }
     }
@@ -661,7 +661,7 @@ public final class MainViewController extends BaseController {
     private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
         Log.i(I18N.getString("elapsedTime.text"), true,
                 operation.calculateElapsedTime());
-        _activeTasks.remove(task.toString());
+        _activeTasks.remove(task.hashCode());
         if (_activeTasks.isEmpty()) {
             unbindUIcontrols();
             _state.refresh();
@@ -825,7 +825,7 @@ public final class MainViewController extends BaseController {
                         info.getArchiveType().getDisplayName());
                 Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
                 bindUIcontrols(task); // do this before submitting task
-                _activeTasks.put(task.toString(), _taskHandler.submit(task));
+                _activeTasks.put(task.hashCode(), _taskHandler.submit(task));
             }
         }
 
