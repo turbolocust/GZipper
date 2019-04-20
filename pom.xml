@@ -6,7 +6,7 @@
     
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     
     <name>GZipper</name>
@@ -85,11 +85,11 @@
                 <!-- Maven surefire plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.0</version>
+                <version>2.22.1</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>                
-            </plugin>
+            </plugin>       
         </plugins>
     </build>
     <dependencies>
@@ -111,28 +111,28 @@
             <!-- JavaFX Base -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>11.0.1</version>
+            <version>11.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <!-- JavaFX Controls -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11.0.1</version>
+            <version>11.0.2</version>
             <scope>compile</scope>
         </dependency> 
         <dependency>
             <!-- JavaFX FXML -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11.0.1</version>
+            <version>11.0.2</version>
             <scope>compile</scope>
         </dependency>   
         <dependency>
             <!-- JavaFX graphics -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>11.0.1</version>
+            <version>11.0.2</version>
             <scope>compile</scope>
         </dependency>                     
         <dependency>
