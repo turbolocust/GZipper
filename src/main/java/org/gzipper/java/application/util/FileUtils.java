@@ -294,13 +294,17 @@ public final class FileUtils {
      * filename extension.
      */
     public static String generateUniqueFilename(String path, String name, String ext, int beginSuffix) {
-        String uniqueFilename;
         int suffix = beginSuffix > 0 ? beginSuffix : 1; // will be appended
         boolean isFirst = true; // to ignore suffix on first check
         final StringBuilder filename = new StringBuilder();
 
         if (ext.startsWith("*")) { // ignore asterisk if any
             ext = ext.substring(1);
+        }
+
+        String uniqueFilename = FileUtils.combine(path, name + ext);
+        if (!FileUtils.isValid(uniqueFilename)) {
+            return uniqueFilename; // return as it is if not exists
         }
 
         do { // as long as file exists

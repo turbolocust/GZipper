@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2019 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -169,13 +169,14 @@ public class CompressionAlgorithmTest {
 
         final String location = _tempDirectory;
         final String name = _archiveFileNamePrefix + suffix;
-        final String fullname = FileUtils.combine(location, name);
+        final String filename = FileUtils.generateUniqueFilename(
+                location, _archiveFileNamePrefix, suffix, 0);
 
         final TestObject testObj = TestUtils
                 .generateTestObject(_tempDirectory, _testFileNamePrefix);
 
         final File testFile = testObj._testFile;
-        final File archiveFile = new File(fullname);
+        final File archiveFile = new File(filename);
 
         try {
             System.out.println("compress");
@@ -190,7 +191,7 @@ public class CompressionAlgorithmTest {
             }
 
             System.out.println("extract");
-            instance.extract(sb.toString(), fullname); // overwrite existing
+            instance.extract(sb.toString(), filename);
 
             // build output file name
             File outputFolder = null;
@@ -208,7 +209,7 @@ public class CompressionAlgorithmTest {
             try {
                 // validate extracted file
                 final Iterator<String> iter = testObj._fileContent.linesIterator();
-                try (FileReader fr = new FileReader(extractedFile);
+                try (FileReader fr = new FileReader(extractedFile);  
                         BufferedReader reader = new BufferedReader(fr)) {
                     String line;
                     while ((line = reader.readLine()) != null) {
