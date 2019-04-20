@@ -38,7 +38,7 @@ For compression and decompression this application uses parts of the commons-com
   - <a href>https://tukaani.org/</a>
   
 <br />
-<b>This application requires at least Java 1.8.0_40 (Java 8 Update 40)</b>
+<b>This application is built for Java 11 but is compatible with Java 8 as well. To build this application with Java 8, module-specific files have to be removed and the Maven configuration (pom.xml) needs to be updated.</b>
 
 # Screenshots
 
