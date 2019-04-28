@@ -42,7 +42,7 @@ public final class GUIUtils {
 
         try {
             final Class<?> clazz;
-            if (AppUtils.getJavaVersion().charAt(0) == '9') { // Java 9
+            if ((AppUtils.getJavaVersion().charAt(0) - 48) > 8) { // Java 9 and above
                 /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
                 // does not work with Java 9 since module is not part of public API
             } else {
@@ -66,6 +66,7 @@ public final class GUIUtils {
      *
      * @param table the table of which the columns are to be auto fitted.
      */
+    @SuppressWarnings("Convert2Lambda")
     public static void autoFitTable(TableView<?> table) {
         if (COLUMN_AUTOFIT_METHOD == null) {
             return;

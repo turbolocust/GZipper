@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2019 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,10 +43,18 @@ public final class AppUtils {
     }
 
     private static String determineJavaVersion() {
-        final String version = System.getProperty("java.version");
+
+        String version = System.getProperty("java.version");
+
         int pos = version.indexOf('.');
-        pos = version.indexOf('.', pos + 1);
-        return version.substring(0, pos);
+        if (pos != -1) { // found
+            pos = version.indexOf('.', pos + 1);
+            if (pos != -1) { // found
+                version = version.substring(0, pos);
+            }
+        }
+
+        return version;
     }
 
     /**
