@@ -26,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
@@ -61,6 +62,7 @@ public final class Dialogs {
         stage.getIcons().add(icon);
         alert.setTitle(title);
         alert.setHeaderText(header);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         CSS.load(theme, alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
@@ -91,6 +93,8 @@ public final class Dialogs {
         Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);
         yesButton.setDefaultButton(false);
         noButton.setDefaultButton(true);
+
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         CSS.load(theme, alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
@@ -117,6 +121,7 @@ public final class Dialogs {
         stage.getIcons().add(icon);
         dialog.setResizable(true);
 
+        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         CSS.load(theme, dialog.getDialogPane().getScene());
         return dialog.showAndWait();
     }
@@ -156,6 +161,8 @@ public final class Dialogs {
                 confirmButton.setDisable(true);
             }
         });
+
+        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         CSS.load(theme, dialog.getDialogPane().getScene());
         return dialog.showAndWait();
     }
