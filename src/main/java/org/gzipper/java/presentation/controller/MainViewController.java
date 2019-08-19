@@ -139,6 +139,11 @@ public final class MainViewController extends BaseController {
      */
     private int _compressionLevel;
 
+    /**
+     * True if user wishes to put each file into a separate archive.
+     */
+    private boolean _putIntoSeparateArchives;
+
     @FXML
     private MenuItem _applyFilterMenuItem;
     @FXML
@@ -280,9 +285,10 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final List<String> filePaths = ViewControllers
-                    .showDropView(_theme).getAddresses();
+            final DropViewController ctrl = ViewControllers.showDropView(_theme);
+            final List<String> filePaths = ctrl.getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
+                _putIntoSeparateArchives = ctrl.isPutInSeparateArchives();
                 final int size = filePaths.size();
                 _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
@@ -565,6 +571,7 @@ public final class MainViewController extends BaseController {
         if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
             Log.i(I18N.getString("selectionReset.text"), true);
         }
+        _putIntoSeparateArchives = false;
         _selectedFiles = Collections.emptyList();
         _startButton.setDisable(true);
     }
@@ -885,7 +892,7 @@ public final class MainViewController extends BaseController {
         public List<ArchiveOperation> initOperation(ArchiveType archiveType)
                 throws GZipperException {
             List<ArchiveOperation> operations;
-            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP) {
+            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP || _putIntoSeparateArchives) {
                 // put each file into a separate archive
                 operations = new ArrayList<>(_selectedFiles.size());
                 List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(

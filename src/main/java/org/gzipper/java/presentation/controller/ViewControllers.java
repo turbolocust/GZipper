@@ -85,6 +85,7 @@ public final class ViewControllers {
         catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
+
         return controller;
     }
 
@@ -114,6 +115,7 @@ public final class ViewControllers {
         catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
+
         return controller;
     }
 
@@ -156,6 +158,7 @@ public final class ViewControllers {
         catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
+
         return controller;
     }
 

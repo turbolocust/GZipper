@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2019 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,14 +141,44 @@ public final class FileUtils {
     }
 
     /**
+     * Returns the name of the specified filename including its extension.
+     *
+     * @param filename the name of the file as string.
+     * @return the name of the file including its file name extension.
+     */
+    public static String getName(String filename) {
+        int lastSeparatorIndex = filename.lastIndexOf(File.separator);
+
+        if (lastSeparatorIndex == -1) {
+            lastSeparatorIndex = 0; // no separator present
+        } else {
+            ++lastSeparatorIndex;
+        }
+
+        return filename.substring(lastSeparatorIndex);
+    }
+
+    /**
      * Returns the display name of the specified filename without its extension.
      *
      * @param filename the name of the file as string.
-     * @return the display name of the filename without its file name extension.
+     * @return the display name of the file without its file name extension.
      */
     public static String getDisplayName(String filename) {
         int lastSeparatorIndex = filename.lastIndexOf(File.separator);
-        return filename.substring(lastSeparatorIndex + 1, filename.lastIndexOf('.'));
+        int lastPeriodIndex = filename.lastIndexOf('.');
+
+        if (lastSeparatorIndex == -1) {
+            lastSeparatorIndex = 0; // no separator present
+        } else {
+            ++lastSeparatorIndex;
+        }
+
+        if (lastPeriodIndex == -1) {
+            lastPeriodIndex = filename.length();
+        }
+
+        return filename.substring(lastSeparatorIndex, lastPeriodIndex);
     }
 
     /**

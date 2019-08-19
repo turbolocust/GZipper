@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2019 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.zip.Deflater;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.util.FileUtils;
+import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
 
 /**
@@ -46,7 +47,7 @@ public final class ArchiveInfoFactory {
      * @param level the compression level of the archive.
      * @param files the files to be compressed.
      * @param outputPath the path where to save the archive.
-     * @return {@link ArchiveInfo} that may be used for an operation.
+     * @return a new {@link ArchiveInfo} object.
      * @throws GZipperException if archive type could not be determined.
      */
     public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName,
@@ -60,21 +61,15 @@ public final class ArchiveInfoFactory {
                     "Faulty compression level specified.");
         }
 
-        boolean hasExtension = false;
-        final String[] extNames = archiveType.getExtensionNames(false);
-        for (String extName : extNames) {
-            if (archiveName.endsWith(extName)) {
-                hasExtension = true;
-                break;
-            }
-        }
+        final String properName = checkAddExtension(archiveName, archiveType);
+        final String ext = FileUtils.getExtension(properName);
+        final String displayName = properName.replace(ext, StringUtils.EMPTY);
 
-        if (!hasExtension) {
-            // add extension to archive name if missing and ignore the asterisk
-            archiveName = archiveName + extNames[0];
-        }
+        final String fullName = FileUtils
+                .generateUniqueFilename(outputPath, displayName, ext, 0);
+        String name = FileUtils.getName(fullName);
 
-        return new ArchiveInfo(archiveType, archiveName, level, files, outputPath);
+        return new ArchiveInfo(archiveType, name, level, files, outputPath);
     }
 
     /**
@@ -86,16 +81,28 @@ public final class ArchiveInfoFactory {
      * @param level the compression level of the archive.
      * @param files the files to be compressed.
      * @param outputPath the path where to save the archive.
-     * @return List consisting of {@link ArchiveInfo} objects.
+     * @return a list consisting of {@link ArchiveInfo} objects.
      * @throws GZipperException if archive type could not be determined.
      */
     public static List<ArchiveInfo> createArchiveInfos(ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
 
+        if (archiveType == null) {
+            throw new NullPointerException("Archive type must not be null.");
+        } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
+            throw GZipperException.createWithReason(
+                    GZipperException.Reason.FAULTY_COMPRESSION_LVL,
+                    "Faulty compression level specified.");
+        }
+
+        final String properName = checkAddExtension(archiveName, archiveType);
+        final String ext = FileUtils.getExtension(properName);
+        final String displayName = properName.replace(ext, StringUtils.EMPTY);
+
         final Set<String> names = new HashSet<>(); // to avoid name collisions
         List<ArchiveInfo> infos = new ArrayList<>(files.size());
         List<File> fileList; // used to be compatible with current API
-        String name, ext; // holds the name of the archive
+        String fullName, name; // hold the names of the (next) archive
         int nameSuffix = -1; // will be appended if necessary
 
         for (File next : files) {
@@ -103,17 +110,17 @@ public final class ArchiveInfoFactory {
             fileList.add(next);
             do {
                 ++nameSuffix;
-                ext = FileUtils.getExtension(archiveName);
-                name = FileUtils.getDisplayName(archiveName)
-                        + Integer.toString(nameSuffix);
-                name = new File(FileUtils.generateUniqueFilename(
-                        outputPath, name, ext, nameSuffix)).getName();
+                fullName = displayName + Integer.toString(nameSuffix);
+                fullName = FileUtils.generateUniqueFilename(
+                        outputPath, fullName, ext, nameSuffix);
+                name = FileUtils.getName(fullName);
             } while (names.contains(name));
             names.add(name);
-            ArchiveInfo info = createArchiveInfo(
+            ArchiveInfo info = new ArchiveInfo(
                     archiveType, name, level, fileList, outputPath);
             infos.add(info);
         }
+
         return infos;
     }
 
@@ -132,6 +139,30 @@ public final class ArchiveInfoFactory {
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null.");
         }
+
         return new ArchiveInfo(archiveType, archiveName, 0, null, outputPath);
     }
+
+    private static String checkAddExtension(String archiveName, ArchiveType archiveType) {
+
+        String name = archiveName;
+        boolean hasExtension = false;
+
+        final String[] extNames = archiveType.getExtensionNames(false);
+
+        for (String extName : extNames) {
+            if (archiveName.endsWith(extName)) {
+                hasExtension = true;
+                break;
+            }
+        }
+
+        if (!hasExtension) {
+            // add extension to archive name if missing and ignore the asterisk
+            name = archiveName + extNames[0];
+        }
+
+        return name;
+    }
+
 }

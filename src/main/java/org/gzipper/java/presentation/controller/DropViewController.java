@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2019 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,8 @@ public final class DropViewController extends BaseController {
     private Button _submitButton;
     @FXML
     private CheckBox _appendAddressesCheckBox;
+    @FXML
+    private CheckBox _putIntoSeparateArchivesCheckBox;
     @FXML
     private Text _titleText;
 
@@ -134,6 +136,15 @@ public final class DropViewController extends BaseController {
      */
     public List<String> getAddresses() {
         return new LinkedList<>(_addresses);
+    }
+
+    /**
+     * Returns true if the user wishes to put each file into a separate archive.
+     *
+     * @return true if the user wishes to put each file into a separate archive.
+     */
+    public boolean isPutInSeparateArchives() {
+        return _putIntoSeparateArchivesCheckBox.isSelected();
     }
 
     @Override
