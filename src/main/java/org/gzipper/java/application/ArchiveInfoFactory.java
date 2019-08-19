@@ -95,7 +95,7 @@ public final class ArchiveInfoFactory {
         final Set<String> names = new HashSet<>(); // to avoid name collisions
         List<ArchiveInfo> infos = new ArrayList<>(files.size());
         List<File> fileList; // used to be compatible with current API
-        String name; // holds the name of the archive
+        String name, ext; // holds the name of the archive
         int nameSuffix = -1; // will be appended if necessary
 
         for (File next : files) {
@@ -103,8 +103,11 @@ public final class ArchiveInfoFactory {
             fileList.add(next);
             do {
                 ++nameSuffix;
+                ext = FileUtils.getExtension(archiveName);
+                name = FileUtils.getDisplayName(archiveName)
+                        + Integer.toString(nameSuffix);
                 name = new File(FileUtils.generateUniqueFilename(
-                        outputPath, archiveName, nameSuffix)).getName();
+                        outputPath, name, ext, nameSuffix)).getName();
             } while (names.contains(name));
             names.add(name);
             ArchiveInfo info = createArchiveInfo(
