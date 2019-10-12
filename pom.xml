@@ -97,7 +97,7 @@
             <!-- commons-compress -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
+            <version>1.19</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
