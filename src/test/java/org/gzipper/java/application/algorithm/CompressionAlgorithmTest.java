@@ -164,6 +164,18 @@ public class CompressionAlgorithmTest {
         }
     }
 
+    @Test
+    public void testTarXzCompressExtract() {
+        try {
+            System.out.println("TAR+XZ test");
+            testCompressionExtraction(new TarXz(), ".txz");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            fail(ex.getMessage());
+        }
+    }
+
     private void testCompressionExtraction(
             CompressionAlgorithm instance, String suffix) throws Exception {
 
@@ -209,7 +221,7 @@ public class CompressionAlgorithmTest {
             try {
                 // validate extracted file
                 final Iterator<String> iter = testObj._fileContent.linesIterator();
-                try (FileReader fr = new FileReader(extractedFile);  
+                try (FileReader fr = new FileReader(extractedFile);
                         BufferedReader reader = new BufferedReader(fr)) {
                     String line;
                     while ((line = reader.readLine()) != null) {

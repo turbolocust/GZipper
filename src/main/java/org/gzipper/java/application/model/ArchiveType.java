@@ -23,6 +23,7 @@ import org.gzipper.java.application.algorithm.type.Tar;
 import org.gzipper.java.application.algorithm.type.TarBzip2;
 import org.gzipper.java.application.algorithm.type.TarLzma;
 import org.gzipper.java.application.algorithm.type.TarGzip;
+import org.gzipper.java.application.algorithm.type.TarXz;
 import org.gzipper.java.application.algorithm.type.Zip;
 
 /**
@@ -72,6 +73,12 @@ public enum ArchiveType {
         @Override
         public CompressionAlgorithm getAlgorithm() {
             return new TarLzma();
+        }
+    },
+    TAR_XZ("TarXz", "TAR+XZ", new String[]{"*.tar.xz", "*.txz"}) {
+        @Override
+        public CompressionAlgorithm getAlgorithm() {
+            return new TarXz();
         }
     };
 
