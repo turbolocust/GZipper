@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import org.gzipper.java.application.model.OS;
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.FileUtils;
@@ -40,7 +41,7 @@ public final class TestUtils {
 
     static String generateRandomString(int length) {
         final StringBuilder sb = new StringBuilder(length);
-        final Random rand = new Random();
+        final Random rand = ThreadLocalRandom.current();
         for (int i = 0; i < length; ++i) {
             char c = (char) (rand.nextInt(126 - 32) + 32);
             sb.append(Character.toString(c));
