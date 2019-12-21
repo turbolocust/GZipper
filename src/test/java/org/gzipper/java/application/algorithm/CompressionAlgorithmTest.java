@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Iterator;
 import org.gzipper.java.application.algorithm.TestUtils.TestObject;
 import org.gzipper.java.application.algorithm.type.*;
@@ -32,22 +33,53 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import static org.junit.Assert.*;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test of {@link CompressionAlgorithm} interface and its realizations.
  *
  * @author Matthias Fussenegger
  */
+@RunWith(Parameterized.class)
 public class CompressionAlgorithmTest {
 
+    // <editor-fold defaultstate="collapsed" desc="setUp attributes">
     private String _archiveFileNamePrefix;
 
     private String _testFileNamePrefix;
 
+    // </editor-fold>
+    private final CompressionAlgorithm _algorithm;
+
+    private final String _printText;
+
+    private final String _fileNameExtension;
+
     private final String _tempDirectory;
 
-    public CompressionAlgorithmTest() throws IOException {
+    @Parameters
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            {new Zip(), "ZIP test", ".zip"},
+            {new Jar(), "JAR test", ".jar"},
+            {new Gzip(), "GZIP test", ".gzip"},
+            {new Tar(), "TAR test", ".tar"},
+            {new TarGzip(), "TAR+GZ test", ".tgz"},
+            {new TarBzip2(), "TAR+BZIP2 test", ".tbz2"},
+            {new TarLzma(), "TAR+LZMA test", ".tlz"},
+            {new TarXz(), "TAR+XZ test", ".txz"}
+        });
+    }
+
+    public CompressionAlgorithmTest(CompressionAlgorithm algorithm,
+            String printText, String fileNameExtension) throws IOException {
+        _algorithm = algorithm;
+        _printText = printText;
+        _fileNameExtension = fileNameExtension;
+        // create temporary file to determine TEMP folder location
         File temp = File.createTempFile("gzipper_temp_file", null);
         _tempDirectory = temp.getAbsoluteFile().getParent();
     }
@@ -81,94 +113,10 @@ public class CompressionAlgorithmTest {
      * Test of compress and extract method, of class ArchivingAlgorithm.
      */
     @Test
-    public void testZipCompressExtract() {
+    public void testCompressExtract() {
         try {
-            System.out.println("ZIP test");
-            testCompressionExtraction(new Zip(), ".zip");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testJarCompressExtract() {
-        try {
-            System.out.println("JAR test");
-            testCompressionExtraction(new Jar(), ".jar");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testGzipCompressExtract() {
-        try {
-            System.out.println("GZIP test");
-            testCompressionExtraction(new Gzip(), ".gzip");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testTarCompressExtract() {
-        try {
-            System.out.println("TAR test");
-            testCompressionExtraction(new Tar(), ".tar");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testTarGzCompressExtract() {
-        try {
-            System.out.println("TAR+GZ test");
-            testCompressionExtraction(new TarGzip(), ".tgz");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testTarBzip2CompressExtract() {
-        try {
-            System.out.println("TAR+BZIP2 test");
-            testCompressionExtraction(new TarBzip2(), ".tbz2");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testTarLzmaCompressExtract() {
-        try {
-            System.out.println("TAR+LZMA test");
-            testCompressionExtraction(new TarLzma(), ".tlz");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        }
-    }
-
-    @Test
-    public void testTarXzCompressExtract() {
-        try {
-            System.out.println("TAR+XZ test");
-            testCompressionExtraction(new TarXz(), ".txz");
+            System.out.println(_printText);
+            testCompressionExtraction(_algorithm, _fileNameExtension);
         }
         catch (Exception ex) {
             ex.printStackTrace();
