@@ -10,6 +10,7 @@
   - Tarball (GZIP)
   - Tarball (BZIP2)
   - Tarball (LZMA)
+  - Tarball (XZ)
 * Compress and decompress GZIP
 * Compression levels can be adjusted
   - if supported by compressor
