@@ -44,10 +44,10 @@ For compression and decompression this application uses parts of the commons-com
 # Screenshots
 
 <b>Main view with enabled default theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_mainView.PNG" alt="main view with enabled default theme"/><br />
+![Main view with enabled default theme.](./images/gzipper_gui_FX_mainView.PNG)
 <br /><b>Hash view with enabled default theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_hashView.PNG" alt="hash view with enabled default theme"/><br />
+![Hash view with enabled default theme.](./images/gzipper_gui_FX_hashView.PNG)
 <br /><b>Main view with enabled dark theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_mainView_dark.PNG" alt="main view with enabled dark theme"/><br />
+![Main view with enabled dark theme.](./images/gzipper_gui_FX_mainView_dark.PNG)
 <br /><b>Hash view with enabled dark theme:</b><br />
-<img src="https://homepages.fhv.at/mfu7609/images/gzipper_gui_FX_hashView_dark.PNG" alt="hash view with enabled dark theme"/>
+![Hash view with enabled dark theme.](./images/gzipper_gui_FX_hashView_dark.PNG)
