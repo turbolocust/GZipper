@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package org.gzipper.java.presentation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -31,29 +32,32 @@ import org.gzipper.java.util.Log;
  */
 public final class GUIUtils {
 
-// WORKAROUND based on: 
-// https://stackoverflow.com/questions/14650787/javafx-column-in-tableview-auto-fit-size
+    private static final String REGEX_VERSION_LEGACY = "^\\d\\."; // e.g. 1.8.0
     private static final Method COLUMN_AUTOFIT_METHOD = initMethod();
 
     private static Method initMethod() {
 
         final String methodName = "resizeColumnToFitContent";
+        final Pattern patternVersionLegacy = Pattern.compile(REGEX_VERSION_LEGACY);
         Method method = null;
 
         try {
             final Class<?> clazz;
-            if ((AppUtils.getJavaVersion().charAt(0) - 48) > 8) { // Java 9 and above
-                /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
-                // does not work with Java 9 since module is not part of public API
-            } else {
+            final String version = AppUtils.getJavaVersion();
+
+            if (patternVersionLegacy.matcher(version).find()) {
                 clazz = Class.forName("com.sun.javafx.scene.control.skin.TableViewSkin");
                 method = clazz.getDeclaredMethod(methodName, TableColumn.class, int.class);
                 method.setAccessible(true);
+            } else {
+                /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
+                // does not work with Java 9 and above since module is not part of public API
             }
         }
         catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
             Log.e("Method lookup via reflection failed.", ex);
         }
+
         return method;
     }
 
