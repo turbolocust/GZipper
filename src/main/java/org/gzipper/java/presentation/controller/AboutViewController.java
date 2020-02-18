@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,12 +61,12 @@ public final class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private static final String APP_VERSION = "1.2.2";
+    private static final String APP_VERSION = "1.2.3";
 
     /**
      * The build date of this application.
      */
-    private static final String APP_BUILD_DATE = "12/23/2019";
+    private static final String APP_BUILD_DATE = "02/18/2020";
 
     /**
      * The author of this application.
