@@ -35,6 +35,6 @@ public final class PatternPredicate implements Predicate<String> {
 
     @Override
     public boolean test(String t) {
-        return _pattern.matcher(t).matches();
+        return _pattern.matcher(t).find();
     }
 }
