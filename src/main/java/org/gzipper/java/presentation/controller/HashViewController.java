@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-//import java.nio.ByteBuffer;
-//import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -36,7 +34,9 @@ import org.gzipper.java.application.concurrency.Interruptible;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
 import org.gzipper.java.application.hashing.MessageDigestResult;
+import org.gzipper.java.application.hashing.NamedMessageDigestResult;
 import org.gzipper.java.application.util.ListUtils;
+import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
@@ -88,8 +88,8 @@ public final class HashViewController extends BaseController implements Interrup
     private static final int BUFFER_SIZE = 1024 * 1024;
 
     /**
-     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently 100
-     * mebibytes.
+     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently set to
+     * 100 Mebibytes.
      */
     private static final int LARGE_FILE_THRESHOLD = 1024 * 1024 * 100;
 
@@ -101,7 +101,7 @@ public final class HashViewController extends BaseController implements Interrup
     /**
      * Set to remember results for {@link #_resultTable} to avoid duplicates.
      */
-    private final Set<MessageDigestResult> _models = new HashSet<>();
+    private final Set<NamedMessageDigestResult> _models = new HashSet<>();
 
     /**
      * Handler used to execute tasks.
@@ -257,8 +257,7 @@ public final class HashViewController extends BaseController implements Interrup
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
                     final ClipboardContent content = new ClipboardContent();
                     final StringBuilder sb = new StringBuilder();
-                    final HashViewTableModel model
-                            = (HashViewTableModel) cell.getTableRow().getItem();
+                    final HashViewTableModel model = cell.getTableRow().getItem();
                     sb.append(model.getFileName()).append("\t")
                             .append(model.getFilePath()).append("\t")
                             .append(model.getHashValue());
@@ -335,16 +334,6 @@ public final class HashViewController extends BaseController implements Interrup
                 if (file.length() > LARGE_FILE_THRESHOLD) {
                     final MessageDigestProvider provider
                             = MessageDigestProvider.createProvider(algorithm);
-//                    try (FileInputStream fis = new FileInputStream(file);
-//                            FileChannel ch = fis.getChannel()) {
-//                        final byte[] arrBuffer = new byte[BUFFER_SIZE];
-//                        final ByteBuffer buffer = ByteBuffer.wrap(arrBuffer);
-//                        int readBytes;
-//                        while ((readBytes = ch.read(buffer)) > 0) {
-//                            provider.updateHash(buffer.array(), 0, readBytes);
-//                            buffer.clear();
-//                        }
-//                    }
                     try (FileInputStream fis = new FileInputStream(file);
                             BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
                         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -358,12 +347,17 @@ public final class HashViewController extends BaseController implements Interrup
                     byte[] bytes = Files.readAllBytes(file.toPath());
                     result = MessageDigestProvider.computeHash(bytes, algorithm);
                 }
-                appendColumn(result, file);
+
+                final String name = file.getAbsolutePath();
+                NamedMessageDigestResult namedResult
+                        = new NamedMessageDigestResult(result, name);
+                appendColumn(namedResult, file);
             }
         }
         catch (IOException | NoSuchAlgorithmException ex) {
             Log.e("Error reading file.", ex);
-            appendColumn(new MessageDigestResult(), file);
+            final MessageDigestResult result = new MessageDigestResult();
+            appendColumn(new NamedMessageDigestResult(result, StringUtils.EMPTY), file);
         }
     }
 
@@ -454,14 +448,14 @@ public final class HashViewController extends BaseController implements Interrup
         _models.clear();
     }
 
-    private void appendColumn(MessageDigestResult result, File file) {
-        if (!_models.contains(result)) {
+    private void appendColumn(NamedMessageDigestResult namedResult, File file) {
+        if (!_models.contains(namedResult)) {
             final HashViewTableModel model;
-            if (!result.isEmpty()) {
+            if (!namedResult.getMessageDigestResult().isEmpty()) {
                 model = new HashViewTableModel(
                         file.getName(),
                         file.getAbsolutePath(),
-                        setCase(result.toString()));
+                        setCase(namedResult.getMessageDigestResult().toString()));
             } else {
                 model = new HashViewTableModel(
                         file.getName(),
@@ -470,7 +464,7 @@ public final class HashViewController extends BaseController implements Interrup
             }
             Platform.runLater(() -> {
                 _resultTable.getItems().add(model);
-                _models.add(result);
+                _models.add(namedResult);
             });
         }
     }
