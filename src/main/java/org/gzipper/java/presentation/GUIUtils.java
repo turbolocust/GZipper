@@ -32,7 +32,7 @@ import org.gzipper.java.util.Log;
  */
 public final class GUIUtils {
 
-    private static final String REGEX_VERSION_LEGACY = "^\\d\\."; // e.g. 1.8.0
+    private static final String REGEX_VERSION_LEGACY = "^1\\.\\d"; // e.g. 1.8
     private static final Method COLUMN_AUTOFIT_METHOD = initMethod();
 
     private static Method initMethod() {
