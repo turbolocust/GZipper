@@ -28,4 +28,5 @@ module org.gzipper {
     requires javafx.fxml;
     requires javafx.graphicsEmpty;
     requires javafx.graphics;
+    requires kotlin.stdlib;
 }
