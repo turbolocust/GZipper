@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: org.gzipper.java.presentation.GZipper
+Class-Path: lib/javafx-graphics-11.0.2-win.jar lib/javafx-base-11.0.2.jar lib/kotlin
+ -stdlib-jdk8-1.3.72.jar lib/javafx-controls-11.0.2-win.jar lib/javafx-base-11.0
+ .2-win.jar xz-1.8.jar lib/commons-compress-1.20.jar lib/annotations-13.0.jar lib/ja
+ vafx-fxml-11.0.2-win.jar lib/kotlin-stdlib-jdk7-1.3.72.jar lib/javafx-fxml-11.0
+ .2.jar lib/javafx-controls-11.0.2.jar lib/javafx-graphics-11.0.2.jar lib/kotlin-std
+ lib-common-1.3.72.jar lib/kotlin-stdlib-1.3.72.jar
+
