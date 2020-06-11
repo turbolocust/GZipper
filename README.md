@@ -1,6 +1,10 @@
-# GZipper
+<p align="center">
+  <img alt="gzipper logo" src="./src/main/resources/images/icon_256.png" width="100px" />
+  <h1 align="center">GZipper</h1>
+</p>
 
-<a href="https://travis-ci.org/turbolocust/GZipper"><img href src="https://travis-ci.org/turbolocust/GZipper.svg?branch=master" alt="CI build passed"/></a>
+![Travis CI](https://travis-ci.org/turbolocust/GZipper.svg?branch=master)
+![Java CI](https://github.com/turbolocust/GZipper/workflows/Java%20CI/badge.svg?branch=master)
 
 <b>Features:</b><br />
 
