@@ -67,9 +67,8 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      *
      * @param path the path that contains the files to be compressed.
      * @return an array of files from the specified path.
-     * @throws IOException if an I/O error occurs.
      */
-    protected final File[] getFiles(String path) throws IOException {
+    protected final File[] getFiles(String path) {
         final File dir = new File(path);
         return dir.listFiles();
     }

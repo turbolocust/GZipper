@@ -97,8 +97,11 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
             final File outputFolder = new File(location + fullname.substring(
                     startIndex, fullname.indexOf('.', startIndex)));
 
-            if (!outputFolder.exists()) {
-                outputFolder.mkdir(); // create output folder of archive
+            if (!outputFolder.exists()) { // create output folder of archive
+                if (!outputFolder.mkdir()) {
+                    Log.e(I18N.getString("errorCreatingDirectory.text", outputFolder.getAbsolutePath()));
+                    throw new IOException(String.format("%s could not be created.", outputFolder.getAbsolutePath()));
+                }
             }
 
             while (!_interrupt && entry != null) {
@@ -110,8 +113,12 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                     // check if entry contains a directory
                     if (entryName.indexOf('/') > -1) {
                         if (!newFile.getParentFile().exists()) {
-                            // also creates parent directories
-                            newFile.getParentFile().mkdirs();
+                            // also create parent directories by calling "mkdirs"
+                            if (!newFile.getParentFile().mkdirs()) {
+                                final String parentFilePath = newFile.getParentFile().getAbsolutePath();
+                                Log.e(I18N.getString("errorCreatingDirectory.text", parentFilePath));
+                                throw new IOException(String.format("%s could not be created.", parentFilePath));
+                            }
                         }
                     }
                     if (!entry.isDirectory()) {
@@ -222,11 +229,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * @param stream the {@link InputStream} being used when creating a new
      * {@link ArchiveInputStream}.
      * @return new instance of {@link ArchiveInputStream}.
-     * @throws java.io.IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
-    protected ArchiveInputStream makeArchiveInputStream(InputStream stream)
-            throws IOException, ArchiveException {
+    protected ArchiveInputStream makeArchiveInputStream(InputStream stream) throws ArchiveException {
         return _archiveStreamFactory.createArchiveInputStream(_archiveType, stream);
     }
 
@@ -252,11 +257,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * @param stream the {@link OutputStream} being used when creating a new
      * {@link ArchiveOutputStream}.
      * @return new instance of {@link ArchiveOutputStream}.
-     * @throws IOException if an I/O error occurs.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
-    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
-            throws IOException, ArchiveException {
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) throws ArchiveException {
         return _archiveStreamFactory.createArchiveOutputStream(_archiveType, stream);
     }
 

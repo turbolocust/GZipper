@@ -40,7 +40,7 @@ public abstract class BaseController implements Initializable {
     /**
      * A set with all the stages currently open.
      */
-    private static Set<Stage> _stages = new HashSet<>();
+    private static final Set<Stage> _stages = new HashSet<>();
 
     public static Set<Stage> getStages() {
         return _stages;
@@ -72,7 +72,7 @@ public abstract class BaseController implements Initializable {
     /**
      * The currently active theme.
      */
-    protected CSS.Theme _theme = CSS.Theme.MODENA;
+    protected CSS.Theme _theme;
 
     /**
      * Constructs a controller with the specified CSS theme.
@@ -102,9 +102,7 @@ public abstract class BaseController implements Initializable {
      */
     protected void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
         _theme = enableTheme ? theme : CSS.Theme.getDefault();
-        _stages.forEach((stage) -> {
-            CSS.load(_theme, stage.getScene());
-        });
+        _stages.forEach((stage) -> CSS.load(_theme, stage.getScene()));
     }
 
     /**

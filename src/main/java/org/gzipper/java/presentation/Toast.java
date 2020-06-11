@@ -94,23 +94,21 @@ public final class Toast {
         final KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeInDelay),
                 new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
         fadeInTimeline.getKeyFrames().add(fadeInKey1);
-        fadeInTimeline.setOnFinished((ev1) -> {
-            new Thread(() -> {
-                try {
-                    Thread.sleep(toastDelay);
-                }
-                catch (InterruptedException ex) {
-                    Log.e("Thread of toast stage interrupted.", ex);
-                    Thread.currentThread().interrupt();
-                }
-                final Timeline fadeOutTimeline = new Timeline();
-                final KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOutDelay),
-                        new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 0));
-                fadeOutTimeline.getKeyFrames().add(fadeOutKey1);
-                fadeOutTimeline.setOnFinished((ev2) -> toastStage.close());
-                fadeOutTimeline.play();
-            }).start();
-        });
+        fadeInTimeline.setOnFinished((ev1) -> new Thread(() -> {
+            try {
+                Thread.sleep(toastDelay);
+            }
+            catch (InterruptedException ex) {
+                Log.e("Thread of toast stage interrupted.", ex);
+                Thread.currentThread().interrupt();
+            }
+            final Timeline fadeOutTimeline = new Timeline();
+            final KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOutDelay),
+                    new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 0));
+            fadeOutTimeline.getKeyFrames().add(fadeOutKey1);
+            fadeOutTimeline.setOnFinished((ev2) -> toastStage.close());
+            fadeOutTimeline.play();
+        }).start());
         fadeInTimeline.play();
     }
 }

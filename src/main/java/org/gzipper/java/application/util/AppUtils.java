@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import org.gzipper.java.util.Log;
 
@@ -84,7 +85,7 @@ public final class AppUtils {
         final URL url = clazz.getResource(name);
         if (url.toString().startsWith("jar:")) {
 
-            String tempName = name.substring(name.lastIndexOf('/') + 1, name.length());
+            String tempName = name.substring(name.lastIndexOf('/') + 1);
 
             try (BufferedInputStream bis = new BufferedInputStream(clazz.getResourceAsStream(name))) {
 
@@ -130,11 +131,9 @@ public final class AppUtils {
         String decPath; // to hold decoded path of JAR-file
 
         if (System.getProperty("os.name").startsWith("Windows")) {
-            decPath = URLDecoder.decode(path.substring(
-                    1, path.length() - cutLength), "UTF-8");
+            decPath = URLDecoder.decode(path.substring(1, path.length() - cutLength), StandardCharsets.UTF_8);
         } else {
-            decPath = URLDecoder.decode(path.substring(
-                    0, path.length() - cutLength), "UTF-8");
+            decPath = URLDecoder.decode(path.substring(0, path.length() - cutLength), StandardCharsets.UTF_8);
         }
 
         return decPath;

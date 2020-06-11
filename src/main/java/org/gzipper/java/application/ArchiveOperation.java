@@ -55,12 +55,6 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
     private final CompressionMode _compressionMode;
 
     /**
-     * {@link Predicate} that may be used to filter files/entries when
-     * processing archives.
-     */
-    private final Predicate<String> _filterPredicate;
-
-    /**
      * The elapsed time of the operation which will be stored after its end.
      */
     private final AtomicLong _elapsedTime = new AtomicLong();
@@ -84,8 +78,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         _archiveInfo = builder._archiveInfo;
         _algorithm = builder._algorithm;
         _compressionMode = builder._compressionMode;
-        _filterPredicate = builder._filterPredicate;
-        _algorithm.setPredicate(_filterPredicate);
+        _algorithm.setPredicate(builder._filterPredicate);
     }
 
     private void setElapsedTime() {
@@ -148,13 +141,8 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
                 final Throwable cause = ex.getCause();
                 if (cause instanceof GZipperException) {
                     GZipperException inner = (GZipperException) cause;
-                    switch (inner.getReason()) {
-                        case NO_DIR_SUPPORTED:
-                            Log.w(I18N.getString("noDirSupported.text"), true);
-                            break;
-                        default:
-                            // ignore
-                            break;
+                    if (inner.getReason() == GZipperException.Reason.NO_DIR_SUPPORTED) {
+                        Log.w(I18N.getString("noDirSupported.text"), true);
                     }
                 }
                 Log.e(ex.getLocalizedMessage(), ex);

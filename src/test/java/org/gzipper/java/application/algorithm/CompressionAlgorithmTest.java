@@ -105,10 +105,6 @@ public class CompressionAlgorithmTest {
         assertFalse(FileUtils.containsIllegalChars(_testFileNamePrefix));
     }
 
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of compress and extract method, of class ArchivingAlgorithm.
      */

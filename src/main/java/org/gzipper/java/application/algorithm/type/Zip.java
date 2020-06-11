@@ -16,21 +16,19 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Represents the ZIP archive type.
@@ -61,8 +59,7 @@ public class Zip extends ArchivingAlgorithm {
     }
 
     @Override
-    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
-            throws IOException, ArchiveException {
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) {
         ZipArchiveOutputStream zaos = new ZipArchiveOutputStream(stream);
         zaos.setLevel(_compressionLevel);
         zaos.setUseZip64(Zip64Mode.AsNeeded);
@@ -70,20 +67,17 @@ public class Zip extends ArchivingAlgorithm {
     }
 
     @Override
-    protected ArchiveInputStream makeArchiveInputStream(
-            InputStream stream) throws ArchiveException {
+    protected ArchiveInputStream makeArchiveInputStream(InputStream stream) {
         return new ZipArchiveInputStream(stream, null, false, true);
     }
 
     @Override
-    protected CompressorInputStream makeCompressorInputStream(
-            InputStream stream) throws CompressorException {
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream) {
         return null; // as no separate compressor stream is required
     }
 
     @Override
-    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
-            throws IOException, CompressorException {
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream) {
         return null; // as no separate compressor stream is required
     }
 }

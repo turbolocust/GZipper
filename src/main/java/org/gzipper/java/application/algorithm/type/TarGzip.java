@@ -16,17 +16,17 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
@@ -46,8 +46,7 @@ public class TarGzip extends Tar {
     }
 
     @Override
-    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
-            throws IOException, CompressorException {
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream) throws IOException {
         // set additional parameters for compressor stream
         GzipParameters params = Gzip.getDefaultGzipParams(null);
         params.setCompressionLevel(_compressionLevel);
@@ -55,8 +54,7 @@ public class TarGzip extends Tar {
     }
 
     @Override
-    protected CompressorInputStream makeCompressorInputStream(
-            InputStream stream) throws IOException, CompressorException {
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream) throws IOException {
         return new GzipCompressorInputStream(stream);
     }
 }

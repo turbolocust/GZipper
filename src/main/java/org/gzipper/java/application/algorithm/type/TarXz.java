@@ -16,16 +16,16 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Represents the TAR+XZ archive type.
@@ -44,15 +44,13 @@ public class TarXz extends Tar {
     }
 
     @Override
-    protected CompressorOutputStream makeCompressorOutputStream(
-            OutputStream stream) throws IOException, CompressorException {
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream) throws IOException {
         return new XZCompressorOutputStream(stream);
 
     }
 
     @Override
-    protected CompressorInputStream makeCompressorInputStream(
-            InputStream stream) throws IOException, CompressorException {
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream) throws IOException {
         return new XZCompressorInputStream(stream);
     }
 }

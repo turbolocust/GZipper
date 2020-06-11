@@ -48,9 +48,7 @@ public class TextAreaHandler extends StreamHandler {
         flush();
 
         if (_textArea != null) {
-            Platform.runLater(() -> {
-                _textArea.appendText(getFormatter().format(record));
-            });
+            Platform.runLater(() -> _textArea.appendText(getFormatter().format(record)));
         }
     }
 }

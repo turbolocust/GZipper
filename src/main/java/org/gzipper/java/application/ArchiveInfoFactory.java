@@ -110,7 +110,7 @@ public final class ArchiveInfoFactory {
             fileList.add(next);
             do {
                 ++nameSuffix;
-                fullName = displayName + Integer.toString(nameSuffix);
+                fullName = displayName + nameSuffix;
                 fullName = FileUtils.generateUniqueFilename(
                         outputPath, fullName, ext, nameSuffix);
                 name = FileUtils.getName(fullName);
@@ -131,10 +131,8 @@ public final class ArchiveInfoFactory {
      * @param archiveName the name of the archive to be extracted.
      * @param outputPath the path where to extract the archive.
      * @return {@link ArchiveInfo} that may be used for an operation.
-     * @throws GZipperException if archive type could not be determined.
      */
-    public static ArchiveInfo createArchiveInfo(ArchiveType archiveType,
-            String archiveName, String outputPath) throws GZipperException {
+    public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName, String outputPath) {
 
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null.");

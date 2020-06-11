@@ -293,17 +293,11 @@ public final class MainViewController extends BaseController {
                 _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
                 if (size > 10) { // threshold, to avoid flooding text area
-                    filePaths.forEach((filePath) -> {
-                        _selectedFiles.add(new File(filePath));
-                    });
+                    filePaths.forEach((filePath) -> _selectedFiles.add(new File(filePath)));
                     Log.i(I18N.getString("manyFilesSelected.text"), true, size);
                 } else { // log files in detail
-                    filePaths.stream().map((filePath) -> {
-                        _selectedFiles.add(new File(filePath));
-                        return filePath;
-                    }).forEachOrdered((filePath) -> {
-                        Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath);
-                    });
+                    filePaths.stream().peek((filePath) -> _selectedFiles.add(new File(filePath)))
+                            .forEachOrdered((filePath) -> Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath));
                 }
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
@@ -606,7 +600,7 @@ public final class MainViewController extends BaseController {
      */
     @SuppressWarnings("SleepWhileInLoop")
     private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
-        Task<Boolean> task = new Task<Boolean>() {
+        Task<Boolean> task = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
 
@@ -615,8 +609,7 @@ public final class MainViewController extends BaseController {
                 while (!futureTask.isDone()) {
                     try {
                         Thread.sleep(10); // check for interruption
-                    }
-                    catch (InterruptedException ex) {
+                    } catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
                         Log.i(I18N.getString("interrupt.text"), true);
                         Log.w(ex.getLocalizedMessage(), false);
@@ -628,8 +621,7 @@ public final class MainViewController extends BaseController {
                 }
                 try { // check for cancellation
                     return futureTask.get();
-                }
-                catch (CancellationException ex) {
+                } catch (CancellationException ex) {
                     // ignore exception
                     return false;
                 }
@@ -898,10 +890,8 @@ public final class MainViewController extends BaseController {
                 List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(
                         archiveType, _archiveName, _compressionLevel,
                         _selectedFiles, _outputFile.getParent());
-                for (int i = 0; i < infos.size(); ++i) {
-                    final ArchiveOperation.Builder builder
-                            = new ArchiveOperation.Builder(
-                                    infos.get(i), CompressionMode.COMPRESS);
+                for (ArchiveInfo info : infos) {
+                    final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                     builder.addListener(this).filterPredicate(_filterPredicate);
                     operations.add(builder.build());
                 }
@@ -942,13 +932,12 @@ public final class MainViewController extends BaseController {
                 throws GZipperException {
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
             // create new operation for each archive to be extracted
-            for (int i = 0; i < _selectedFiles.size(); ++i) {
-                final File file = _selectedFiles.get(i);
+            for (final File file : _selectedFiles) {
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         file.getAbsolutePath(), _outputFile + File.separator);
                 final ArchiveOperation.Builder builder
                         = new ArchiveOperation.Builder(
-                                info, CompressionMode.DECOMPRESS);
+                        info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }

@@ -16,14 +16,13 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+
+import java.io.OutputStream;
 
 /**
  * Represents the JAR archive type.
@@ -42,8 +41,7 @@ public class Jar extends Zip {
     }
 
     @Override
-    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream)
-            throws IOException, ArchiveException {
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) {
         JarArchiveOutputStream jaos = new JarArchiveOutputStream(stream);
         jaos.setLevel(_compressionLevel);
         jaos.setUseZip64(Zip64Mode.AsNeeded);

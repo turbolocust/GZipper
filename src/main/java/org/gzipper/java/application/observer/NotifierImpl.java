@@ -65,9 +65,7 @@ public class NotifierImpl<T> implements Notifier<T> {
     @Override
     public final void notifyListeners() {
         if (hasChanged()) {
-            _listeners.forEach((listener) -> {
-                listener.update(this, _value);
-            });
+            _listeners.forEach((listener) -> listener.update(this, _value));
             clearChanged();
         }
     }

@@ -205,8 +205,7 @@ public final class FileUtils {
      * @return the path to the target file.
      * @throws IOException if an I/O error occurs.
      */
-    public static Path copy(String src, String dst,
-            CopyOption... options) throws IOException {
+    public static Path copy(String src, String dst, CopyOption... options) throws IOException {
         if (options == null) {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
         }
@@ -234,10 +233,10 @@ public final class FileUtils {
      */
     public static long fileSizes(Path path, Predicate<String> filter) {
 
-        final SizeValueHolder holder = new SizeValueHolder(0);
+        final SizeValueHolder holder = new SizeValueHolder();
 
         try {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     String name = file.getFileName().toString();
@@ -357,8 +356,8 @@ public final class FileUtils {
 
         private long _size;
 
-        SizeValueHolder(long size) {
-            _size = size;
+        SizeValueHolder() {
+            _size = 0;
         }
     }
 }

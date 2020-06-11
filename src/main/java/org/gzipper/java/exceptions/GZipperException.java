@@ -139,6 +139,6 @@ public class GZipperException extends Exception {
      * The reason of the exception.
      */
     public enum Reason {
-        NO_DIR_SUPPORTED, FAULTY_COMPRESSION_LVL, ILLEGAL_MODE, UNKNOWN;
+        NO_DIR_SUPPORTED, FAULTY_COMPRESSION_LVL, ILLEGAL_MODE, UNKNOWN
     }
 }

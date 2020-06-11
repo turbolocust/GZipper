@@ -44,7 +44,7 @@ public final class TestUtils {
         final Random rand = ThreadLocalRandom.current();
         for (int i = 0; i < length; ++i) {
             char c = (char) (rand.nextInt(126 - 32) + 32);
-            sb.append(Character.toString(c));
+            sb.append(c);
         }
         return sb.toString();
     }

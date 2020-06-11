@@ -39,8 +39,7 @@ import org.gzipper.java.exceptions.GZipperException;
 public abstract class CompressorAlgorithm extends AbstractAlgorithm {
 
     @Override
-    public final void compress(File[] files, String location, String name)
-            throws IOException, ArchiveException, CompressorException {
+    public final void compress(File[] files, String location, String name) throws IOException {
 
         initAlgorithmProgress(files);
         String fullname = FileUtils.combine(location, name);
@@ -75,8 +74,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public final void extract(String location, String fullname)
-            throws IOException, ArchiveException, CompressorException {
+    public final void extract(String location, String fullname) throws IOException {
 
         final File archive = new File(fullname);
 

@@ -161,9 +161,7 @@ public final class HashViewController extends BaseController implements Interrup
     @FXML
     void handleLowerCaseCheckBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_lowerCaseCheckBox)) {
-            _resultTable.getItems().forEach(item -> {
-                item.setHashValue(setCase(item.getHashValue()));
-            });
+            _resultTable.getItems().forEach(item -> item.setHashValue(setCase(item.getHashValue())));
             _resultTable.refresh();
         }
     }
@@ -175,9 +173,7 @@ public final class HashViewController extends BaseController implements Interrup
             final List<File> files = new ArrayList<>(size);
             _resultTable.getItems().stream()
                     .map((model) -> new File(model.getFilePath()))
-                    .forEachOrdered((file) -> {
-                        files.add(file);
-                    });
+                    .forEachOrdered(files::add);
             clearRows();
             computeAndAppend(files);
             GUIUtils.autoFitTable(_resultTable);
@@ -227,8 +223,7 @@ public final class HashViewController extends BaseController implements Interrup
 
     private void setCellFactory(TableColumn<HashViewTableModel, String> column) {
         column.setCellFactory((TableColumn<HashViewTableModel, String> col) -> {
-            final TableCell<HashViewTableModel, String> cell
-                    = new TableCell<HashViewTableModel, String>() {
+            final TableCell<HashViewTableModel, String> cell = new TableCell<>() {
                 @Override
                 protected void updateItem(String value, boolean empty) {
                     super.updateItem(value, empty);
@@ -378,9 +373,9 @@ public final class HashViewController extends BaseController implements Interrup
             clearRows();
         }
 
-        final Task<Boolean> task = new Task<Boolean>() {
+        final Task<Boolean> task = new Task<>() {
             @Override
-            protected Boolean call() throws Exception {
+            protected Boolean call() {
                 for (File file : files) {
                     if (!_isAlive) {
                         return false;
@@ -392,8 +387,8 @@ public final class HashViewController extends BaseController implements Interrup
         };
 
         // set up event handlers
-        task.setOnSucceeded(e -> onTaskCompleted(e));
-        task.setOnFailed(e -> onTaskCompleted(e));
+        task.setOnSucceeded(this::onTaskCompleted);
+        task.setOnFailed(this::onTaskCompleted);
 
         bindUIcontrols(task);
         _isAlive = true;
@@ -412,7 +407,7 @@ public final class HashViewController extends BaseController implements Interrup
     }
 
     private void onTaskCompleted(Event evt) {
-        Platform.runLater(() -> unbindUIcontrols());
+        Platform.runLater(this::unbindUIcontrols);
         _isAlive = false;
         evt.consume();
     }

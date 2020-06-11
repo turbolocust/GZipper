@@ -146,12 +146,11 @@ public final class ArchiveInfo {
 
     @Override
     public String toString() {
-        return new StringBuilder("ArchiveInfo{")
-                .append("\nArchive type : ").append(_archiveType)
-                .append(",\nCompression level : ").append(_level)
-                .append(",\nFiles : ").append(_files)
-                .append(",\nArchive name : ").append(_archiveName)
-                .append(",\nOutput path : ").append(_outputPath).append('}')
-                .toString();
+        return "ArchiveInfo{" +
+                "\nArchive type : " + _archiveType +
+                ",\nCompression level : " + _level +
+                ",\nFiles : " + _files +
+                ",\nArchive name : " + _archiveName +
+                ",\nOutput path : " + _outputPath + '}';
     }
 }

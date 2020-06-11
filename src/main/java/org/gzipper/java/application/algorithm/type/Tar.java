@@ -16,18 +16,17 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.algorithm.ArchivingAlgorithm;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
@@ -58,8 +57,7 @@ public class Tar extends ArchivingAlgorithm {
     }
 
     @Override
-    protected ArchiveOutputStream makeArchiveOutputStream(
-            OutputStream stream) throws IOException, ArchiveException {
+    protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) {
         TarArchiveOutputStream taos = new TarArchiveOutputStream(stream);
         taos.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
@@ -67,14 +65,12 @@ public class Tar extends ArchivingAlgorithm {
     }
 
     @Override
-    protected CompressorOutputStream makeCompressorOutputStream(
-            OutputStream stream) throws IOException, CompressorException {
+    protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream) throws IOException {
         return null;
     }
 
     @Override
-    protected CompressorInputStream makeCompressorInputStream(
-            InputStream stream) throws IOException, CompressorException {
+    protected CompressorInputStream makeCompressorInputStream(InputStream stream) throws IOException {
         return null;
     }
 }

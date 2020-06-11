@@ -60,7 +60,7 @@ public final class TaskHandler implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         _executorService.shutdown();
     }
 

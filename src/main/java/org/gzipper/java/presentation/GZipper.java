@@ -142,11 +142,7 @@ public class GZipper extends Application {
             handler.setFormatter(new SimpleFormatter());
             logger.addHandler(handler);
             Log.setVerboseUiLogging(true);
-        }
-        catch (UnsupportedEncodingException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        catch (IOException | SecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
@@ -170,21 +166,18 @@ public class GZipper extends Application {
                 "[%1$tm-%1$te-%1$ty, %1$tH:%1$tM:%1$tS] %4$s: %5$s %n"
         );
         // store away settings file at application termination
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Settings.getInstance().storeAway();
-                    Logger logger = Log.DEFAULT_LOGGER;
-                    for (Handler handler : logger.getHandlers()) {
-                        handler.close();
-                    }
-                }
-                catch (IOException ex) {
-                    Log.e(ex.getLocalizedMessage(), ex);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                Settings.getInstance().storeAway();
+                Logger logger = Log.DEFAULT_LOGGER;
+                for (Handler handler : logger.getHandlers()) {
+                    handler.close();
                 }
             }
-        });
+            catch (IOException ex) {
+                Log.e(ex.getLocalizedMessage(), ex);
+            }
+        }));
         launch(args); // actually launch the UI
     }
 }

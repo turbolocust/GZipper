@@ -22,5 +22,5 @@ package org.gzipper.java.application;
  * @author Matthias Fussenegger
  */
 public enum CompressionMode {
-    COMPRESS, DECOMPRESS;
+    COMPRESS, DECOMPRESS
 }
