@@ -747,7 +747,7 @@ public final class MainViewController extends BaseController {
 
         /**
          * Converts percentage values to string objects. See method
-         * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Double)}.
+         * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Integer)}.
          */
         private final PercentageStringConverter _converter = new PercentageStringConverter();
 
