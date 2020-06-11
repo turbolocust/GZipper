@@ -50,11 +50,11 @@ For compression and decompression this application uses parts of the commons-com
 <b>Main view with enabled default theme:</b><br />
 ![Main view with enabled default theme.](./images/gzipper_gui_FX_mainView.PNG)
 
-<br /><b>Hash view with enabled default theme:</b><br />
-![Hash view with enabled default theme.](./images/gzipper_gui_FX_hashView.PNG)
-
 <br /><b>Main view with enabled dark theme:</b><br />
 ![Main view with enabled dark theme.](./images/gzipper_gui_FX_mainView_dark.PNG)
+
+<br /><b>Hash view with enabled default theme:</b><br />
+![Hash view with enabled default theme.](./images/gzipper_gui_FX_hashView.PNG)
 
 <br /><b>Hash view with enabled dark theme:</b><br />
 ![Hash view with enabled dark theme.](./images/gzipper_gui_FX_hashView_dark.PNG)
