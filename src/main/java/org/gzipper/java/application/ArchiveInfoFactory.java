@@ -89,7 +89,9 @@ public final class ArchiveInfoFactory {
 
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null.");
-        } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
+        }
+
+        if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
             throw GZipperException.createWithReason(
                     GZipperException.Reason.FAULTY_COMPRESSION_LVL,
                     "Faulty compression level specified.");

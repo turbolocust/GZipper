@@ -108,8 +108,7 @@ public class GZipperException extends Exception {
      * @param cause the cause of this exception.
      * @return a new instance of {@link GZipperException}.
      */
-    public static GZipperException createWithReason(Reason reason, String msg,
-            Throwable cause) {
+    public static GZipperException createWithReason(Reason reason, String msg, Throwable cause) {
         GZipperException ex = new GZipperException(msg, cause);
         ex.setReason(reason);
         return ex;
