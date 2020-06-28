@@ -104,9 +104,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                 }
             }
 
-            while (!_interrupt && entry != null) {
+            while (!interrupt && entry != null) {
                 final String entryName = entry.getName();
-                if (_filterPredicate.test(entryName)) { // check predicate first
+                if (filterPredicate.test(entryName)) { // check predicate first
                     final String uniqueName = FileUtils.generateUniqueFilename(
                             outputFolder.getAbsolutePath(), entryName);
                     final File newFile = new File(uniqueName);
@@ -127,13 +127,13 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                                 new FileOutputStream(newFile))) {
                             final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                             int readBytes;
-                            while (!_interrupt && (readBytes = ais.read(buffer)) != -1) {
+                            while (!interrupt && (readBytes = ais.read(buffer)) != -1) {
                                 bos.write(buffer, 0, readBytes);
                                 updateProgress(readBytes);
                             }
                         }
                         catch (IOException ex) {
-                            if (!_interrupt) {
+                            if (!interrupt) {
                                 Log.e(ex.getLocalizedMessage(), ex);
                                 Log.e("{0}\n{1}",
                                         I18N.getString("errorWritingFile.text"),
@@ -144,7 +144,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                         }
                     }
                 }
-                if (!_interrupt) {
+                if (!interrupt) {
                     entry = ais.getNextEntry();
                 }
             }
@@ -182,13 +182,13 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
         int readBytes;
 
         if (files.length > 0) {
-            for (int i = 0; !_interrupt && i < files.length; ++i) {
+            for (int i = 0; !interrupt && i < files.length; ++i) {
                 // create next file and define entry name based on folder level
                 final File newFile = files[i];
                 final String entryName = base + newFile.getName();
                 if (newFile.isFile()) {
                     // check predicate first
-                    if (!_filterPredicate.test(newFile.getName())) {
+                    if (!filterPredicate.test(newFile.getName())) {
                         continue; // skip entry
                     }
                     // read and compress the file
@@ -198,14 +198,14 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                         ArchiveEntry entry = aos.createArchiveEntry(newFile, entryName);
                         aos.putArchiveEntry(entry);
                         // write bytes to file
-                        while (!_interrupt && (readBytes = buf.read(buffer)) != -1) {
+                        while (!interrupt && (readBytes = buf.read(buffer)) != -1) {
                             aos.write(buffer, 0, readBytes);
                             updateProgress(readBytes);
                         }
                         aos.closeArchiveEntry();
                     }
                     catch (IOException ex) {
-                        if (!_interrupt) {
+                        if (!interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
                             Log.e("{0}\n{1}",
                                     I18N.getString("errorReadingFile.text"),

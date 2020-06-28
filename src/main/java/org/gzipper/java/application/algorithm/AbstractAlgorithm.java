@@ -19,6 +19,7 @@ package org.gzipper.java.application.algorithm;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Predicate;
+
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.gzipper.java.application.observer.NotifierImpl;
@@ -37,29 +38,29 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     /**
      * If set to true the currently running operation will be interrupted.
      */
-    protected volatile boolean _interrupt = false;
+    protected volatile boolean interrupt = false;
 
     /**
      * The compression level. Will only be considered if supported by algorithm.
      */
-    protected int _compressionLevel;
+    protected int compressionLevel;
 
     /**
      * Object used to update the progress of the algorithm.
      */
-    protected AlgorithmProgress _algorithmProgress;
+    protected AlgorithmProgress algorithmProgress;
 
     /**
      * Predicate used to filter files or entries when processing archives.
      */
-    protected Predicate<String> _filterPredicate;
+    protected Predicate<String> filterPredicate;
 
     /**
      * The default constructor of this class.
      */
     public AbstractAlgorithm() {
         // accepts all files/entries since the test result is never false
-        _filterPredicate = Predicates.createAlwaysTrue();
+        filterPredicate = Predicates.createAlwaysTrue();
     }
 
     /**
@@ -74,12 +75,12 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     }
 
     /**
-     * Initializes {@link #_algorithmProgress} with the specified files.
+     * Initializes {@link #algorithmProgress} with the specified files.
      *
      * @param files the files to be used for initialization.
      */
     protected final void initAlgorithmProgress(File... files) {
-        _algorithmProgress = new AlgorithmProgress(_filterPredicate, files);
+        algorithmProgress = new AlgorithmProgress(filterPredicate, files);
     }
 
     /**
@@ -91,34 +92,31 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      * @param readBytes the amount of bytes read so far.
      */
     protected final void updateProgress(long readBytes) {
-        _algorithmProgress.updateProgress(readBytes);
-        changeValue(_algorithmProgress.getProgress());
+        algorithmProgress.updateProgress(readBytes);
+        changeValue(algorithmProgress.getProgress());
     }
 
     @Override
-    public final void compress(ArchiveInfo info) throws IOException,
-            ArchiveException, CompressorException {
+    public final void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
         final File[] files = new File[info.getFiles().size()];
-        _compressionLevel = info.getLevel();
-        compress(info.getFiles().toArray(files),
-                info.getOutputPath(), info.getArchiveName());
+        compressionLevel = info.getLevel();
+        compress(info.getFiles().toArray(files), info.getOutputPath(), info.getArchiveName());
     }
 
     @Override
-    public final void extract(ArchiveInfo info) throws IOException,
-            ArchiveException, CompressorException {
+    public final void extract(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
         extract(info.getOutputPath(), info.getArchiveName());
     }
 
     @Override
     public final void setPredicate(Predicate<String> predicate) {
         if (predicate != null) {
-            _filterPredicate = predicate;
+            filterPredicate = predicate;
         }
     }
 
     @Override
     public final void interrupt() {
-        _interrupt = true;
+        interrupt = true;
     }
 }

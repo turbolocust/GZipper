@@ -68,7 +68,7 @@ public class Gzip extends CompressorAlgorithm {
             CompressorOptions options) throws IOException {
         // set additional parameters for compressor stream
         GzipParameters params = getDefaultGzipParams(options.getName());
-        params.setCompressionLevel(_compressionLevel);
+        params.setCompressionLevel(compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
     }
 }

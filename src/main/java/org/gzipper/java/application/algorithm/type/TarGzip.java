@@ -49,7 +49,7 @@ public class TarGzip extends Tar {
     protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream) throws IOException {
         // set additional parameters for compressor stream
         GzipParameters params = Gzip.getDefaultGzipParams(null);
-        params.setCompressionLevel(_compressionLevel);
+        params.setCompressionLevel(compressionLevel);
         return new GzipCompressorOutputStream(stream, params);
     }
 

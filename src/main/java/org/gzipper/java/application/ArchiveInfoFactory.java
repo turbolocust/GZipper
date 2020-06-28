@@ -102,7 +102,7 @@ public final class ArchiveInfoFactory {
         final String displayName = properName.replace(ext, StringUtils.EMPTY);
 
         final Set<String> names = new HashSet<>(); // to avoid name collisions
-        List<ArchiveInfo> infos = new ArrayList<>(files.size());
+        List<ArchiveInfo> archiveInfos = new ArrayList<>(files.size());
         List<File> fileList; // used to be compatible with current API
         String fullName, name; // hold the names of the (next) archive
         int nameSuffix = -1; // will be appended if necessary
@@ -110,6 +110,7 @@ public final class ArchiveInfoFactory {
         for (File next : files) {
             fileList = new LinkedList<>();
             fileList.add(next);
+
             do {
                 ++nameSuffix;
                 fullName = displayName + nameSuffix;
@@ -117,13 +118,13 @@ public final class ArchiveInfoFactory {
                         outputPath, fullName, ext, nameSuffix);
                 name = FileUtils.getName(fullName);
             } while (names.contains(name));
+
             names.add(name);
-            ArchiveInfo info = new ArchiveInfo(
-                    archiveType, name, level, fileList, outputPath);
-            infos.add(info);
+            ArchiveInfo info = new ArchiveInfo(archiveType, name, level, fileList, outputPath);
+            archiveInfos.add(info);
         }
 
-        return infos;
+        return archiveInfos;
     }
 
     /**

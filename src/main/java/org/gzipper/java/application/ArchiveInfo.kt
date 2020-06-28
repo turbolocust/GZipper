@@ -38,9 +38,9 @@ class ArchiveInfo internal constructor(
          */
         var level: Int,
         /**
-         * The files to be compressed.
+         * The files to be compressed. May be <code>null</code> if decompression.
          */
-        var files: List<File>,
+        var files: List<File>?,
         /**
          * The output path either of the archive or the decompressed file(s).
          */

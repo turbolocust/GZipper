@@ -43,7 +43,7 @@ public class Jar extends Zip {
     @Override
     protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) {
         JarArchiveOutputStream jaos = new JarArchiveOutputStream(stream);
-        jaos.setLevel(_compressionLevel);
+        jaos.setLevel(compressionLevel);
         jaos.setUseZip64(Zip64Mode.AsNeeded);
         jaos.setFallbackToUTF8(true);
         return jaos;

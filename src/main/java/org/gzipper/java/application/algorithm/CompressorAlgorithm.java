@@ -24,8 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
+
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.util.FileUtils;
@@ -49,11 +48,11 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             // API does not need to be changed/more complicated
             final File file = files[0];
             // check predicate first
-            if (!_filterPredicate.test(file.getName())) {
+            if (!filterPredicate.test(file.getName())) {
                 return; // ignore file
             }
             final CompressorOptions options = new CompressorOptions(
-                    file.getName(), _compressionLevel);
+                    file.getName(), compressionLevel);
 
             try (final FileInputStream fis = new FileInputStream(file);
                     final BufferedInputStream bis = new BufferedInputStream(fis);
@@ -61,7 +60,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                             new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                 int readBytes = 0;
-                while (!_interrupt && (readBytes = bis.read(buffer)) != -1) {
+                while (!interrupt && (readBytes = bis.read(buffer)) != -1) {
                     cos.write(buffer, 0, readBytes);
                     updateProgress(readBytes);
                 }
@@ -79,7 +78,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
         final File archive = new File(fullname);
 
         // check predicate first
-        if (!_filterPredicate.test(archive.getName())) {
+        if (!filterPredicate.test(archive.getName())) {
             return; // ignore file
         }
 
@@ -102,7 +101,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                     new FileOutputStream(outputFile))) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                 int readBytes = 0;
-                while (!_interrupt && (readBytes = gcis.read(buffer)) != -1) {
+                while (!interrupt && (readBytes = gcis.read(buffer)) != -1) {
                     bos.write(buffer, 0, readBytes);
                     updateProgress(readBytes);
                 }

@@ -61,7 +61,7 @@ public class Zip extends ArchivingAlgorithm {
     @Override
     protected ArchiveOutputStream makeArchiveOutputStream(OutputStream stream) {
         ZipArchiveOutputStream zaos = new ZipArchiveOutputStream(stream);
-        zaos.setLevel(_compressionLevel);
+        zaos.setLevel(compressionLevel);
         zaos.setUseZip64(Zip64Mode.AsNeeded);
         return zaos;
     }
