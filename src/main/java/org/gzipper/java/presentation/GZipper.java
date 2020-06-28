@@ -163,7 +163,7 @@ public final class GZipper extends Application {
      * @return the default resource bundle to be used by this application.
      */
     private ResourceBundle getDefaultResourceBundle() {
-        return ResourceBundle.getBundle("i18n/gzipperMainView");
+        return ResourceBundle.getBundle("i18n/gzipper");
     }
 
     /**

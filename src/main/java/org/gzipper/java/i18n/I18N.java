@@ -60,7 +60,7 @@ public final class I18N {
      */
     public static synchronized ResourceBundle getBundle() {
         if (_bundle == null) {
-            final String base = "i18n/gzipperMainView";
+            final String base = "i18n/gzipper";
             final Locale locale = determineLocale();
             _bundle = locale != null
                     ? ResourceBundle.getBundle(base, locale)
