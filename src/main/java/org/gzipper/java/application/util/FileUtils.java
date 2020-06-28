@@ -37,7 +37,7 @@ import org.gzipper.java.util.Log;
 public final class FileUtils {
 
     private FileUtils() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**
@@ -248,14 +248,14 @@ public final class FileUtils {
 
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException ex) {
-                    Log.e(file + " skipped. Progress may be inaccurate.", ex);
+                    Log.e(file + " skipped. Progress may be inaccurate", ex);
                     return FileVisitResult.CONTINUE; // skip folder that can't be traversed
                 }
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException ex) {
                     if (ex != null) {
-                        Log.e(dir + " could not be traversed. Progress may be inaccurate.", ex);
+                        Log.e(dir + " could not be traversed. Progress may be inaccurate", ex);
                     }
                     return FileVisitResult.CONTINUE;
                 }

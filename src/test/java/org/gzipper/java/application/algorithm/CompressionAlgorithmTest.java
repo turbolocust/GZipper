@@ -173,7 +173,7 @@ public class CompressionAlgorithmTest {
                         assertEquals(line, iter.next());
                     }
                 }
-                System.out.println("Test successful.");
+                System.out.println("Test successful");
             }
             finally {
                 extractedFile.delete();

@@ -55,14 +55,14 @@ public final class GUIUtils {
             }
         }
         catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
-            Log.e("Method lookup via reflection failed.", ex);
+            Log.e("Method lookup via reflection failed", ex);
         }
 
         return method;
     }
 
     private GUIUtils() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**

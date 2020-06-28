@@ -40,7 +40,7 @@ import javafx.util.Duration;
 public final class Toast {
 
     private Toast() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**
@@ -110,7 +110,7 @@ public final class Toast {
             try {
                 Thread.sleep(toastDelay);
             } catch (InterruptedException ex) {
-                Log.e("Thread of toast stage interrupted.", ex);
+                Log.e("Thread of toast stage interrupted", ex);
                 Thread.currentThread().interrupt();
             }
             final Timeline fadeOutTimeline = new Timeline();

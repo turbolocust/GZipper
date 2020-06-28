@@ -100,7 +100,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
             if (!outputFolder.exists()) { // create output folder of archive
                 if (!outputFolder.mkdir()) {
                     Log.e(I18N.getString("errorCreatingDirectory.text", outputFolder.getAbsolutePath()));
-                    throw new IOException(String.format("%s could not be created.", outputFolder.getAbsolutePath()));
+                    throw new IOException(String.format("%s could not be created", outputFolder.getAbsolutePath()));
                 }
             }
 
@@ -117,7 +117,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                             if (!newFile.getParentFile().mkdirs()) {
                                 final String parentFilePath = newFile.getParentFile().getAbsolutePath();
                                 Log.e(I18N.getString("errorCreatingDirectory.text", parentFilePath));
-                                throw new IOException(String.format("%s could not be created.", parentFilePath));
+                                throw new IOException(String.format("%s could not be created", parentFilePath));
                             }
                         }
                     }

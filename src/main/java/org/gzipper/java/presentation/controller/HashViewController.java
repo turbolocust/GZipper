@@ -328,7 +328,7 @@ public final class HashViewController extends BaseController implements Interrup
                 appendColumn(namedResult, file);
             }
         } catch (IOException | NoSuchAlgorithmException ex) {
-            Log.e("Error reading file.", ex);
+            Log.e("Error reading file", ex);
             final MessageDigestResult result = new MessageDigestResult();
             appendColumn(new NamedMessageDigestResult(result, StringUtils.EMPTY), file);
         }
@@ -377,7 +377,7 @@ public final class HashViewController extends BaseController implements Interrup
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ex) {
-                Log.e("Task interrupted.", ex);
+                Log.e("Task interrupted", ex);
                 Thread.currentThread().interrupt();
             }
         }

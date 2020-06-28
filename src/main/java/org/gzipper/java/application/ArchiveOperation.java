@@ -117,7 +117,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
     @Override
     public Boolean call() throws Exception {
         if (_completed) {
-            throw new IllegalStateException("Operation already completed.");
+            throw new IllegalStateException("Operation already completed");
         }
         boolean success = false;
         _startTime = System.nanoTime();
@@ -132,7 +132,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
                 default:
                     throw GZipperException.createWithReason(
                             GZipperException.Reason.ILLEGAL_MODE,
-                            "Mode could not be determined.");
+                            "Mode could not be determined");
             }
             success = true;
         }
@@ -210,7 +210,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
             _compressionMode = compressionMode;
             if ((_algorithm = init(info)) == null) {
                 throw new GZipperException(new NullPointerException(
-                        "Algorithm could not be determined."));
+                        "Algorithm could not be determined"));
             }
         }
 

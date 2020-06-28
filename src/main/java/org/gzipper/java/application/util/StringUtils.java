@@ -29,7 +29,7 @@ public final class StringUtils {
     public static final String EMPTY = "";
 
     private StringUtils() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**

@@ -86,7 +86,7 @@ public class MessageDigestProvider {
             return new MessageDigestResult(result, convertToHex(result));
         }
         catch (NoSuchAlgorithmException ex) {
-            Log.e("Specified message digest algorithm does not exist.", ex);
+            Log.e("Specified message digest algorithm does not exist", ex);
         }
         // return an empty result if something went wrong
         return new MessageDigestResult(new byte[0], StringUtils.EMPTY);

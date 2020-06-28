@@ -51,7 +51,7 @@ public final class ViewControllers {
     private static final String HASH_VIEW_RES = "/fxml/HashView.fxml";
 
     private ViewControllers() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**
@@ -64,7 +64,7 @@ public final class ViewControllers {
     static AboutViewController showAboutView(CSS.Theme theme, HostServices hostServices) {
 
         if (hostServices == null) {
-            throw new NullPointerException("Host services must not be null.");
+            throw new NullPointerException("Host services must not be null");
         }
 
         final FXMLLoader fxmlLoader = initFXMLLoader(ABOUT_VIEW_RES);
@@ -140,12 +140,12 @@ public final class ViewControllers {
         BaseController.getStages().add(hashView);
 
         hashView.setOnCloseRequest(evt -> {
-            Log.i("Closing hash view.", false);
+            Log.i("Closing hash view", false);
             controller.interrupt(); // cancels any active task
         });
 
         hashView.setOnHiding(evt -> {
-            Log.i("Hiding hash view.", false);
+            Log.i("Hiding hash view", false);
             controller.interrupt(); // cancels any active task
         });
 

@@ -854,7 +854,7 @@ public final class MainViewController extends BaseController {
             if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
-                Log.e("Operation cannot be started as no files have been specified.");
+                Log.e("Operation cannot be started as no files have been specified");
                 Log.i(I18N.getString("noFilesSelectedWarning.text"), true);
             }
         }
@@ -898,7 +898,7 @@ public final class MainViewController extends BaseController {
             if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
-                Log.e("Operation cannot be started as an invalid path has been specified.");
+                Log.e("Operation cannot be started as an invalid path has been specified");
                 Log.w(I18N.getString("outputPathWarning.text"), true);
                 _outputPathTextField.requestFocus();
             }

@@ -85,6 +85,6 @@ public final class I18N {
     }
 
     private I18N() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 }

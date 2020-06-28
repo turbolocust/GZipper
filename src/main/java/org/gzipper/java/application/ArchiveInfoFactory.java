@@ -36,7 +36,7 @@ import org.gzipper.java.exceptions.GZipperException;
 public final class ArchiveInfoFactory {
 
     private ArchiveInfoFactory() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**
@@ -54,11 +54,11 @@ public final class ArchiveInfoFactory {
             int level, List<File> files, String outputPath) throws GZipperException {
 
         if (archiveType == null) {
-            throw new NullPointerException("Archive type must not be null.");
+            throw new NullPointerException("Archive type must not be null");
         } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
             throw GZipperException.createWithReason(
                     GZipperException.Reason.FAULTY_COMPRESSION_LVL,
-                    "Faulty compression level specified.");
+                    "Faulty compression level specified");
         }
 
         final String properName = checkAddExtension(archiveName, archiveType);
@@ -88,13 +88,13 @@ public final class ArchiveInfoFactory {
             int level, List<File> files, String outputPath) throws GZipperException {
 
         if (archiveType == null) {
-            throw new NullPointerException("Archive type must not be null.");
+            throw new NullPointerException("Archive type must not be null");
         }
 
         if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
             throw GZipperException.createWithReason(
                     GZipperException.Reason.FAULTY_COMPRESSION_LVL,
-                    "Faulty compression level specified.");
+                    "Faulty compression level specified");
         }
 
         final String properName = checkAddExtension(archiveName, archiveType);
@@ -138,7 +138,7 @@ public final class ArchiveInfoFactory {
     public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName, String outputPath) {
 
         if (archiveType == null) {
-            throw new NullPointerException("Archive type must not be null.");
+            throw new NullPointerException("Archive type must not be null");
         }
 
         return new ArchiveInfo(archiveType, archiveName, 0, null, outputPath);

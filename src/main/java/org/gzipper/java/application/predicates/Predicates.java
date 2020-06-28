@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 public final class Predicates {
 
     private Predicates() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**

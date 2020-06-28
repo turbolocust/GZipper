@@ -72,6 +72,6 @@ public class MessageDigestProviderImplTest {
             assertEquals(result.toUpperCase(), expResult.toString());
             System.out.println(algorithm.name() + " end");
         }
-        System.out.println("All tests successful.");
+        System.out.println("All tests successful");
     }
 }

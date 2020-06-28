@@ -38,7 +38,7 @@ import org.gzipper.java.util.Log;
 public final class Dialogs {
 
     private Dialogs() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**

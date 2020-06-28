@@ -26,7 +26,7 @@ import java.util.List;
 public final class ListUtils {
 
     private ListUtils() {
-        throw new AssertionError("Holds static members only.");
+        throw new AssertionError("Holds static members only");
     }
 
     /**

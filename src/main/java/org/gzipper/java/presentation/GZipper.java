@@ -170,7 +170,7 @@ public final class GZipper extends Application {
      * Exits the application gracefully.
      */
     private void exitApplication() {
-        Log.i("Exiting application.", false);
+        Log.i("Exiting application", false);
         Platform.exit();
         System.exit(0);
     }
