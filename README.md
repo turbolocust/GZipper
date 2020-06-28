@@ -1,6 +1,10 @@
-# GZipper
+<p align="center">
+  <img alt="gzipper logo" src="./src/main/resources/images/icon_256.png" width="100px" />
+  <h1 align="center">GZipper</h1>
+</p>
 
-<a href="https://travis-ci.org/turbolocust/GZipper"><img href src="https://travis-ci.org/turbolocust/GZipper.svg?branch=master" alt="CI build passed"/></a>
+![Travis CI](https://travis-ci.org/turbolocust/GZipper.svg?branch=master)
+![Java CI](https://github.com/turbolocust/GZipper/workflows/Java%20CI/badge.svg?branch=master)
 
 <b>Features:</b><br />
 
@@ -45,9 +49,12 @@ For compression and decompression this application uses parts of the commons-com
 
 <b>Main view with enabled default theme:</b><br />
 ![Main view with enabled default theme.](./images/gzipper_gui_FX_mainView.PNG)
-<br /><b>Hash view with enabled default theme:</b><br />
-![Hash view with enabled default theme.](./images/gzipper_gui_FX_hashView.PNG)
+
 <br /><b>Main view with enabled dark theme:</b><br />
 ![Main view with enabled dark theme.](./images/gzipper_gui_FX_mainView_dark.PNG)
+
+<br /><b>Hash view with enabled default theme:</b><br />
+![Hash view with enabled default theme.](./images/gzipper_gui_FX_hashView.PNG)
+
 <br /><b>Hash view with enabled dark theme:</b><br />
 ![Hash view with enabled dark theme.](./images/gzipper_gui_FX_hashView_dark.PNG)
