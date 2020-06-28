@@ -59,7 +59,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                     final CompressorOutputStream cos = makeCompressorOutputStream(
                             new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                int readBytes = 0;
+                int readBytes;
                 while (!interrupt && (readBytes = bis.read(buffer)) != -1) {
                     cos.write(buffer, 0, readBytes);
                     updateProgress(readBytes);
@@ -100,7 +100,7 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             try (final BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(outputFile))) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                int readBytes = 0;
+                int readBytes;
                 while (!interrupt && (readBytes = gcis.read(buffer)) != -1) {
                     bos.write(buffer, 0, readBytes);
                     updateProgress(readBytes);

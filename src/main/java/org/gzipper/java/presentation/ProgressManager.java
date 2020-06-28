@@ -118,8 +118,7 @@ public class ProgressManager {
 
     private double calculateProgress(Integer id, double value) {
         _progressMap.merge(id, value, (oldValue, newValue) -> newValue);
-        double totalProgress = _progressMap.values().stream()
-                .mapToDouble(Double::doubleValue).sum();
+        double totalProgress = _progressMap.values().stream().mapToDouble(Double::doubleValue).sum();
         return (totalProgress /= _progressMap.size()) / 100d;
     }
 }

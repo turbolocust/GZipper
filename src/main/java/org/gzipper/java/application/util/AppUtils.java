@@ -119,9 +119,8 @@ public final class AppUtils {
      *
      * @param clazz the class of which to receive the root path.
      * @return the decoded root path of the JAR-file.
-     * @throws UnsupportedEncodingException if encoding is not supported.
      */
-    public static String getDecodedRootPath(Class<?> clazz) throws UnsupportedEncodingException {
+    public static String getDecodedRootPath(Class<?> clazz) {
 
         String path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
 

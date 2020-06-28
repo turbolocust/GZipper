@@ -16,26 +16,10 @@
  */
 package org.gzipper.java.presentation;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-
-import javafx.scene.Parent;
-import org.gzipper.java.presentation.controller.BaseController;
-import org.gzipper.java.presentation.controller.HashViewController;
-import org.gzipper.java.presentation.controller.MainViewController;
-
-import java.util.ResourceBundle;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -43,8 +27,17 @@ import org.gzipper.java.application.model.OS;
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.application.util.FileUtils;
-import org.gzipper.java.util.Settings;
+import org.gzipper.java.presentation.controller.BaseController;
+import org.gzipper.java.presentation.controller.HashViewController;
+import org.gzipper.java.presentation.controller.MainViewController;
 import org.gzipper.java.util.Log;
+import org.gzipper.java.util.Settings;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ResourceBundle;
+import java.util.logging.*;
 
 /**
  * @author Matthias Fussenegger
@@ -62,30 +55,25 @@ public final class GZipper extends Application {
     //<editor-fold desc="Initialization">
 
     private void initApplication() {
-        try {
-            final String decPath = AppUtils.getDecodedRootPath(getClass());
+        final String decPath = AppUtils.getDecodedRootPath(getClass());
 
-            File settings = new File(decPath + "settings.properties");
-            if (!settings.exists()) {
-                try { // copy settings file to application folder if missing
-                    String resource = AppUtils.getResource(GZipper.class, "/settings.properties");
-                    FileUtils.copy(resource, decPath + "settings.properties");
-                } catch (URISyntaxException | IOException ex) {
-                    Log.e(ex.getLocalizedMessage(), ex);
-                }
+        File settings = new File(decPath + "settings.properties");
+        if (!settings.exists()) {
+            try { // copy settings file to application folder if missing
+                String resource = AppUtils.getResource(GZipper.class, "/settings.properties");
+                FileUtils.copy(resource, decPath + "settings.properties");
+            } catch (URISyntaxException | IOException ex) {
+                Log.e(ex.getLocalizedMessage(), ex);
             }
-
-            // determine operating system and initialize settings class
-            OperatingSystem os = System.getProperty("os.name")
-                    .toLowerCase().startsWith("windows")
-                    ? new OperatingSystem(OS.WINDOWS)
-                    : new OperatingSystem(OS.UNIX);
-
-            Settings.getInstance().init(settings, os);
-
-        } catch (UnsupportedEncodingException ex) {
-            Log.e(ex.getLocalizedMessage(), ex);
         }
+
+        // determine operating system and initialize settings class
+        OperatingSystem os = System.getProperty("os.name")
+                .toLowerCase().startsWith("windows")
+                ? new OperatingSystem(OS.WINDOWS)
+                : new OperatingSystem(OS.UNIX);
+
+        Settings.getInstance().init(settings, os);
     }
 
     private void initLogger() {

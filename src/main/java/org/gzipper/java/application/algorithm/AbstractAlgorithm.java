@@ -18,6 +18,7 @@ package org.gzipper.java.application.algorithm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -98,7 +99,7 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
 
     @Override
     public final void compress(ArchiveInfo info) throws IOException, ArchiveException, CompressorException {
-        final File[] files = new File[info.getFiles().size()];
+        final File[] files = new File[Objects.requireNonNull(info.getFiles()).size()];
         compressionLevel = info.getLevel();
         compress(info.getFiles().toArray(files), info.getOutputPath(), info.getArchiveName());
     }

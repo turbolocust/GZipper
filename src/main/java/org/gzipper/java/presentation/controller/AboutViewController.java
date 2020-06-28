@@ -16,18 +16,6 @@
  */
 package org.gzipper.java.presentation.controller;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import org.gzipper.java.application.util.AppUtils;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.CSS;
-import org.gzipper.java.presentation.GZipper;
-import org.gzipper.java.util.Log;
-
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,11 +23,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
+import org.gzipper.java.application.util.AppUtils;
+import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.CSS;
+import org.gzipper.java.presentation.GZipper;
+import org.gzipper.java.util.Log;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * Controller for the FXML named "AboutView.fxml".
@@ -94,7 +88,7 @@ public final class AboutViewController extends BaseController {
      * Constructs a controller for About View with the specified CSS theme and
      * host services.
      *
-     * @param theme the {@link CSS} theme to be applied.
+     * @param theme        the {@link CSS} theme to be applied.
      * @param hostServices the host services to aggregate.
      */
     public AboutViewController(CSS.Theme theme, HostServices hostServices) {
@@ -115,17 +109,10 @@ public final class AboutViewController extends BaseController {
             try {
                 // load image from JAR and display it in image view
                 imgRes = AppUtils.getResource(GZipper.class, "/" + IMG_NAME);
-            }
-            catch (URISyntaxException ex) {
+            } catch (URISyntaxException ex) {
                 Log.e(I18N.getString("error.text"), ex);
-                try {
-                    imgRes = AppUtils.getDecodedRootPath(getClass()) + IMG_NAME;
-                }
-                catch (UnsupportedEncodingException ex1) {
-                    Log.e(I18N.getString("error.text"), ex1);
-                }
-            }
-            finally {
+                imgRes = AppUtils.getDecodedRootPath(getClass()) + IMG_NAME;
+            } finally {
                 if (imgRes != null) {
                     _imageFile = new File(imgRes);
                 }
@@ -139,22 +126,22 @@ public final class AboutViewController extends BaseController {
         final Text appName = new Text(APP_NAME + "\n"),
                 appVersion = new Text(
                         "Version"
-                        + ": "
-                        + APP_VERSION
-                        + "\n"),
+                                + ": "
+                                + APP_VERSION
+                                + "\n"),
                 appBuildDate = new Text(
                         resources.getString("buildDate.text")
-                        + ": "
-                        + APP_BUILD_DATE
-                        + "\n"),
+                                + ": "
+                                + APP_BUILD_DATE
+                                + "\n"),
                 appCopyright = new Text(
                         resources.getString("author.text")
-                        + ": "
-                        + APP_COPYRIGHT
-                        + "\n\r"),
+                                + ": "
+                                + APP_COPYRIGHT
+                                + "\n\r"),
                 appLicense = new Text(
                         resources.getString("license.text")
-                        + "\n\r");
+                                + "\n\r");
 
         final Hyperlink appHomePage = new Hyperlink(APP_HOME_PAGE);
         appHomePage.setId("aboutViewAppHomePage");

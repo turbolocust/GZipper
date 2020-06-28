@@ -29,7 +29,6 @@ import org.gzipper.java.application.algorithm.type.*;
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.util.Settings;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

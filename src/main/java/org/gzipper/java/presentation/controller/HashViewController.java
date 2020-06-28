@@ -245,11 +245,10 @@ public final class HashViewController extends BaseController implements Interrup
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
                     final ClipboardContent content = new ClipboardContent();
                     final StringBuilder sb = new StringBuilder();
-                    _resultTable.getItems().forEach((model) -> {
-                        sb.append(model.getFileName()).append("\t")
-                                .append(model.getFilePath()).append("\t")
-                                .append(model.getHashValue()).append("\n");
-                    });
+                    _resultTable.getItems().forEach((model) ->
+                            sb.append(model.getFileName()).append("\t")
+                                    .append(model.getFilePath()).append("\t")
+                                    .append(model.getHashValue()).append("\n"));
                     content.putString(sb.toString());
                     clipboard.setContent(content);
                 }
