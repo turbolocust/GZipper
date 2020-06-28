@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -148,7 +149,6 @@ public final class DropViewController extends BaseController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         _titleText.setFont(Font.font("System", FontWeight.BOLD, -1));
-        _appendAddressesCheckBox.setTooltip(
-                new Tooltip(I18N.getString("appendAddressesTooltip.text")));
+        _appendAddressesCheckBox.setTooltip(new Tooltip(I18N.getString("appendAddressesTooltip.text")));
     }
 }

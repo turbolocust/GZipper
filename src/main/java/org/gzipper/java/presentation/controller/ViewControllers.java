@@ -71,7 +71,7 @@ public final class ViewControllers {
         AboutViewController controller = new AboutViewController(theme, hostServices);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController._iconImage;
+        final Image icon = BaseController.iconImage;
         final Stage aboutView = new Stage();
         aboutView.initModality(Modality.APPLICATION_MODAL);
         controller.setPrimaryStage(aboutView);
@@ -100,7 +100,7 @@ public final class ViewControllers {
         DropViewController controller = new DropViewController(theme);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController._iconImage;
+        final Image icon = BaseController.iconImage;
         final Stage dropView = new Stage();
         dropView.setAlwaysOnTop(true);
         dropView.initModality(Modality.APPLICATION_MODAL);
@@ -130,7 +130,7 @@ public final class ViewControllers {
         HashViewController controller = new HashViewController(theme);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController._iconImage;
+        final Image icon = BaseController.iconImage;
         final Stage hashView = new Stage();
         hashView.setAlwaysOnTop(false);
         hashView.initModality(Modality.NONE);

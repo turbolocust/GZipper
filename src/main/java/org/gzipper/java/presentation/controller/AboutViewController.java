@@ -160,7 +160,7 @@ public final class AboutViewController extends BaseController {
         appHomePage.setId("aboutViewAppHomePage");
         appHomePage.setOnAction((ActionEvent evt) -> {
             if (evt.getSource().equals(appHomePage)) {
-                _hostServices.showDocument(appHomePage.getText());
+                hostServices.showDocument(appHomePage.getText());
             }
         });
 

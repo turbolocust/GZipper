@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,13 +16,46 @@
  */
 package org.gzipper.java.presentation.controller;
 
+import javafx.application.HostServices;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.converter.PercentageStringConverter;
+import org.gzipper.java.application.ArchiveInfo;
+import org.gzipper.java.application.ArchiveInfoFactory;
+import org.gzipper.java.application.ArchiveOperation;
+import org.gzipper.java.application.CompressionMode;
+import org.gzipper.java.application.model.ArchiveType;
+import org.gzipper.java.application.model.OperatingSystem;
+import org.gzipper.java.application.observer.Listener;
+import org.gzipper.java.application.observer.Notifier;
+import org.gzipper.java.application.predicates.PatternPredicate;
+import org.gzipper.java.application.util.FileUtils;
+import org.gzipper.java.application.util.ListUtils;
+import org.gzipper.java.application.util.StringUtils;
+import org.gzipper.java.application.util.TaskHandler;
+import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.presentation.CSS;
+import org.gzipper.java.presentation.Dialogs;
+import org.gzipper.java.presentation.ProgressManager;
+import org.gzipper.java.presentation.handler.TextAreaHandler;
+import org.gzipper.java.util.Log;
+import org.gzipper.java.util.Settings;
+
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,53 +65,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
-
-import org.gzipper.java.application.ArchiveOperation;
-import org.gzipper.java.application.CompressionMode;
-import org.gzipper.java.application.model.ArchiveType;
-import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.observer.Listener;
-import org.gzipper.java.application.observer.Notifier;
-import org.gzipper.java.application.ArchiveInfo;
-import org.gzipper.java.application.ArchiveInfoFactory;
-import org.gzipper.java.application.util.FileUtils;
-import org.gzipper.java.application.util.ListUtils;
-import org.gzipper.java.application.util.TaskHandler;
-import org.gzipper.java.exceptions.GZipperException;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.Dialogs;
-import org.gzipper.java.presentation.ProgressManager;
-import org.gzipper.java.presentation.handler.TextAreaHandler;
-import org.gzipper.java.presentation.CSS;
-import org.gzipper.java.util.Log;
-import org.gzipper.java.util.Settings;
-
-import javafx.application.HostServices;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.converter.PercentageStringConverter;
-import org.gzipper.java.application.predicates.PatternPredicate;
-import org.gzipper.java.application.util.StringUtils;
 
 /**
  * Controller for the FXML named "MainView.fxml".
@@ -199,7 +185,7 @@ public final class MainViewController extends BaseController {
      * Constructs a controller for Main View with the specified CSS theme and
      * host services.
      *
-     * @param theme the {@link CSS} theme to be applied.
+     * @param theme        the {@link CSS} theme to be applied.
      * @param hostServices the host services to aggregate.
      */
     public MainViewController(CSS.Theme theme, HostServices hostServices) {
@@ -216,7 +202,7 @@ public final class MainViewController extends BaseController {
      */
     public void cancelActiveTasks() {
         if (_activeTasks != null && !_activeTasks.isEmpty()) {
-            _activeTasks.keySet().stream().map((key) -> _activeTasks.get(key))
+            _activeTasks.keySet().stream().map(_activeTasks::get)
                     .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
                 // log warning message only when cancellation failed
                 Log.e("Task cancellation failed for {0}", task.hashCode());
@@ -228,7 +214,7 @@ public final class MainViewController extends BaseController {
     void handleApplyFilterMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_applyFilterMenuItem)) {
             final Optional<String> result = Dialogs
-                    .showPatternInputDialog(_theme, getIconImage());
+                    .showPatternInputDialog(theme, getIconImage());
             if (result.isPresent()) {
                 if (!result.get().isEmpty()) {
                     final Pattern pattern = Pattern.compile(result.get());
@@ -274,7 +260,7 @@ public final class MainViewController extends BaseController {
             final Optional<ButtonType> result = Dialogs
                     .showConfirmationDialog(I18N.getString("clearText.text"),
                             I18N.getString("clearTextConfirmation.text"),
-                            I18N.getString("confirmation.text"), _theme, getIconImage());
+                            I18N.getString("confirmation.text"), theme, getIconImage());
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -285,7 +271,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final DropViewController ctrl = ViewControllers.showDropView(_theme);
+            final DropViewController ctrl = ViewControllers.showDropView(theme);
             final List<String> filePaths = ctrl.getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
                 _putIntoSeparateArchives = ctrl.isPutInSeparateArchives();
@@ -297,7 +283,8 @@ public final class MainViewController extends BaseController {
                     Log.i(I18N.getString("manyFilesSelected.text"), true, size);
                 } else { // log files in detail
                     filePaths.stream().peek((filePath) -> _selectedFiles.add(new File(filePath)))
-                            .forEachOrdered((filePath) -> Log.i("{0}: {1}", true, I18N.getString("fileSelected.text"), filePath));
+                            .forEachOrdered((filePath) -> Log.i("{0}: {1}",
+                                    true, I18N.getString("fileSelected.text"), filePath));
                 }
             } else {
                 Log.i(I18N.getString("noFilesSelected.text"), true);
@@ -309,7 +296,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleHashingMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_hashingMenuItem)) {
-            ViewControllers.showHashView(_theme);
+            ViewControllers.showHashView(theme);
         }
     }
 
@@ -319,7 +306,7 @@ public final class MainViewController extends BaseController {
             final Optional<ButtonType> result = Dialogs
                     .showConfirmationDialog(I18N.getString("resetApp.text"),
                             I18N.getString("resetAppConfirmation.text"),
-                            I18N.getString("confirmation.text"), _theme, getIconImage());
+                            I18N.getString("confirmation.text"), theme, getIconImage());
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 Settings.getInstance().restoreDefaults();
             }
@@ -329,7 +316,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
-            ViewControllers.showAboutView(_theme, _hostServices);
+            ViewControllers.showAboutView(theme, hostServices);
         }
     }
 
@@ -356,8 +343,7 @@ public final class MainViewController extends BaseController {
                 } else {
                     Log.w(I18N.getString("invalidOutputPath.text"), true);
                 }
-            }
-            catch (GZipperException ex) {
+            } catch (GZipperException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }
         }
@@ -382,8 +368,7 @@ public final class MainViewController extends BaseController {
                 _state.applyExtensionFilters(fc);
             }
 
-            final List<File> selectedFiles
-                    = fc.showOpenMultipleDialog(_primaryStage);
+            final List<File> selectedFiles = fc.showOpenMultipleDialog(primaryStage);
 
             String message;
             if (selectedFiles != null) {
@@ -415,11 +400,11 @@ public final class MainViewController extends BaseController {
                 final FileChooser fc = new FileChooser();
                 fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
                 _state.applyExtensionFilters(fc);
-                file = fc.showSaveDialog(_primaryStage);
+                file = fc.showSaveDialog(primaryStage);
             } else {
                 final DirectoryChooser dc = new DirectoryChooser();
                 dc.setTitle(I18N.getString("saveAsPathTitle.text"));
-                file = dc.showDialog(_primaryStage);
+                file = dc.showDialog(primaryStage);
             }
 
             if (file != null) {
@@ -494,13 +479,12 @@ public final class MainViewController extends BaseController {
     void handleEnableDarkThemeCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableDarkThemeCheckMenuItem)) {
             boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
-            loadAlternativeTheme(enableTheme, CSS.Theme.DARK_THEME);
+            loadAlternativeTheme(enableTheme);
             Settings.getInstance().setProperty("darkThemeEnabled", enableTheme);
         }
     }
 
-    private void performModeRadioButtonAction(boolean compress,
-            String selectFilesButtonText, String saveAsButtonText) {
+    private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
         _state = compress ? new CompressState() : new DecompressState();
         _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
         _saveAsButton.setText(I18N.getString(saveAsButtonText));
@@ -512,15 +496,13 @@ public final class MainViewController extends BaseController {
         boolean showDialog = settings.evaluateProperty(propertyKey);
         if (showDialog) {
             final String infoTitle = I18N.getString("info.text");
-            final String infoText = I18N.getString("gzipCompressionInfo.text",
-                    ArchiveType.TAR_GZ.getDisplayName());
-            Dialogs.showDialog(Alert.AlertType.INFORMATION, infoTitle, infoTitle,
-                    infoText, _theme, getIconImage());
+            final String infoText = I18N.getString("gzipCompressionInfo.text", ArchiveType.TAR_GZ.getDisplayName());
+            Dialogs.showDialog(Alert.AlertType.INFORMATION, infoTitle, infoTitle, infoText, theme, getIconImage());
             settings.setProperty(propertyKey, false);
         }
     }
 
-    private void bindUIcontrols(Task<?> task) {
+    private void bindUIControls(Task<?> task) {
 
         final ReadOnlyBooleanProperty running = task.runningProperty();
 
@@ -538,7 +520,7 @@ public final class MainViewController extends BaseController {
         _progressText.visibleProperty().bind(running);
     }
 
-    private void unbindUIcontrols() {
+    private void unbindUIControls() {
         // controls
         _startButton.disableProperty().unbind();
         _abortButton.disableProperty().unbind();
@@ -594,13 +576,14 @@ public final class MainViewController extends BaseController {
      * through user interaction, the operation will be interrupted.
      *
      * @param operation the {@link ArchiveOperation} that will eventually be
-     * performed by the task when executed.
+     *                  performed by the task when executed.
      * @return a {@link Task} that can be executed to perform the specified
      * archiving operation.
      */
     @SuppressWarnings("SleepWhileInLoop")
     private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
         Task<Boolean> task = new Task<>() {
+            @SuppressWarnings("BusyWait")
             @Override
             protected Boolean call() throws Exception {
 
@@ -655,14 +638,13 @@ public final class MainViewController extends BaseController {
      * {@link #_startButton} and {@link #_abortButton}.
      *
      * @param operation {@link ArchiveOperation} that holds elapsed time.
-     * @param task the task that will be removed from {@link #_activeTasks}.
+     * @param task      the task that will be removed from {@link #_activeTasks}.
      */
     private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
-        Log.i(I18N.getString("elapsedTime.text"), true,
-                operation.calculateElapsedTime());
+        Log.i(I18N.getString("elapsedTime.text"), true, operation.calculateElapsedTime());
         _activeTasks.remove(task.hashCode());
         if (_activeTasks.isEmpty()) {
-            unbindUIcontrols();
+            unbindUIControls();
             _state.refresh();
             _progressBar.setProgress(0d); // reset
             _progressText.setText(StringUtils.EMPTY);
@@ -694,7 +676,7 @@ public final class MainViewController extends BaseController {
         _outputFile = new File(_outputPathTextField.getText());
 
         // set dark theme as enabled if done so on previous application launch
-        if (_theme == CSS.Theme.DARK_THEME) {
+        if (theme == CSS.Theme.DARK_THEME) {
             _enableDarkThemeCheckMenuItem.setSelected(true);
         }
 
@@ -716,9 +698,7 @@ public final class MainViewController extends BaseController {
 
         // set up initial state, window icon and the default text for the text area
         _state = new CompressState();
-        _iconImage = new Image("/images/icon_32.png");
-        final String formattedText = String.format("run:\n%s\n",
-                I18N.getString("changeOutputPath.text"));
+        final String formattedText = String.format("run:\n%s\n", I18N.getString("changeOutputPath.text"));
         _textArea.setText(formattedText);
     }
 
@@ -780,7 +760,7 @@ public final class MainViewController extends BaseController {
          * @param archiveType the type of the archive, see {@link ArchiveType}.
          * @return list consisting of {@link ArchiveOperation}.
          * @throws GZipperException if the archive type could not have been
-         * determined.
+         *                          determined.
          */
         abstract List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException;
 
@@ -788,7 +768,7 @@ public final class MainViewController extends BaseController {
          * Applies the required extension filters to the specified file chooser.
          *
          * @param chooser the {@link FileChooser} to which the extension filters
-         * will be applied to.
+         *                will be applied to.
          */
         void applyExtensionFilters(FileChooser chooser) {
             if (chooser != null) {
@@ -823,7 +803,7 @@ public final class MainViewController extends BaseController {
                 Log.i(I18N.getString("operationStarted.text"), true, operation,
                         info.getArchiveType().getDisplayName());
                 Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
-                bindUIcontrols(task); // do this before submitting task
+                bindUIControls(task); // do this before submitting task
                 _activeTasks.put(task.hashCode(), _taskHandler.submit(task));
             }
         }
@@ -859,8 +839,7 @@ public final class MainViewController extends BaseController {
 
             if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
-                outputPath = FileUtils.generateUniqueFilename(outputPath,
-                        DEFAULT_ARCHIVE_NAME, extName);
+                outputPath = FileUtils.generateUniqueFilename(outputPath, DEFAULT_ARCHIVE_NAME, extName);
             }
             if (FileUtils.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
@@ -899,9 +878,7 @@ public final class MainViewController extends BaseController {
                 operations = new ArrayList<>(1);
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
-                final ArchiveOperation.Builder builder
-                        = new ArchiveOperation.Builder(
-                                info, CompressionMode.COMPRESS);
+                final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }
@@ -935,9 +912,7 @@ public final class MainViewController extends BaseController {
             for (final File file : _selectedFiles) {
                 ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         file.getAbsolutePath(), _outputFile + File.separator);
-                final ArchiveOperation.Builder builder
-                        = new ArchiveOperation.Builder(
-                        info, CompressionMode.DECOMPRESS);
+                final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }

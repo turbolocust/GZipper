@@ -16,20 +16,20 @@
  */
 package org.gzipper.java.presentation.controller;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import org.gzipper.java.application.concurrency.Interruptible;
 import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
@@ -46,34 +46,14 @@ import org.gzipper.java.presentation.Toast;
 import org.gzipper.java.presentation.model.HashViewTableModel;
 import org.gzipper.java.util.Log;
 
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
-import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * Controller for the FXML named "HashView.fxml".
@@ -88,8 +68,7 @@ public final class HashViewController extends BaseController implements Interrup
     private static final int BUFFER_SIZE = 1024 * 1024;
 
     /**
-     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently set to
-     * 100 Mebibytes.
+     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently set to 100 Mebibytes.
      */
     private static final int LARGE_FILE_THRESHOLD = 1024 * 1024 * 100;
 
@@ -152,7 +131,7 @@ public final class HashViewController extends BaseController implements Interrup
             fc.setTitle(I18N.getString("browseForFiles.text"));
 
             final List<File> selectedFiles
-                    = fc.showOpenMultipleDialog(_primaryStage);
+                    = fc.showOpenMultipleDialog(primaryStage);
             computeAndAppend(selectedFiles); // performs null check
             GUIUtils.autoFitTable(_resultTable);
         }
@@ -282,16 +261,16 @@ public final class HashViewController extends BaseController implements Interrup
                             I18N.getString("compareTo.text"),
                             I18N.getString("compareToDialogHeader.text"),
                             I18N.getString("hashValue.text"),
-                            _theme, _iconImage);
+                            theme, iconImage);
                     if (result.isPresent() && !result.get().isEmpty()) {
                         final String message;
                         final int delay = 3600;
                         if (result.get().equalsIgnoreCase(cell.getItem())) {
                             message = I18N.getString("equal.text").toUpperCase();
-                            Toast.show(_primaryStage, message, Color.GREEN, delay);
+                            Toast.show(primaryStage, message, Color.GREEN, delay);
                         } else {
                             message = I18N.getString("notEqual.text").toUpperCase();
-                            Toast.show(_primaryStage, message, Color.RED, delay);
+                            Toast.show(primaryStage, message, Color.RED, delay);
                         }
                     }
                 }
@@ -330,7 +309,7 @@ public final class HashViewController extends BaseController implements Interrup
                     final MessageDigestProvider provider
                             = MessageDigestProvider.createProvider(algorithm);
                     try (FileInputStream fis = new FileInputStream(file);
-                            BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
+                         BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
                         final byte[] buffer = new byte[BUFFER_SIZE];
                         int readBytes;
                         while ((readBytes = bis.read(buffer, 0, buffer.length)) > 0) {
@@ -348,8 +327,7 @@ public final class HashViewController extends BaseController implements Interrup
                         = new NamedMessageDigestResult(result, name);
                 appendColumn(namedResult, file);
             }
-        }
-        catch (IOException | NoSuchAlgorithmException ex) {
+        } catch (IOException | NoSuchAlgorithmException ex) {
             Log.e("Error reading file.", ex);
             final MessageDigestResult result = new MessageDigestResult();
             appendColumn(new NamedMessageDigestResult(result, StringUtils.EMPTY), file);
@@ -363,7 +341,7 @@ public final class HashViewController extends BaseController implements Interrup
      *
      * @param files list of files to be processed.
      */
-    @SuppressWarnings("SleepWhileInLoop")
+    @SuppressWarnings({"SleepWhileInLoop", "BusyWait"})
     private void computeAndAppend(final List<File> files) {
         if (_isAlive || ListUtils.isNullOrEmpty(files)) {
             return;
@@ -390,7 +368,7 @@ public final class HashViewController extends BaseController implements Interrup
         task.setOnSucceeded(this::onTaskCompleted);
         task.setOnFailed(this::onTaskCompleted);
 
-        bindUIcontrols(task);
+        bindUIControls(task);
         _isAlive = true;
         _taskHandler.submit(task);
 
@@ -398,8 +376,7 @@ public final class HashViewController extends BaseController implements Interrup
         while (task.isRunning()) {
             try {
                 Thread.sleep(10);
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Log.e("Task interrupted.", ex);
                 Thread.currentThread().interrupt();
             }
@@ -407,12 +384,12 @@ public final class HashViewController extends BaseController implements Interrup
     }
 
     private void onTaskCompleted(Event evt) {
-        Platform.runLater(this::unbindUIcontrols);
+        Platform.runLater(this::unbindUIControls);
         _isAlive = false;
         evt.consume();
     }
 
-    private void bindUIcontrols(Task<?> task) {
+    private void bindUIControls(Task<?> task) {
 
         final ReadOnlyBooleanProperty running = task.runningProperty();
 
@@ -424,7 +401,7 @@ public final class HashViewController extends BaseController implements Interrup
         _progressIndicator.visibleProperty().bind(running);
     }
 
-    private void unbindUIcontrols() {
+    private void unbindUIControls() {
         _addFilesButton.disableProperty().unbind();
         _algorithmComboBox.disableProperty().unbind();
         _appendFilesCheckBox.disableProperty().unbind();

@@ -18,6 +18,7 @@ package org.gzipper.java.presentation.controller;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
@@ -32,6 +33,8 @@ import org.gzipper.java.presentation.CSS;
  */
 public abstract class BaseController implements Initializable {
 
+    //<editor-fold desc="Static members">
+
     /**
      * The default archive name of an archive if not explicitly specified.
      */
@@ -42,6 +45,11 @@ public abstract class BaseController implements Initializable {
      */
     private static final Set<Stage> _stages = new HashSet<>();
 
+    /**
+     * Returns all currently open stages.
+     *
+     * @return all currently open stages.
+     */
     public static Set<Stage> getStages() {
         return _stages;
     }
@@ -49,30 +57,43 @@ public abstract class BaseController implements Initializable {
     /**
      * The icon image used for each stage.
      */
-    protected static Image _iconImage;
+    protected static Image iconImage;
 
+    /**
+     * Returns the icon image that is to be used for each stage.
+     *
+     * @return the icon image that is to be used for each stage.
+     */
     public static Image getIconImage() {
-        return _iconImage;
+        var resource = BaseController.class.getResource("/images/icon_32.png");
+        return iconImage = new Image(resource.toExternalForm());
     }
+
+    //</editor-fold>
 
     /**
      * The aggregated primary stage.
      */
-    protected Stage _primaryStage;
+    protected Stage primaryStage;
 
+    /**
+     * Sets the primary stage of this controller.
+     *
+     * @param primaryStage the primary stage to be set.
+     */
     public void setPrimaryStage(Stage primaryStage) {
-        _primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
     }
 
     /**
      * The aggregated host services. May be {@code null} if not set.
      */
-    protected HostServices _hostServices;
+    protected HostServices hostServices;
 
     /**
      * The currently active theme.
      */
-    protected CSS.Theme _theme;
+    protected CSS.Theme theme;
 
     /**
      * Constructs a controller with the specified CSS theme.
@@ -80,36 +101,35 @@ public abstract class BaseController implements Initializable {
      * @param theme the {@link CSS} theme to be applied.
      */
     public BaseController(CSS.Theme theme) {
-        _theme = theme;
+        this.theme = theme;
     }
 
     /**
      * Constructs a controller with the specified CSS theme and host services.
      *
-     * @param theme the {@link CSS} theme to be applied.
+     * @param theme        the {@link CSS} theme to be applied.
      * @param hostServices the host services to be aggregated.
      */
     public BaseController(CSS.Theme theme, HostServices hostServices) {
-        _theme = theme;
-        _hostServices = hostServices;
+        this.theme = theme;
+        this.hostServices = hostServices;
     }
 
     /**
-     * Loads an alternative theme.
+     * Loads the alternative theme (dark theme).
      *
-     * @param enableTheme true to enable, false to disable alternative theme.
-     * @param theme the theme to be loaded.
+     * @param enableTheme true to enable, false to disable the alternative theme.
      */
-    protected void loadAlternativeTheme(boolean enableTheme, CSS.Theme theme) {
-        _theme = enableTheme ? theme : CSS.Theme.getDefault();
-        _stages.forEach((stage) -> CSS.load(_theme, stage.getScene()));
+    protected void loadAlternativeTheme(boolean enableTheme) {
+        this.theme = enableTheme ? CSS.Theme.DARK_THEME : CSS.Theme.getDefault();
+        _stages.forEach((stage) -> CSS.load(this.theme, stage.getScene()));
     }
 
     /**
      * Closes the primary stage of this controller.
      */
     protected void close() {
-        _primaryStage.close();
+        primaryStage.close();
     }
 
     /**
