@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 module org.gzipper {
+    opens org.gzipper.java.presentation to javafx.graphics;
+    opens org.gzipper.java.presentation.controller to javafx.fxml;
     // standard-lib modules
     requires java.logging;
     // third-party modules
