@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,10 +32,8 @@ import javafx.util.Duration;
 
 /**
  * Class for creating and displaying toast messages.
- *
- * The implementation of this class is based on
- * <a href="https://stackoverflow.com/questions/26792812/android-toast-equivalent-in-javafx/38373408#38373408">this</a>
- * code.
+ * <p>
+ * The implementation of this class is based on <a href="https://stackoverflow.com/a/38373408/8240983">this</a> code.
  *
  * @author Matthias Fussenegger
  */
@@ -49,8 +47,8 @@ public final class Toast {
      * Shows a toast using the specified parameters.
      *
      * @param ownerStage the owner stage.
-     * @param toastMsg the message to be displayed.
-     * @param msgColor the color of the message.
+     * @param toastMsg   the message to be displayed.
+     * @param msgColor   the color of the message.
      * @param toastDelay specifies how long the toast will be visible.
      */
     public static void show(Stage ownerStage, String toastMsg, Color msgColor, int toastDelay) {
@@ -60,15 +58,15 @@ public final class Toast {
     /**
      * Shows a toast using the specified parameters.
      *
-     * @param ownerStage the owner stage.
-     * @param toastMsg the message to be displayed.
-     * @param msgColor the color of the message.
-     * @param toastDelay specifies how long the toast will be visible.
-     * @param fadeInDelay delay when fading in.
+     * @param ownerStage   the owner stage.
+     * @param toastMsg     the message to be displayed.
+     * @param msgColor     the color of the message.
+     * @param toastDelay   specifies how long the toast will be visible.
+     * @param fadeInDelay  delay when fading in.
      * @param fadeOutDelay delay when fading out.
      */
     public static void show(Stage ownerStage, String toastMsg, Color msgColor,
-            int toastDelay, int fadeInDelay, int fadeOutDelay) {
+                            int toastDelay, int fadeInDelay, int fadeOutDelay) {
 
         final Stage toastStage = new Stage();
         toastStage.initOwner(ownerStage);
@@ -81,24 +79,37 @@ public final class Toast {
 
         final StackPane root = new StackPane(text);
         root.setStyle("-fx-background-radius: 16; "
-                + "-fx-background-color: rgba(0, 0, 0, 0.2); "
+                + "-fx-background-color: rgba(0, 0, 0, 0.1); "
                 + "-fx-padding: 32px;");
         root.setOpacity(0);
 
         final Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
+
+        double centerXOwnerStage = ownerStage.getX() + ownerStage.getWidth() / 2d;
+        double centerYOwnerStage = ownerStage.getY() + ownerStage.getHeight() / 2d;
+
+        // size of stage is unknown until rendered, hence hide and relocate
+        toastStage.setOnShowing(windowEvent -> toastStage.hide());
+        // relocate toast stage to the center of the owner stage
+        toastStage.setOnShown(windowEvent -> {
+            toastStage.setX(centerXOwnerStage - toastStage.getWidth() / 2d);
+            toastStage.setY(centerYOwnerStage - toastStage.getHeight() / 2d);
+            toastStage.show();
+        });
+
         toastStage.setScene(scene);
         toastStage.show();
 
         final Timeline fadeInTimeline = new Timeline();
         final KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeInDelay),
                 new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
+
         fadeInTimeline.getKeyFrames().add(fadeInKey1);
         fadeInTimeline.setOnFinished((ev1) -> new Thread(() -> {
             try {
                 Thread.sleep(toastDelay);
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Log.e("Thread of toast stage interrupted.", ex);
                 Thread.currentThread().interrupt();
             }
@@ -109,6 +120,7 @@ public final class Toast {
             fadeOutTimeline.setOnFinished((ev2) -> toastStage.close());
             fadeOutTimeline.play();
         }).start());
+
         fadeInTimeline.play();
     }
 }
