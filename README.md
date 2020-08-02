@@ -6,7 +6,7 @@
 ![Travis CI](https://travis-ci.org/turbolocust/GZipper.svg?branch=master)
 ![Java CI](https://github.com/turbolocust/GZipper/workflows/Java%20CI/badge.svg?branch=master)
 
-<b>Features:</b><br />
+## Features
 
 * Create and extract the following archive types:
   - ZIP
@@ -30,20 +30,33 @@
 * Languages which are supported:
   - English
   - German
-  
+
+## Compatibility
+
 <b>The application has been tested on these platforms:</b>
  * Windows
  * Unix-based systems
    - make sure to install the JavaFX components
    - `sudo apt-get install openjfx`
-   
-<br /><br />
+
+## Command line arguments
+
+``--launch_mode``
+- ``application``
+  - Default. Launches full application.
+- ``hashview``
+  - Launches hash (message digest) view only.
+
+## Attribution
+
 For compression and decompression this application uses parts of the commons-compress library by Apache Foundation as well as 'XZ for Java' by Tukaani. Their source code and documentation can be found here: 
   - <a href>http://commons.apache.org/</a>
   - <a href>https://tukaani.org/</a>
-  
+
+## Remarks
+
 <br />
-<b>This application is built for Java 11 but is compatible with Java 8 as well. To build this application with Java 8, module-specific files have to be removed and the Maven configuration (pom.xml) needs to be updated.</b>
+<b>This application is built for Java 11 and supports Kotlin, but is compatible with Java 8 as well. To build this application with Java 8, module-specific files have to be removed and the Maven configuration (pom.xml) needs to be updated.</b>
 
 # Screenshots
 
