@@ -39,10 +39,7 @@ import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.observer.Listener;
 import org.gzipper.java.application.observer.Notifier;
 import org.gzipper.java.application.predicates.PatternPredicate;
-import org.gzipper.java.application.util.FileUtils;
-import org.gzipper.java.application.util.ListUtils;
-import org.gzipper.java.application.util.StringUtils;
-import org.gzipper.java.application.util.TaskHandler;
+import org.gzipper.java.application.util.*;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
@@ -72,6 +69,8 @@ import java.util.zip.Deflater;
  * @author Matthias Fussenegger
  */
 public final class MainViewController extends BaseController {
+
+    //<editor-fold desc="Attributes">
 
     /**
      * Key constant used to access the properties map for menu items.
@@ -130,6 +129,10 @@ public final class MainViewController extends BaseController {
      */
     private boolean _putIntoSeparateArchives;
 
+    //</editor-fold>
+
+    //<editor-fold desc="FXML attributes">
+
     @FXML
     private MenuItem _applyFilterMenuItem;
     @FXML
@@ -181,6 +184,8 @@ public final class MainViewController extends BaseController {
     @FXML
     private Text _progressText;
 
+    //</editor-fold>
+
     /**
      * Constructs a controller for Main View with the specified CSS theme and
      * host services.
@@ -197,18 +202,7 @@ public final class MainViewController extends BaseController {
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 
-    /**
-     * Cancels all currently active tasks.
-     */
-    public void cancelActiveTasks() {
-        if (_activeTasks != null && !_activeTasks.isEmpty()) {
-            _activeTasks.keySet().stream().map(_activeTasks::get)
-                    .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                // log warning message only when cancellation failed
-                Log.e("Task cancellation failed for {0}", task.hashCode());
-            });
-        }
-    }
+    //<editor-fold desc="FXML methods">
 
     @FXML
     void handleApplyFilterMenuItemAction(ActionEvent evt) {
@@ -484,6 +478,10 @@ public final class MainViewController extends BaseController {
         }
     }
 
+    //</editor-fold>
+
+    //<editor-fold desc="Methods related to UI">
+
     private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
         _state = compress ? new CompressState() : new DecompressState();
         _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
@@ -555,11 +553,10 @@ public final class MainViewController extends BaseController {
     private void updateSelectedFile(File file) {
         if (file != null) {
             if (!file.isDirectory()) {
-                String archiveName = _archiveName = file.getName(),
-                        fileExtension = FileUtils.getExtension(archiveName);
+                final String archiveName = _archiveName = file.getName();
+                String fileExtension = FileUtils.getExtension(archiveName);
                 if (fileExtension.isEmpty()) { // update file extension
-                    fileExtension = _archiveTypeComboBox.getValue()
-                            .getDefaultExtensionName(false);
+                    fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
                 }
                 _archiveFileExtension = fileExtension;
             }
@@ -567,10 +564,27 @@ public final class MainViewController extends BaseController {
         }
     }
 
+    //</editor-fold>
+
+    //<editor-fold desc="Methods related to archiving job">
+
+    /**
+     * Cancels all currently active tasks.
+     */
+    public void cancelActiveTasks() {
+        if (!MapUtils.isNullOrEmpty(_activeTasks)) {
+            _activeTasks.keySet().stream().map(_activeTasks::get)
+                    .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
+                // log error message only when cancellation failed
+                Log.e("Task cancellation failed for {0}", task.hashCode());
+            });
+        }
+    }
+
     /**
      * Initializes the archiving job by creating the required {@link Task}. This
-     * task will not perform the algorithmic operations for archives but instead
-     * constantly check for interruption to properly detect the abort of an
+     * task will not perform the algorithmic operations for archiving but instead
+     * constantly checks for interruption to properly detect the abortion of an
      * operation. For the algorithmic operations a new task will be created and
      * submitted to the task handler. If an operation has been aborted, e.g.
      * through user interaction, the operation will be interrupted.
@@ -586,9 +600,7 @@ public final class MainViewController extends BaseController {
             @SuppressWarnings("BusyWait")
             @Override
             protected Boolean call() throws Exception {
-
                 final Future<Boolean> futureTask = _taskHandler.submit(operation);
-
                 while (!futureTask.isDone()) {
                     try {
                         Thread.sleep(10); // check for interruption
@@ -602,6 +614,7 @@ public final class MainViewController extends BaseController {
                         }
                     }
                 }
+
                 try { // check for cancellation
                     return futureTask.get();
                 } catch (CancellationException ex) {
@@ -610,7 +623,23 @@ public final class MainViewController extends BaseController {
                 }
             }
         };
-        // show success message and finalize archiving job on success
+
+        showSuccessMessageAndFinalizeArchivingJob(operation, task);
+        showErrorMessageAndFinalizeArchivingJob(operation, task);
+
+        return task;
+    }
+
+    private void showErrorMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
+        task.setOnFailed(e -> {
+            Log.i(I18N.getString("operationFail.text"), true, operation);
+            final Throwable thrown = e.getSource().getException();
+            if (thrown != null) Log.e(thrown.getLocalizedMessage(), thrown);
+            finishArchivingJob(operation, task);
+        });
+    }
+
+    private void showSuccessMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
         task.setOnSucceeded(e -> {
             boolean success = (boolean) e.getSource().getValue();
             if (success) {
@@ -620,16 +649,6 @@ public final class MainViewController extends BaseController {
             }
             finishArchivingJob(operation, task);
         });
-        // show error message when task has failed and finalize archiving job
-        task.setOnFailed(e -> {
-            Log.i(I18N.getString("operationFail.text"), true, operation);
-            final Throwable thrown = e.getSource().getException();
-            if (thrown != null) {
-                Log.e(thrown.getLocalizedMessage(), thrown);
-            }
-            finishArchivingJob(operation, task);
-        });
-        return task;
     }
 
     /**
@@ -651,6 +670,10 @@ public final class MainViewController extends BaseController {
         }
     }
 
+    //</editor-fold>
+
+    //<editor-fold desc="Initialization">
+
     private void initLogger() {
         TextAreaHandler handler = new TextAreaHandler(_textArea);
         handler.setFormatter(new SimpleFormatter());
@@ -661,36 +684,19 @@ public final class MainViewController extends BaseController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        final Settings settings = Settings.getInstance();
-        final OperatingSystem os = settings.getOs();
 
         initLogger();
 
-        // set recently used path from settings if valid
-        final String recentPath = settings.getProperty("recentPath");
-        if (FileUtils.isValidDirectory(recentPath)) {
-            _outputPathTextField.setText(recentPath);
-        } else {
-            _outputPathTextField.setText(os.getDefaultUserDirectory());
-        }
-        _outputFile = new File(_outputPathTextField.getText());
+        final Settings settings = Settings.getInstance();
+        setRecentlyUsedPathInOutputPathTextField(settings);
 
         // set dark theme as enabled if done so on previous application launch
         if (theme == CSS.Theme.DARK_THEME) {
             _enableDarkThemeCheckMenuItem.setSelected(true);
         }
 
-        // set up properties for menu items regarding compression level
-        _noCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.NO_COMPRESSION);
-        _bestSpeedCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_SPEED);
-        _defaultCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.DEFAULT_COMPRESSION);
-        _bestCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
-
-        // set up combo box items and set default selected type
-        final ArchiveType selectedType = ArchiveType.TAR_GZ;
-        _archiveTypeComboBox.getItems().addAll(ArchiveType.values());
-        _archiveTypeComboBox.setValue(selectedType);
-        _archiveFileExtension = selectedType.getDefaultExtensionName(false);
+        setUpPropertiesForCompressionLevelMenuItem();
+        setUpArchiveTypesComboBox();
 
         // set menu item for logging as selected if logging has been enabled
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
@@ -701,6 +707,37 @@ public final class MainViewController extends BaseController {
         final String formattedText = String.format("run:\n%s\n", I18N.getString("changeOutputPath.text"));
         _textArea.setText(formattedText);
     }
+
+    private void setRecentlyUsedPathInOutputPathTextField(Settings settings) {
+        final OperatingSystem os = settings.getOs();
+
+        // set recently used path from settings if valid
+        final String recentPath = settings.getProperty("recentPath");
+        if (FileUtils.isValidDirectory(recentPath)) {
+            _outputPathTextField.setText(recentPath);
+        } else {
+            _outputPathTextField.setText(os.getDefaultUserDirectory());
+        }
+        _outputFile = new File(_outputPathTextField.getText());
+    }
+
+    private void setUpArchiveTypesComboBox() {
+        final ArchiveType selectedType = ArchiveType.TAR_GZ;
+        _archiveTypeComboBox.getItems().addAll(ArchiveType.values());
+        _archiveTypeComboBox.setValue(selectedType);
+        _archiveFileExtension = selectedType.getDefaultExtensionName(false);
+    }
+
+    private void setUpPropertiesForCompressionLevelMenuItem() {
+        _noCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.NO_COMPRESSION);
+        _bestSpeedCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_SPEED);
+        _defaultCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.DEFAULT_COMPRESSION);
+        _bestCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Controller states">
 
     /**
      * Inner class that represents the currently active state. This can either
@@ -772,8 +809,7 @@ public final class MainViewController extends BaseController {
          */
         void applyExtensionFilters(FileChooser chooser) {
             if (chooser != null) {
-                final ArchiveType selectedType = _archiveTypeComboBox
-                        .getSelectionModel().getSelectedItem();
+                final ArchiveType selectedType = _archiveTypeComboBox.getSelectionModel().getSelectedItem();
                 for (ArchiveType type : ArchiveType.values()) {
                     if (type.equals(selectedType)) {
                         ExtensionFilter extFilter = new ExtensionFilter(
@@ -829,13 +865,12 @@ public final class MainViewController extends BaseController {
         }
     }
 
-    private class CompressState extends ArchivingState {
+    private final class CompressState extends ArchivingState {
 
         @Override
         public boolean validateOutputPath() {
             String outputPath = _outputPathTextField.getText();
-            final String extName = _archiveTypeComboBox.getValue()
-                    .getDefaultExtensionName(false);
+            final String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
 
             if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
@@ -866,9 +901,8 @@ public final class MainViewController extends BaseController {
             if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP || _putIntoSeparateArchives) {
                 // put each file into a separate archive
                 operations = new ArrayList<>(_selectedFiles.size());
-                List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(
-                        archiveType, _archiveName, _compressionLevel,
-                        _selectedFiles, _outputFile.getParent());
+                final List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(
+                        archiveType, _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
                 for (ArchiveInfo info : infos) {
                     final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                     builder.addListener(this).filterPredicate(_filterPredicate);
@@ -876,7 +910,7 @@ public final class MainViewController extends BaseController {
                 }
             } else {
                 operations = new ArrayList<>(1);
-                ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
                 final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
@@ -886,7 +920,7 @@ public final class MainViewController extends BaseController {
         }
     }
 
-    private class DecompressState extends ArchivingState {
+    private final class DecompressState extends ArchivingState {
 
         @Override
         public boolean validateOutputPath() {
@@ -909,8 +943,8 @@ public final class MainViewController extends BaseController {
                 throws GZipperException {
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
             // create new operation for each archive to be extracted
-            for (final File file : _selectedFiles) {
-                ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+            for (File file : _selectedFiles) {
+                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                         file.getAbsolutePath(), _outputFile + File.separator);
                 final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
@@ -919,4 +953,6 @@ public final class MainViewController extends BaseController {
             return operations;
         }
     }
+
+    //</editor-fold>
 }

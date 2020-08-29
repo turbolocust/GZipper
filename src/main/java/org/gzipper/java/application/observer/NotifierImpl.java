@@ -21,9 +21,8 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- *
- * @author Matthias Fussenegger
  * @param <T> type of the value.
+ * @author Matthias Fussenegger
  */
 public class NotifierImpl<T> implements Notifier<T> {
 
@@ -102,17 +101,4 @@ public class NotifierImpl<T> implements Notifier<T> {
     public final void clearListeners() {
         _listeners.clear();
     }
-
-    // FORMER IMPLEMENTATION WITHOUT CopyOnWriteArrayList
-    //
-    // private List<Listener<T>> makeListenersCopy() {
-    // List<Listener<T>> listeners;
-    // if (hasChanged()) {
-    // listeners = new ArrayList<>(_listeners);
-    // clearChanged();
-    // } else {
-    // listeners = Collections.EMPTY_LIST;
-    // }
-    // return listeners;
-    // }
 }

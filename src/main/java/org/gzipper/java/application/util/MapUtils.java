@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Matthias Fussenegger
+ * Copyright (C) 2020 Matthias Fussenegger
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,27 +16,28 @@
  */
 package org.gzipper.java.application.util;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * Utility class that provides methods for instances of {@link List}.
+ * Utility class that provides methods for instances of {@link Map}.
  *
  * @author Matthias Fussenegger
  */
-public final class ListUtils {
+public final class MapUtils {
 
-    private ListUtils() {
+    private MapUtils() {
         throw new AssertionError("Holds static members only");
     }
 
     /**
      * Checks whether the given list is {@code null} or empty.
      *
-     * @param <T>  types of which this list consists of.
-     * @param list the list to be checked.
-     * @return true if list is {@code null} or empty, false otherwise.
+     * @param <K> the type of the key of this map.
+     * @param <V> the type of the value that is mapped to the key.
+     * @param map the map to be checked.
+     * @return true if map is {@code null} or empty, false otherwise.
      */
-    public static <T> boolean isNullOrEmpty(List<T> list) {
-        return list == null || list.isEmpty();
+    public static <K, V> boolean isNullOrEmpty(Map<K, V> map) {
+        return map == null || map.isEmpty();
     }
 }
