@@ -202,14 +202,13 @@ public final class FileUtils {
      * @param src the source path.
      * @param dst the destination path.
      * @param options optional copy options.
-     * @return the path to the target file.
      * @throws IOException if an I/O error occurs.
      */
-    public static Path copy(String src, String dst, CopyOption... options) throws IOException {
+    public static void copy(String src, String dst, CopyOption... options) throws IOException {
         if (options == null) {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
         }
-        return Files.copy(Paths.get(src), Paths.get(dst), options);
+        Files.copy(Paths.get(src), Paths.get(dst), options);
     }
 
     /**
@@ -339,12 +338,11 @@ public final class FileUtils {
         do { // as long as file exists
             if (isFirst && beginSuffix <= 0) {
                 filename.append(name).append(ext);
-                isFirst = false;
             } else {
                 filename.append(name).append(suffix).append(ext);
                 ++suffix;
-                isFirst = false;
             }
+            isFirst = false;
             uniqueFilename = FileUtils.combine(path, filename.toString());
             filename.setLength(0); // clear
         } while (FileUtils.isValidFile(uniqueFilename));

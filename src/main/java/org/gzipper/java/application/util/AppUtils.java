@@ -16,18 +16,14 @@
  */
 package org.gzipper.java.application.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import org.gzipper.java.util.Log;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import org.gzipper.java.util.Log;
 
 /**
  * Utility class that provides application-specific methods for e.g. receiving
