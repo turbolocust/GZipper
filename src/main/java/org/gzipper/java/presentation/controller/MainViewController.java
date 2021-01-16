@@ -435,7 +435,7 @@ public final class MainViewController extends BaseController {
                 resetSelectedFiles();
             } else { // update file extension
                 String outputPathText = _outputPathTextField.getText(),
-                        fileExtension = type.getDefaultExtensionName(false);
+                        fileExtension = type.getDefaultExtensionName();
                 String outputPath;
                 if (outputPathText.endsWith(_archiveFileExtension)) {
                     outputPath = outputPathText.replace(_archiveFileExtension, fileExtension);
@@ -556,7 +556,7 @@ public final class MainViewController extends BaseController {
                 final String archiveName = _archiveName = file.getName();
                 String fileExtension = FileUtils.getExtension(archiveName);
                 if (fileExtension.isEmpty()) { // update file extension
-                    fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
+                    fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName();
                 }
                 _archiveFileExtension = fileExtension;
             }
@@ -725,7 +725,7 @@ public final class MainViewController extends BaseController {
         final ArchiveType selectedType = ArchiveType.TAR_GZ;
         _archiveTypeComboBox.getItems().addAll(ArchiveType.values());
         _archiveTypeComboBox.setValue(selectedType);
-        _archiveFileExtension = selectedType.getDefaultExtensionName(false);
+        _archiveFileExtension = selectedType.getDefaultExtensionName();
     }
 
     private void setUpPropertiesForCompressionLevelMenuItem() {
@@ -870,7 +870,7 @@ public final class MainViewController extends BaseController {
         @Override
         public boolean validateOutputPath() {
             String outputPath = _outputPathTextField.getText();
-            final String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName(false);
+            final String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
 
             if (FileUtils.isValidDirectory(outputPath)) {
                 // user has not specified output filename
@@ -881,6 +881,7 @@ public final class MainViewController extends BaseController {
                 _archiveFileExtension = extName;
                 return true;
             }
+
             return false;
         }
 
@@ -895,14 +896,23 @@ public final class MainViewController extends BaseController {
         }
 
         @Override
-        public List<ArchiveOperation> initOperation(ArchiveType archiveType)
-                throws GZipperException {
+        public List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException {
+
             List<ArchiveOperation> operations;
+
             if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP || _putIntoSeparateArchives) {
-                // put each file into a separate archive
+
+                final List<ArchiveInfo> infos;
                 operations = new ArrayList<>(_selectedFiles.size());
-                final List<ArchiveInfo> infos = ArchiveInfoFactory.createArchiveInfos(
-                        archiveType, _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
+
+                if (_putIntoSeparateArchives) {
+                    infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
+                            _compressionLevel, _selectedFiles, _outputFile.getParent());
+                } else {
+                    infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
+                            _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
+                }
+
                 for (ArchiveInfo info : infos) {
                     final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                     builder.addListener(this).filterPredicate(_filterPredicate);
@@ -916,6 +926,7 @@ public final class MainViewController extends BaseController {
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }
+
             return operations;
         }
     }
@@ -932,16 +943,17 @@ public final class MainViewController extends BaseController {
             if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
                 super.performOperation(operation);
             } else {
-                Log.e("Operation cannot be started as an invalid path has been specified");
+                Log.e("Operation cannot be started because an invalid path has been specified");
                 Log.w(I18N.getString("outputPathWarning.text"), true);
                 _outputPathTextField.requestFocus();
             }
         }
 
         @Override
-        public List<ArchiveOperation> initOperation(ArchiveType archiveType)
-                throws GZipperException {
+        public List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException {
+
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
+
             // create new operation for each archive to be extracted
             for (File file : _selectedFiles) {
                 final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
@@ -950,6 +962,7 @@ public final class MainViewController extends BaseController {
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }
+
             return operations;
         }
     }

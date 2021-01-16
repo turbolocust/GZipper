@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.Deflater;
+
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.StringUtils;
@@ -40,62 +41,56 @@ public final class ArchiveInfoFactory {
     }
 
     /**
-     * Creates a new {@link ArchiveInfo} for compression operation.
+     * Creates a new {@link ArchiveInfo} for a compression operation.
      *
      * @param archiveType the type of the archive, see {@link ArchiveType}.
      * @param archiveName the name of the archive to be created.
-     * @param level the compression level of the archive.
-     * @param files the files to be compressed.
-     * @param outputPath the path where to save the archive.
+     * @param level       the compression level of the archive.
+     * @param files       the files to be compressed.
+     * @param outputPath  the path where to save the archive.
      * @return a new {@link ArchiveInfo} object.
      * @throws GZipperException if archive type could not be determined.
      */
-    public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName,
+    public static ArchiveInfo createArchiveInfo(
+            ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
 
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null");
-        } else if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
-            throw GZipperException.createWithReason(
-                    GZipperException.Reason.FAULTY_COMPRESSION_LVL,
-                    "Faulty compression level specified");
-        }
+        } else throwGZipperExceptionIfFaultyCompressionLevelSpecified(level);
 
         final String properName = checkAddExtension(archiveName, archiveType);
         final String ext = FileUtils.getExtension(properName);
         final String displayName = properName.replace(ext, StringUtils.EMPTY);
 
-        final String fullName = FileUtils
-                .generateUniqueFilename(outputPath, displayName, ext, 0);
+        final String fullName = FileUtils.generateUniqueFilename(outputPath, displayName, ext, 0);
         String name = FileUtils.getName(fullName);
 
         return new ArchiveInfo(archiveType, name, level, files, outputPath);
     }
 
     /**
-     * Creates a new {@link ArchiveInfo} for compression operation. This will
-     * generate a unique archive name for each file provided.
+     * Creates a new {@link ArchiveInfo} for a compression operation. This will generate a unique archive name
+     * for each file provided, using the specified archive name so that each file starts with the same name and
+     * ends with a unique identifier (or number) starting from one ({@code 1}).
      *
      * @param archiveType the type of the archive, see {@link ArchiveType}.
      * @param archiveName the name of the archive to be created.
-     * @param level the compression level of the archive.
-     * @param files the files to be compressed.
-     * @param outputPath the path where to save the archive.
+     * @param level       the compression level of the archive.
+     * @param files       the files to be compressed.
+     * @param outputPath  the path where to save the archive.
      * @return a list consisting of {@link ArchiveInfo} objects.
      * @throws GZipperException if archive type could not be determined.
      */
-    public static List<ArchiveInfo> createArchiveInfos(ArchiveType archiveType, String archiveName,
+    public static List<ArchiveInfo> createArchiveInfos(
+            ArchiveType archiveType, String archiveName,
             int level, List<File> files, String outputPath) throws GZipperException {
 
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null");
         }
 
-        if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
-            throw GZipperException.createWithReason(
-                    GZipperException.Reason.FAULTY_COMPRESSION_LVL,
-                    "Faulty compression level specified");
-        }
+        throwGZipperExceptionIfFaultyCompressionLevelSpecified(level);
 
         final String properName = checkAddExtension(archiveName, archiveType);
         final String ext = FileUtils.getExtension(properName);
@@ -103,19 +98,18 @@ public final class ArchiveInfoFactory {
 
         final Set<String> names = new HashSet<>(); // to avoid name collisions
         List<ArchiveInfo> archiveInfos = new ArrayList<>(files.size());
-        List<File> fileList; // used to be compatible with current API
         String fullName, name; // hold the names of the (next) archive
-        int nameSuffix = -1; // will be appended if necessary
+        int nameSuffix = 0; // will be appended if necessary
 
-        for (File next : files) {
-            fileList = new LinkedList<>();
-            fileList.add(next);
+        for (File nextFile : files) {
+
+            List<File> fileList = new LinkedList<>();
+            fileList.add(nextFile);
 
             do {
                 ++nameSuffix;
                 fullName = displayName + nameSuffix;
-                fullName = FileUtils.generateUniqueFilename(
-                        outputPath, fullName, ext, nameSuffix);
+                fullName = FileUtils.generateUniqueFilename(outputPath, fullName, ext, nameSuffix);
                 name = FileUtils.getName(fullName);
             } while (names.contains(name));
 
@@ -128,11 +122,50 @@ public final class ArchiveInfoFactory {
     }
 
     /**
-     * Creates a new {@link ArchiveInfo} for decompression operation.
+     * Creates a new {@link ArchiveInfo} for a compression operation. This will generate a unique archive name
+     * for each file provided if it already exists, so that the file ends with a unique identifier (or number).
+     *
+     * @param archiveType the type of the archive, see {@link ArchiveType}.
+     * @param level       the compression level of the archive.
+     * @param files       the files to be compressed.
+     * @param outputPath  the path where to save the archive.
+     * @return a list consisting of {@link ArchiveInfo} objects.
+     * @throws GZipperException if archive type could not be determined.
+     */
+    public static List<ArchiveInfo> createArchiveInfos(
+            ArchiveType archiveType, int level, List<File> files, String outputPath) throws GZipperException {
+
+        if (archiveType == null) {
+            throw new NullPointerException("Archive type must not be null");
+        }
+
+        throwGZipperExceptionIfFaultyCompressionLevelSpecified(level);
+
+        final String ext = archiveType.getDefaultExtensionName();
+        final int nameSuffix = 1; // will be appended if necessary
+        List<ArchiveInfo> archiveInfos = new ArrayList<>(files.size());
+
+        for (File nextFile : files) {
+
+            List<File> fileList = new LinkedList<>();
+            fileList.add(nextFile);
+
+            String fullName = FileUtils.generateUniqueFilename(outputPath, nextFile.getName(), ext, nameSuffix);
+            String name = FileUtils.getName(fullName);
+
+            ArchiveInfo info = new ArchiveInfo(archiveType, name, level, fileList, outputPath);
+            archiveInfos.add(info);
+        }
+
+        return archiveInfos;
+    }
+
+    /**
+     * Creates a new {@link ArchiveInfo} for a decompression operation.
      *
      * @param archiveType the type of the archive, see {@link ArchiveType}.
      * @param archiveName the name of the archive to be extracted.
-     * @param outputPath the path where to extract the archive.
+     * @param outputPath  the path where to extract the archive.
      * @return {@link ArchiveInfo} that may be used for an operation.
      */
     public static ArchiveInfo createArchiveInfo(ArchiveType archiveType, String archiveName, String outputPath) {
@@ -159,11 +192,17 @@ public final class ArchiveInfoFactory {
         }
 
         if (!hasExtension) {
-            // add extension to archive name if missing and ignore the asterisk
-            name = archiveName + extNames[0];
+            name = archiveName + extNames[0]; // add extension to archive name if missing and ignore the asterisk
         }
 
         return name;
     }
 
+    private static void throwGZipperExceptionIfFaultyCompressionLevelSpecified(int level) throws GZipperException {
+        if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
+            throw GZipperException.createWithReason(
+                    GZipperException.Reason.FAULTY_COMPRESSION_LVL,
+                    "Faulty compression level specified");
+        }
+    }
 }

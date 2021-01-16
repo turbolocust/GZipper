@@ -156,10 +156,9 @@ public enum ArchiveType {
      * extension is the first one that has been specified in the array of file
      * extensions.
      *
-     * @param includeAsterisk true to include asterisk, false to remove it.
      * @return the default file extension of this archive type as string.
      */
-    public String getDefaultExtensionName(boolean includeAsterisk) {
+    public String getDefaultExtensionName() {
         return _extensionNames.length > 0 ? _extensionNames[0].substring(1) : "";
     }
 
