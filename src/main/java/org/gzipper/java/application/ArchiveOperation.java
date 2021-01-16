@@ -16,20 +16,20 @@
  */
 package org.gzipper.java.application;
 
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.algorithm.CompressionAlgorithm;
+import org.gzipper.java.application.concurrency.Interruptible;
+import org.gzipper.java.application.observer.Listener;
+import org.gzipper.java.exceptions.GZipperException;
+import org.gzipper.java.i18n.I18N;
+import org.gzipper.java.util.Log;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
-
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.exceptions.GZipperException;
-import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.util.Log;
-import org.gzipper.java.application.algorithm.CompressionAlgorithm;
-import org.gzipper.java.application.observer.Listener;
-import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
  * Object that represents an archiving operation.
@@ -67,12 +67,12 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
     /**
      * True if a request for interruption has been received.
      */
-    private boolean _interrupt = false;
+    private volatile boolean _interrupt = false;
 
     /**
      * True if operation is completed, false otherwise.
      */
-    private boolean _completed = false;
+    private volatile boolean _completed = false;
 
     private ArchiveOperation(final ArchiveOperation.Builder builder) {
         _archiveInfo = builder._archiveInfo;
@@ -84,6 +84,25 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
     private void setElapsedTime() {
         if (_elapsedTime.get() == 0) {
             _elapsedTime.set(System.nanoTime() - _startTime);
+        }
+    }
+
+    private void performOperation() throws IOException,
+            ArchiveException, CompressorException, GZipperException {
+
+        Log.i(I18N.getString("processingArchiveFile.text"), _archiveInfo.getArchiveName(), true);
+
+        switch (_compressionMode) {
+            case COMPRESS:
+                _algorithm.compress(_archiveInfo);
+                break;
+            case DECOMPRESS:
+                _algorithm.extract(_archiveInfo);
+                break;
+            default:
+                throw GZipperException.createWithReason(
+                        GZipperException.Reason.ILLEGAL_MODE,
+                        "Mode could not be determined");
         }
     }
 
@@ -116,27 +135,16 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
 
     @Override
     public Boolean call() throws Exception {
-        if (_completed) {
+        if (isCompleted())
             throw new IllegalStateException("Operation already completed");
-        }
+
         boolean success = false;
         _startTime = System.nanoTime();
+
         try {
-            switch (_compressionMode) {
-                case COMPRESS:
-                    _algorithm.compress(_archiveInfo);
-                    break;
-                case DECOMPRESS:
-                    _algorithm.extract(_archiveInfo);
-                    break;
-                default:
-                    throw GZipperException.createWithReason(
-                            GZipperException.Reason.ILLEGAL_MODE,
-                            "Mode could not be determined");
-            }
+            performOperation();
             success = true;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             if (!_interrupt) {
                 final Throwable cause = ex.getCause();
                 if (cause instanceof GZipperException) {
@@ -148,22 +156,21 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
                 Log.e(ex.getLocalizedMessage(), ex);
                 Log.w(I18N.getString("corruptArchive.text"), true);
             }
-        }
-        catch (CompressorException | ArchiveException ex) {
+        } catch (CompressorException | ArchiveException ex) {
             Log.e(ex.getLocalizedMessage(), ex);
             Log.w(I18N.getString("wrongFormat.text"), true);
-        }
-        finally {
+        } finally {
             setElapsedTime();
             _completed = true;
             _algorithm.clearListeners();
         }
+
         return success;
     }
 
     @Override
     public void interrupt() {
-        if (!_completed) {
+        if (!isCompleted()) {
             _interrupt = true;
             _algorithm.clearListeners();
             _algorithm.interrupt();
@@ -194,11 +201,11 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         /**
          * Constructs a new instance of this class using the specified values.
          *
-         * @param info the {@link ArchiveInfo} to be aggregated.
+         * @param info            the {@link ArchiveInfo} to be aggregated.
          * @param compressionMode the {@link CompressionMode} for this
-         * operation.
+         *                        operation.
          * @throws org.gzipper.java.exceptions.GZipperException if determination
-         * of archiving algorithm has failed.
+         *                                                      of archiving algorithm has failed.
          */
         public Builder(ArchiveInfo info, CompressionMode compressionMode)
                 throws GZipperException {
@@ -224,6 +231,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
          * @param predicate the {@link Predicate} to be used.
          * @return a reference to this to allow method chaining.
          */
+        @SuppressWarnings("UnusedReturnValue")
         public final Builder filterPredicate(Predicate<String> predicate) {
             _filterPredicate = predicate;
             return this;

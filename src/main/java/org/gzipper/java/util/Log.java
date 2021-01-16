@@ -192,7 +192,7 @@ public final class Log {
      * @param thrown holds the stack trace.
      * @return string representation of the stack trace.
      */
-    public static String stackTraceAsString(Throwable thrown) {
+    private static String stackTraceAsString(Throwable thrown) {
         StringWriter errors = new StringWriter();
         thrown.printStackTrace(new PrintWriter(errors));
         return errors.toString();
