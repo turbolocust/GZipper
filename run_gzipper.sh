@@ -1,1 +1,1 @@
-java --module-path "./lib" --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics -jar ./GZipper.jar
+java --module-path "./lib" --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,org.tukaani.xz -jar ./GZipper.jar
