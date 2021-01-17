@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -35,11 +36,11 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.gzipper.java.application.util.FileUtils;
+import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
@@ -67,7 +68,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     /**
      * Creates a new instance for archiving operations.
      *
-     * @param archiveType the type of the archive.
+     * @param archiveType     the type of the archive.
      * @param compressionType the type of the compressor stream.
      */
     protected ArchivingAlgorithm(String archiveType, String compressionType) {
@@ -85,11 +86,11 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
         initAlgorithmProgress(archive);
 
         try (final FileInputStream fis = new FileInputStream(archive);
-                final BufferedInputStream bis = new BufferedInputStream(fis);
-                final CompressorInputStream cis = makeCompressorInputStream(bis);
-                final ArchiveInputStream ais = cis != null
-                        ? makeArchiveInputStream(cis)
-                        : makeArchiveInputStream(bis)) {
+             final BufferedInputStream bis = new BufferedInputStream(fis);
+             final CompressorInputStream cis = makeCompressorInputStream(bis);
+             final ArchiveInputStream ais = cis != null
+                     ? makeArchiveInputStream(cis)
+                     : makeArchiveInputStream(bis)) {
 
             ArchiveEntry entry = ais.getNextEntry();
 
@@ -123,16 +124,14 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                     }
                     if (!entry.isDirectory()) {
                         // create new output stream and write bytes to file
-                        try (BufferedOutputStream bos = new BufferedOutputStream(
-                                new FileOutputStream(newFile))) {
+                        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile))) {
                             final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                             int readBytes;
                             while (!interrupt && (readBytes = ais.read(buffer)) != -1) {
                                 bos.write(buffer, 0, readBytes);
                                 updateProgress(readBytes);
                             }
-                        }
-                        catch (IOException ex) {
+                        } catch (IOException ex) {
                             if (!interrupt) {
                                 Log.e(ex.getLocalizedMessage(), ex);
                                 Log.e("{0}\n{1}",
@@ -155,28 +154,22 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
     public final void compress(File[] files, String location, String name)
             throws IOException, ArchiveException, CompressorException {
 
-        String fullname = FileUtils.combine(location, name);
+        String archiveName = FileUtils.combine(location, name);
         initAlgorithmProgress(files);
 
-        try (final FileOutputStream fos = new FileOutputStream(fullname);
-                final BufferedOutputStream bos = new BufferedOutputStream(fos);
-                final CompressorOutputStream cos = makeCompressorOutputStream(bos);
-                final ArchiveOutputStream aos = cos != null
-                        ? makeArchiveOutputStream(cos)
-                        : makeArchiveOutputStream(bos)) {
-            compress(files, "", aos);
+        try (final FileOutputStream fos = new FileOutputStream(archiveName);
+             final BufferedOutputStream bos = new BufferedOutputStream(fos);
+             final CompressorOutputStream cos = makeCompressorOutputStream(bos);
+             final ArchiveOutputStream aos = cos != null
+                     ? makeArchiveOutputStream(cos)
+                     : makeArchiveOutputStream(bos)) {
+
+            String basePath = StringUtils.EMPTY;
+            compress(files, basePath, aos, archiveName);
         }
     }
 
-    /**
-     * Private method for compression and recursive call.
-     *
-     * @param files the files to compress.
-     * @param base the base path to store files to.
-     * @param aos the output stream to use.
-     * @throws IOException if an I/O error occurs.
-     */
-    private void compress(File[] files, String base, ArchiveOutputStream aos) throws IOException {
+    private void compress(File[] files, String base, ArchiveOutputStream aos, String archiveName) throws IOException {
 
         final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int readBytes;
@@ -192,8 +185,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                         continue; // skip entry
                     }
                     // read and compress the file
-                    try (BufferedInputStream buf = new BufferedInputStream(
-                            new FileInputStream(newFile))) {
+                    try (BufferedInputStream buf = new BufferedInputStream(new FileInputStream(newFile))) {
                         // create next archive entry and put it on output stream
                         ArchiveEntry entry = aos.createArchiveEntry(newFile, entryName);
                         aos.putArchiveEntry(entry);
@@ -203,8 +195,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                             updateProgress(readBytes);
                         }
                         aos.closeArchiveEntry();
-                    }
-                    catch (IOException ex) {
+                    } catch (IOException ex) {
                         if (!interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
                             Log.e("{0}\n{1}",
@@ -215,11 +206,22 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                         }
                     }
                 } else { // child is a directory
-                    final File[] children = getFiles(newFile.getAbsolutePath());
-                    compress(children, entryName + "/", aos);
+                    final File[] children = getChildrenExcludingArchiveToBeCreated(archiveName, newFile);
+                    compress(children, entryName + "/", aos, archiveName);
                 }
             }
         }
+    }
+
+    private File[] getChildrenExcludingArchiveToBeCreated(String archiveName, File directory) {
+
+        File[] children = getFiles(directory.getAbsolutePath());
+
+        children = Arrays.stream(children)
+                .filter(file -> !file.getAbsolutePath().equals(archiveName))
+                .toArray(File[]::new);
+
+        return children;
     }
 
     /**
@@ -227,7 +229,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * so that specific algorithms can e.g. skip the archive stream.
      *
      * @param stream the {@link InputStream} being used when creating a new
-     * {@link ArchiveInputStream}.
+     *               {@link ArchiveInputStream}.
      * @return new instance of {@link ArchiveInputStream}.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
@@ -240,7 +242,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * so that specific algorithms can e.g. apply individual parameters.
      *
      * @param stream the {@link InputStream} being used when creating a new
-     * {@link CompressorInputStream}.
+     *               {@link CompressorInputStream}.
      * @return new instance of {@link CompressorInputStream}.
      * @throws java.io.IOException if an I/O error occurs.
      * @throws CompressorException if an error related to the compressor occurs.
@@ -255,7 +257,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * used so that specific algorithms can e.g. skip the archive stream.
      *
      * @param stream the {@link OutputStream} being used when creating a new
-     * {@link ArchiveOutputStream}.
+     *               {@link ArchiveOutputStream}.
      * @return new instance of {@link ArchiveOutputStream}.
      * @throws ArchiveException if an error related to the archiver occurs.
      */
@@ -268,9 +270,9 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
      * used so that specific algorithms can e.g. apply individual parameters.
      *
      * @param stream the {@link OutputStream} being used when creating a new
-     * {@link CompressorOutputStream}.
+     *               {@link CompressorOutputStream}.
      * @return new instance of {@link CompressorOutputStream}.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException         if an I/O error occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream)
