@@ -575,9 +575,9 @@ public final class MainViewController extends BaseController {
         if (!MapUtils.isNullOrEmpty(_activeTasks)) {
             _activeTasks.keySet().stream().map(_activeTasks::get)
                     .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                // log error message only when cancellation failed
-                Log.e("Task cancellation failed for {0}", task.hashCode());
-            });
+                        // log error message only when cancellation failed
+                        Log.e("Task cancellation failed for {0}", task.hashCode());
+                    });
         }
     }
 
@@ -873,9 +873,17 @@ public final class MainViewController extends BaseController {
             final String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
 
             if (FileUtils.isValidDirectory(outputPath)) {
+
+                String archiveName = DEFAULT_ARCHIVE_NAME;
+
+                if (_selectedFiles.size() == 1) {
+                    File firstFile = _selectedFiles.get(0);
+                    archiveName = firstFile.getName();
+                }
                 // user has not specified output filename
-                outputPath = FileUtils.generateUniqueFilename(outputPath, DEFAULT_ARCHIVE_NAME, extName);
+                outputPath = FileUtils.generateUniqueFilename(outputPath, archiveName, extName);
             }
+
             if (FileUtils.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
                 _archiveFileExtension = extName;

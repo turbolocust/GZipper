@@ -27,6 +27,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Predicate;
+
 import org.gzipper.java.util.Log;
 
 /**
@@ -71,7 +72,8 @@ public final class FileUtils {
      */
     public static boolean isValidOutputFile(String path) {
         final File file = new File(path);
-        return file.getParentFile().isDirectory();
+        final File parentFile = file.getParentFile();
+        return parentFile.isDirectory() && !parentFile.getName().endsWith(" ");
     }
 
     /**
@@ -110,7 +112,7 @@ public final class FileUtils {
      * missing it will be added.
      *
      * @param filename filename as string.
-     * @param append the filename to be appended.
+     * @param append   the filename to be appended.
      * @return an empty string if either any of the parameters is {@code null}
      * or empty. Otherwise the concatenated absolute path is returned.
      */
@@ -199,8 +201,8 @@ public final class FileUtils {
      * options are specified, the file at the destination will not be replaced
      * in case it already exists.
      *
-     * @param src the source path.
-     * @param dst the destination path.
+     * @param src     the source path.
+     * @param dst     the destination path.
      * @param options optional copy options.
      * @throws IOException if an I/O error occurs.
      */
@@ -214,7 +216,7 @@ public final class FileUtils {
     /**
      * Returns the file size of the specified file.
      *
-     * @param file the file whose size is to be returned.
+     * @param file   the file whose size is to be returned.
      * @param filter the filter to be applied.
      * @return the size of the file or {@code 0} if the specified predicate
      * evaluates to {@code false}.
@@ -226,7 +228,7 @@ public final class FileUtils {
     /**
      * Traverses the specified path and returns the size of all children.
      *
-     * @param path the path to be traversed.
+     * @param path   the path to be traversed.
      * @param filter the filter to be applied.
      * @return the size of all children.
      */
@@ -259,8 +261,7 @@ public final class FileUtils {
                     return FileVisitResult.CONTINUE;
                 }
             });
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw new AssertionError(ex);
         }
 
@@ -282,8 +283,8 @@ public final class FileUtils {
     /**
      * Generates a unique file name using the specified parameters.
      *
-     * @param path the file path including only the directory.
-     * @param name the name of the file of which to generate a unique version.
+     * @param path        the file path including only the directory.
+     * @param name        the name of the file of which to generate a unique version.
      * @param beginSuffix the suffix to begin with (will be incremented).
      * @return a unique filename that consists of the path, name, suffix and
      * filename extension (if any).
@@ -302,7 +303,7 @@ public final class FileUtils {
      *
      * @param path the file path including only the directory.
      * @param name the name of the file of which to generate a unique version.
-     * @param ext the name of the file extension.
+     * @param ext  the name of the file extension.
      * @return a unique filename that consists of the path, name, suffix and
      * filename extension.
      */
@@ -313,11 +314,11 @@ public final class FileUtils {
     /**
      * Generates a unique file name using the specified parameters.
      *
-     * @param path the file path including only the directory.
-     * @param name the name of the file of which to generate a unique version.
-     * @param ext the name of the file extension.
+     * @param path        the file path including only the directory.
+     * @param name        the name of the file of which to generate a unique version.
+     * @param ext         the name of the file extension.
      * @param beginSuffix the suffix to begin with (will be incremented). This
-     * parameter will be ignored if its value is less or equal zero.
+     *                    parameter will be ignored if its value is less or equal zero.
      * @return a unique filename that consists of the path, name, suffix and
      * filename extension.
      */
@@ -330,7 +331,9 @@ public final class FileUtils {
             ext = ext.substring(1);
         }
 
-        String uniqueFilename = FileUtils.combine(path, name + ext);
+        final String trimmedPath = path.trim();
+
+        String uniqueFilename = FileUtils.combine(trimmedPath, name + ext);
         if (!FileUtils.isValid(uniqueFilename)) {
             return uniqueFilename; // return as it is if not exists
         }
@@ -343,7 +346,7 @@ public final class FileUtils {
                 ++suffix;
             }
             isFirst = false;
-            uniqueFilename = FileUtils.combine(path, filename.toString());
+            uniqueFilename = FileUtils.combine(trimmedPath, filename.toString());
             filename.setLength(0); // clear
         } while (FileUtils.isValidFile(uniqueFilename));
 
