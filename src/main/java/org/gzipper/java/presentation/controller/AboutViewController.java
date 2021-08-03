@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
 public final class AboutViewController extends BaseController {
 
     /**
-     * The name of the image to be displayed in the about view.
+     * The name of the image to be displayed in the about-view.
      */
     private static final String IMG_NAME = "images/icon_256.png";
 
@@ -55,12 +55,12 @@ public final class AboutViewController extends BaseController {
     /**
      * The version of this application.
      */
-    private static final String APP_VERSION = "1.4.0";
+    private static final String APP_VERSION = "1.4.1";
 
     /**
-     * The build date of this application.
+     * The build date of this application (mm/dd/yyyy).
      */
-    private static final String APP_BUILD_DATE = "01/17/2021";
+    private static final String APP_BUILD_DATE = "08/03/2021";
 
     /**
      * The author of this application.
