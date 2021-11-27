@@ -208,6 +208,8 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                 } else if (newFile.isDirectory()) {
                     final File[] children = getChildrenExcludingArchiveToBeCreated(archiveName, newFile);
                     compress(children, entryName + "/", aos, archiveName);
+                } else {
+                    Log.i(I18N.getString("skippingUnsupportedFile.text"), true, newFile.getCanonicalPath());
                 }
             }
         }
