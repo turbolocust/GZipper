@@ -98,25 +98,23 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
             final File outputFolder = new File(location + fullname.substring(
                     startIndex, fullname.indexOf('.', startIndex)));
 
-            if (!outputFolder.exists()) { // create output folder of archive
-                if (!outputFolder.mkdir()) {
-                    Log.e(I18N.getString("errorCreatingDirectory.text", outputFolder.getAbsolutePath()));
-                    throw new IOException(String.format("%s could not be created", outputFolder.getAbsolutePath()));
-                }
+            if (createOutputFolderIfNotExists(outputFolder)) {
+                Log.e(I18N.getString("errorCreatingDirectory.text", FileUtils.getPath(outputFolder)));
+                throw new IOException(String.format("%s could not be created", FileUtils.getPath(outputFolder)));
             }
 
             while (!interrupt && entry != null) {
                 final String entryName = entry.getName();
                 if (filterPredicate.test(entryName)) { // check predicate first
                     final String uniqueName = FileUtils.generateUniqueFilename(
-                            outputFolder.getAbsolutePath(), entryName);
+                            FileUtils.getPath(outputFolder), entryName);
                     final File newFile = new File(uniqueName);
                     // check if entry contains a directory
                     if (entryName.indexOf('/') > -1) {
                         if (!newFile.getParentFile().exists()) {
                             // also create parent directories by calling "mkdirs"
                             if (!newFile.getParentFile().mkdirs()) {
-                                final String parentFilePath = newFile.getParentFile().getAbsolutePath();
+                                final String parentFilePath = FileUtils.getPath(newFile.getParentFile());
                                 Log.e(I18N.getString("errorCreatingDirectory.text", parentFilePath));
                                 throw new IOException(String.format("%s could not be created", parentFilePath));
                             }
@@ -198,10 +196,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                     } catch (IOException ex) {
                         if (!interrupt) {
                             Log.e(ex.getLocalizedMessage(), ex);
-                            Log.e("{0}\n{1}",
-                                    I18N.getString("errorReadingFile.text"),
-                                    newFile.getPath()
-                            );
+                            Log.e("{0}\n{1}", I18N.getString("errorReadingFile.text"), newFile.getPath());
                             throw ex; // re-throw
                         }
                     }
@@ -209,18 +204,22 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                     final File[] children = getChildrenExcludingArchiveToBeCreated(archiveName, newFile);
                     compress(children, entryName + "/", aos, archiveName);
                 } else {
-                    Log.i(I18N.getString("skippingUnsupportedFile.text"), true, newFile.getCanonicalPath());
+                    Log.i(I18N.getString("skippingUnsupportedFile.text"), true, FileUtils.getPath(newFile));
                 }
             }
         }
     }
 
+    private boolean createOutputFolderIfNotExists(File outputFolder) {
+        return !outputFolder.exists() && !outputFolder.mkdir();
+    }
+
     private File[] getChildrenExcludingArchiveToBeCreated(String archiveName, File directory) {
 
-        File[] children = getFiles(directory.getAbsolutePath());
+        File[] children = getFiles(FileUtils.getPath(directory));
 
         children = Arrays.stream(children)
-                .filter(file -> !file.getAbsolutePath().equals(archiveName))
+                .filter(file -> !FileUtils.getPath(file).equals(archiveName))
                 .toArray(File[]::new);
 
         return children;

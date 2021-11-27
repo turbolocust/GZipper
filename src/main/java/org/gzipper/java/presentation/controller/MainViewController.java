@@ -319,13 +319,17 @@ public final class MainViewController extends BaseController {
         if (evt.getSource().equals(_startButton)) {
             try {
                 if (_state.validateOutputPath()) {
-                    final String outputPath = _outputPathTextField.getText();
-                    if (!_outputFile.getAbsolutePath().equals(outputPath)) {
+                    final String outputPathText = _outputPathTextField.getText();
+                    final File outputFile = new File(outputPathText);
+                    final String outputPath = FileUtils.getPath(outputFile);
+
+                    if (!FileUtils.getPath(_outputFile).equals(outputPath)) {
                         _outputFile = new File(outputPath);
                         if (!_outputFile.isDirectory()) {
                             _archiveName = _outputFile.getName();
                         }
                     }
+
                     final String recentPath = FileUtils.getParent(outputPath);
                     Settings.getInstance().setProperty("recentPath", recentPath);
                     final ArchiveType archiveType = _archiveTypeComboBox.getValue();
@@ -373,7 +377,7 @@ public final class MainViewController extends BaseController {
                     selectedFiles.forEach((file) -> { // log the path of each selected file
                         Log.i("{0}: \"{1}\"", true,
                                 I18N.getString("fileSelected.text"),
-                                file.getAbsolutePath());
+                                FileUtils.getPath(file));
                     });
                 }
                 _selectedFiles = selectedFiles;
@@ -403,12 +407,12 @@ public final class MainViewController extends BaseController {
 
             if (file != null) {
                 updateSelectedFile(file);
-                String absolutePath = file.getAbsolutePath();
-                if (!file.isDirectory() && FileUtils.getExtension(absolutePath).isEmpty()) {
-                    absolutePath += _archiveFileExtension;
+                String path = FileUtils.getPath(file);
+                if (!file.isDirectory() && FileUtils.getExtension(path).isEmpty()) {
+                    path += _archiveFileExtension;
                 }
-                _outputPathTextField.setText(absolutePath);
-                Log.i("Output file set to: {0}", file.getAbsolutePath(), false);
+                _outputPathTextField.setText(path);
+                Log.i("Output file set to: {0}", FileUtils.getPath(file), false);
             }
         }
     }
@@ -964,8 +968,8 @@ public final class MainViewController extends BaseController {
 
             // create new operation for each archive to be extracted
             for (File file : _selectedFiles) {
-                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                        file.getAbsolutePath(), _outputFile + File.separator);
+                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
+                        archiveType, FileUtils.getPath(file), _outputFile + File.separator);
                 final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());

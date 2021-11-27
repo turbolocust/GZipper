@@ -114,7 +114,7 @@ public final class FileUtils {
      * @param filename filename as string.
      * @param append   the filename to be appended.
      * @return an empty string if either any of the parameters is {@code null}
-     * or empty. Otherwise the concatenated absolute path is returned.
+     * or empty. Otherwise, the concatenated absolute path is returned.
      */
     public static String combine(String filename, String append) {
         if (StringUtils.isNullOrEmpty(filename) || StringUtils.isNullOrEmpty(append)) {
@@ -181,6 +181,21 @@ public final class FileUtils {
         }
 
         return filename.substring(lastSeparatorIndex, lastPeriodIndex);
+    }
+
+    /**
+     * Returns the canonical path if possible or otherwise the absolute path.
+     *
+     * @param file the file of which to get the path of.
+     * @return the canonical path if possible or otherwise the absolute path.
+     */
+    public static String getPath(File file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException ex) {
+            Log.e("Canonical path could not be computed", ex);
+            return file.getAbsolutePath();
+        }
     }
 
     /**

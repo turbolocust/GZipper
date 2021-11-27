@@ -35,6 +35,7 @@ import org.gzipper.java.application.hashing.MessageDigestAlgorithm;
 import org.gzipper.java.application.hashing.MessageDigestProvider;
 import org.gzipper.java.application.hashing.MessageDigestResult;
 import org.gzipper.java.application.hashing.NamedMessageDigestResult;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.ListUtils;
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.application.util.TaskHandler;
@@ -321,9 +322,8 @@ public final class HashViewController extends BaseController implements Interrup
                     result = MessageDigestProvider.computeHash(bytes, algorithm);
                 }
 
-                final String name = file.getAbsolutePath();
-                NamedMessageDigestResult namedResult
-                        = new NamedMessageDigestResult(result, name);
+                final String path = FileUtils.getPath(file);
+                NamedMessageDigestResult namedResult = new NamedMessageDigestResult(result, path);
                 appendColumn(namedResult, file);
             }
         } catch (IOException | NoSuchAlgorithmException ex) {
@@ -425,12 +425,12 @@ public final class HashViewController extends BaseController implements Interrup
             if (!namedResult.getMessageDigestResult().isEmpty()) {
                 model = new HashViewTableModel(
                         file.getName(),
-                        file.getAbsolutePath(),
+                        FileUtils.getPath(file),
                         setCase(namedResult.getMessageDigestResult().toString()));
             } else {
                 model = new HashViewTableModel(
                         file.getName(),
-                        file.getAbsolutePath(),
+                        FileUtils.getPath(file),
                         I18N.getString("errorReadingFile.text"));
             }
             Platform.runLater(() -> {
