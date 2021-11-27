@@ -205,7 +205,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                             throw ex; // re-throw
                         }
                     }
-                } else { // child is a directory
+                } else if (newFile.isDirectory()) {
                     final File[] children = getChildrenExcludingArchiveToBeCreated(archiveName, newFile);
                     compress(children, entryName + "/", aos, archiveName);
                 }
