@@ -132,8 +132,8 @@ public final class ArchiveInfoFactory {
      * @return a list consisting of {@link ArchiveInfo} objects.
      * @throws GZipperException if archive type could not be determined.
      */
-    public static List<ArchiveInfo> createArchiveInfos(
-            ArchiveType archiveType, int level, List<File> files, String outputPath) throws GZipperException {
+    public static List<ArchiveInfo> createArchiveInfos(ArchiveType archiveType, int level, List<File> files,
+                                                       String outputPath) throws GZipperException {
 
         if (archiveType == null) {
             throw new NullPointerException("Archive type must not be null");
@@ -199,6 +199,7 @@ public final class ArchiveInfoFactory {
     }
 
     private static void throwGZipperExceptionIfFaultyCompressionLevelSpecified(int level) throws GZipperException {
+
         if (level < Deflater.DEFAULT_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
             throw GZipperException.createWithReason(
                     GZipperException.Reason.FAULTY_COMPRESSION_LVL,

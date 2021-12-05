@@ -207,8 +207,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleApplyFilterMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_applyFilterMenuItem)) {
-            final Optional<String> result = Dialogs
-                    .showPatternInputDialog(theme, getIconImage());
+            final Optional<String> result = Dialogs.showPatternInputDialog(theme, getIconImage());
             if (result.isPresent()) {
                 if (!result.get().isEmpty()) {
                     final Pattern pattern = Pattern.compile(result.get());
@@ -231,8 +230,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleCompressionLevelMenuItemAction(ActionEvent evt) {
         final MenuItem selectedItem = (MenuItem) evt.getSource();
-        final Object compressionStrength = selectedItem
-                .getProperties().get(COMPRESSION_LEVEL_KEY);
+        final Object compressionStrength = selectedItem.getProperties().get(COMPRESSION_LEVEL_KEY);
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
             final String msg = I18N.getString("compressionLevelChange.text") + " ";
@@ -255,6 +253,7 @@ public final class MainViewController extends BaseController {
                     .showConfirmationDialog(I18N.getString("clearText.text"),
                             I18N.getString("clearTextConfirmation.text"),
                             I18N.getString("confirmation.text"), theme, getIconImage());
+
             if (result.isPresent() && result.get() == ButtonType.YES) {
                 _textArea.clear();
                 _textArea.setText("run:\n");
@@ -265,10 +264,10 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final DropViewController ctrl = ViewControllers.showDropView(theme);
-            final List<String> filePaths = ctrl.getAddresses();
+            final DropViewController dropViewController = ViewControllers.showDropView(theme);
+            final List<String> filePaths = dropViewController.getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
-                _putIntoSeparateArchives = ctrl.isPutInSeparateArchives();
+                _putIntoSeparateArchives = dropViewController.isPutInSeparateArchives();
                 final int size = filePaths.size();
                 _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
@@ -276,7 +275,8 @@ public final class MainViewController extends BaseController {
                     filePaths.forEach((filePath) -> _selectedFiles.add(new File(filePath)));
                     Log.i(I18N.getString("manyFilesSelected.text"), true, size);
                 } else { // log files in detail
-                    filePaths.stream().peek((filePath) -> _selectedFiles.add(new File(filePath)))
+                    filePaths.stream()
+                            .peek((filePath) -> _selectedFiles.add(new File(filePath)))
                             .forEachOrdered((filePath) -> Log.i("{0}: {1}",
                                     true, I18N.getString("fileSelected.text"), filePath));
                 }
@@ -318,17 +318,12 @@ public final class MainViewController extends BaseController {
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
             try {
-                if (_state.validateOutputPath()) {
+                if (_state.checkUpdateOutputPath()) {
                     final String outputPathText = _outputPathTextField.getText();
                     final File outputFile = new File(outputPathText);
                     final String outputPath = FileUtils.getPath(outputFile);
 
-                    if (!FileUtils.getPath(_outputFile).equals(outputPath)) {
-                        _outputFile = new File(outputPath);
-                        if (!_outputFile.isDirectory()) {
-                            _archiveName = _outputFile.getName();
-                        }
-                    }
+                    checkUpdateOutputFileAndArchiveName(outputPath);
 
                     final String recentPath = FileUtils.getParent(outputPath);
                     Settings.getInstance().setProperty("recentPath", recentPath);
@@ -357,7 +352,6 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleSelectFilesButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_selectFilesButton)) {
-
             final FileChooser fc = new FileChooser();
             if (_compressRadioButton.isSelected()) {
                 fc.setTitle(I18N.getString("browseForFiles.text"));
@@ -392,7 +386,6 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
-
             final File file;
             if (_compressRadioButton.isSelected()) {
                 final FileChooser fc = new FileChooser();
@@ -430,7 +423,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
-            ArchiveType type = _archiveTypeComboBox.getValue();
+            final ArchiveType type = _archiveTypeComboBox.getValue();
             Log.i("Archive type selection change to: {0}", type, false);
             if (type == ArchiveType.GZIP) {
                 performGzipSelectionAction();
@@ -438,8 +431,8 @@ public final class MainViewController extends BaseController {
             if (_decompressRadioButton.isSelected()) {
                 resetSelectedFiles();
             } else { // update file extension
-                String outputPathText = _outputPathTextField.getText(),
-                        fileExtension = type.getDefaultExtensionName();
+                String outputPathText = _outputPathTextField.getText();
+                String fileExtension = type.getDefaultExtensionName();
                 String outputPath;
                 if (outputPathText.endsWith(_archiveFileExtension)) {
                     outputPath = outputPathText.replace(_archiveFileExtension, fileExtension);
@@ -457,9 +450,9 @@ public final class MainViewController extends BaseController {
     @FXML
     void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
-            String filename = _outputPathTextField.getText();
+            final String filename = _outputPathTextField.getText();
             if (!FileUtils.containsIllegalChars(filename)) {
-                updateSelectedFile(new File(filename + evt.getCharacter()));
+                updateSelectedFile(new File(filename));
             }
         }
     }
@@ -467,7 +460,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleEnableLoggingCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
-            boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
+            final boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
             Settings.getInstance().setProperty("loggingEnabled", enableLogging);
             Log.setVerboseUiLogging(enableLogging);
         }
@@ -476,7 +469,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleEnableDarkThemeCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableDarkThemeCheckMenuItem)) {
-            boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
+            final boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
             loadAlternativeTheme(enableTheme);
             Settings.getInstance().setProperty("darkThemeEnabled", enableTheme);
         }
@@ -485,6 +478,15 @@ public final class MainViewController extends BaseController {
     //</editor-fold>
 
     //<editor-fold desc="Methods related to UI">
+
+    private void checkUpdateOutputFileAndArchiveName(String outputPath) {
+        if (!FileUtils.getPath(_outputFile).equals(outputPath)) {
+            _outputFile = new File(outputPath);
+            if (!_outputFile.isDirectory()) {
+                _archiveName = _outputFile.getName();
+            }
+        }
+    }
 
     private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
         _state = compress ? new CompressState() : new DecompressState();
@@ -495,7 +497,7 @@ public final class MainViewController extends BaseController {
     private void performGzipSelectionAction() {
         final Settings settings = Settings.getInstance();
         final String propertyKey = "showGzipInfoDialog";
-        boolean showDialog = settings.evaluateProperty(propertyKey);
+        final boolean showDialog = settings.evaluateProperty(propertyKey);
         if (showDialog) {
             final String infoTitle = I18N.getString("info.text");
             final String infoText = I18N.getString("gzipCompressionInfo.text", ArchiveType.TAR_GZ.getDisplayName());
@@ -538,7 +540,7 @@ public final class MainViewController extends BaseController {
     }
 
     private void resetFilter() {
-        boolean wasApplied = _state.getFilterPredicate() != null;
+        final boolean wasApplied = _state.getFilterPredicate() != null;
         _state.setFilterPredicate(null);
         if (wasApplied) {
             Log.i(I18N.getString("filterReset.text"), true);
@@ -559,7 +561,7 @@ public final class MainViewController extends BaseController {
             if (!file.isDirectory()) {
                 final String archiveName = _archiveName = file.getName();
                 String fileExtension = FileUtils.getExtension(archiveName);
-                if (fileExtension.isEmpty()) { // update file extension
+                if (fileExtension.isEmpty()) {
                     fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName();
                 }
                 _archiveFileExtension = fileExtension;
@@ -595,8 +597,7 @@ public final class MainViewController extends BaseController {
      *
      * @param operation the {@link ArchiveOperation} that will eventually be
      *                  performed by the task when executed.
-     * @return a {@link Task} that can be executed to perform the specified
-     * archiving operation.
+     * @return a {@link Task} that can be executed to perform the specified archiving operation.
      */
     @SuppressWarnings("SleepWhileInLoop")
     private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
@@ -607,7 +608,7 @@ public final class MainViewController extends BaseController {
                 final Future<Boolean> futureTask = _taskHandler.submit(operation);
                 while (!futureTask.isDone()) {
                     try {
-                        Thread.sleep(10); // check for interruption
+                        Thread.sleep(10); // continuous check for interruption
                     } catch (InterruptedException ex) {
                         // if exception is caught, task has been interrupted
                         Log.i(I18N.getString("interrupt.text"), true);
@@ -622,8 +623,7 @@ public final class MainViewController extends BaseController {
                 try { // check for cancellation
                     return futureTask.get();
                 } catch (CancellationException ex) {
-                    // ignore exception
-                    return false;
+                    return false; // ignore exception
                 }
             }
         };
@@ -645,7 +645,7 @@ public final class MainViewController extends BaseController {
 
     private void showSuccessMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
         task.setOnSucceeded(e -> {
-            boolean success = (boolean) e.getSource().getValue();
+            final boolean success = (boolean) e.getSource().getValue();
             if (success) {
                 Log.i(I18N.getString("operationSuccess.text"), true, operation);
             } else {
@@ -694,7 +694,6 @@ public final class MainViewController extends BaseController {
         final Settings settings = Settings.getInstance();
         setRecentlyUsedPathInOutputPathTextField(settings);
 
-        // set dark theme as enabled if done so on previous application launch
         if (theme == CSS.Theme.DARK_THEME) {
             _enableDarkThemeCheckMenuItem.setSelected(true);
         }
@@ -702,26 +701,24 @@ public final class MainViewController extends BaseController {
         setUpPropertiesForCompressionLevelMenuItem();
         setUpArchiveTypesComboBox();
 
-        // set menu item for logging as selected if logging has been enabled
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
         _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
-        // set up initial state, window icon and the default text for the text area
-        _state = new CompressState();
+        _state = new CompressState(); // the default one
         final String formattedText = String.format("run:\n%s\n", I18N.getString("changeOutputPath.text"));
         _textArea.setText(formattedText);
     }
 
     private void setRecentlyUsedPathInOutputPathTextField(Settings settings) {
         final OperatingSystem os = settings.getOs();
-
-        // set recently used path from settings if valid
         final String recentPath = settings.getProperty("recentPath");
+
         if (FileUtils.isValidDirectory(recentPath)) {
             _outputPathTextField.setText(recentPath);
         } else {
             _outputPathTextField.setText(os.getDefaultUserDirectory());
         }
+
         _outputFile = new File(_outputPathTextField.getText());
     }
 
@@ -793,7 +790,7 @@ public final class MainViewController extends BaseController {
          *
          * @return true if output path is valid, false otherwise.
          */
-        abstract boolean validateOutputPath();
+        abstract boolean checkUpdateOutputPath();
 
         /**
          * Initializes the archiving operation.
@@ -871,12 +868,20 @@ public final class MainViewController extends BaseController {
 
     private final class CompressState extends ArchivingState {
 
-        @Override
-        public boolean validateOutputPath() {
-            String outputPath = _outputPathTextField.getText();
-            final String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
+        private String determineOutputPath(File outputFile) {
+            if (outputFile.isFile()) {
+                return outputFile.getParent();
+            }
 
-            if (FileUtils.isValidDirectory(outputPath)) {
+            return FileUtils.getPath(outputFile);
+        }
+
+        @Override
+        public boolean checkUpdateOutputPath() {
+            String outputPath = _outputPathTextField.getText();
+            String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
+
+            if (FileUtils.isValidDirectory(outputPath) && !_putIntoSeparateArchives) {
 
                 String archiveName = DEFAULT_ARCHIVE_NAME;
 
@@ -888,9 +893,10 @@ public final class MainViewController extends BaseController {
                 outputPath = FileUtils.generateUniqueFilename(outputPath, archiveName, extName);
             }
 
+            _archiveFileExtension = extName;
+
             if (FileUtils.isValidOutputFile(outputPath)) {
                 _outputPathTextField.setText(outputPath);
-                _archiveFileExtension = extName;
                 return true;
             }
 
@@ -915,14 +921,15 @@ public final class MainViewController extends BaseController {
             if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP || _putIntoSeparateArchives) {
 
                 final List<ArchiveInfo> infos;
+                final String outputPath = determineOutputPath(_outputFile);
                 operations = new ArrayList<>(_selectedFiles.size());
 
                 if (_putIntoSeparateArchives) {
                     infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
-                            _compressionLevel, _selectedFiles, _outputFile.getParent());
+                            _compressionLevel, _selectedFiles, outputPath);
                 } else {
                     infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
-                            _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
+                            _archiveName, _compressionLevel, _selectedFiles, outputPath);
                 }
 
                 for (ArchiveInfo info : infos) {
@@ -946,7 +953,7 @@ public final class MainViewController extends BaseController {
     private final class DecompressState extends ArchivingState {
 
         @Override
-        public boolean validateOutputPath() {
+        public boolean checkUpdateOutputPath() {
             return FileUtils.isValidDirectory(_outputPathTextField.getText());
         }
 
@@ -966,7 +973,6 @@ public final class MainViewController extends BaseController {
 
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
 
-            // create new operation for each archive to be extracted
             for (File file : _selectedFiles) {
                 final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
                         archiveType, FileUtils.getPath(file), _outputFile + File.separator);
