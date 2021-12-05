@@ -386,18 +386,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleSaveAsButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_saveAsButton)) {
-            final File file;
-            if (_compressRadioButton.isSelected()) {
-                final FileChooser fc = new FileChooser();
-                fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
-                _state.applyExtensionFilters(fc);
-                file = fc.showSaveDialog(primaryStage);
-            } else {
-                final DirectoryChooser dc = new DirectoryChooser();
-                dc.setTitle(I18N.getString("saveAsPathTitle.text"));
-                file = dc.showDialog(primaryStage);
-            }
-
+            final File file = pickFileToBeSaved();
             if (file != null) {
                 updateSelectedFile(file);
                 String path = FileUtils.getPath(file);
@@ -486,6 +475,27 @@ public final class MainViewController extends BaseController {
                 _archiveName = _outputFile.getName();
             }
         }
+    }
+
+    private File pickFileToBeSaved() {
+        final File file;
+
+        if (_compressRadioButton.isSelected() && _putIntoSeparateArchives) {
+            final DirectoryChooser dc = new DirectoryChooser();
+            dc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
+            file = dc.showDialog(primaryStage);
+        } else if (_compressRadioButton.isSelected()) {
+            final FileChooser fc = new FileChooser();
+            fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
+            _state.applyExtensionFilters(fc);
+            file = fc.showSaveDialog(primaryStage);
+        } else {
+            final DirectoryChooser dc = new DirectoryChooser();
+            dc.setTitle(I18N.getString("saveAsPathTitle.text"));
+            file = dc.showDialog(primaryStage);
+        }
+
+        return file;
     }
 
     private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
@@ -869,7 +879,7 @@ public final class MainViewController extends BaseController {
     private final class CompressState extends ArchivingState {
 
         private String determineOutputPath(File outputFile) {
-            if (outputFile.isFile()) {
+            if (!outputFile.exists() || outputFile.isFile()) {
                 return outputFile.getParent();
             }
 
