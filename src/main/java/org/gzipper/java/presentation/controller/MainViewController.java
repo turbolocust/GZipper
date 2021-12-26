@@ -364,6 +364,7 @@ public final class MainViewController extends BaseController {
 
             String message;
             if (selectedFiles != null) {
+                _putIntoSeparateArchives = false;
                 _startButton.setDisable(false);
                 int size = selectedFiles.size();
                 message = I18N.getString("filesSelected.text", size);
