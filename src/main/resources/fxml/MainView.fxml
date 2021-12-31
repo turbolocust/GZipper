@@ -138,7 +138,7 @@
                         <Insets left="4.0" right="4.0" />
                     </GridPane.margin>
                     <children>
-                        <TextField fx:id="_outputPathTextField" onKeyTyped="#onOutputPathTextFieldKeyTyped" promptText="%outputPath.text">
+                        <TextField fx:id="_outputPathTextField" onKeyTyped="#onOutputPathTextFieldKeyTyped" promptText="%outputPathPrompt.text">
                             <padding>
                                 <Insets bottom="4.0" top="2.0" />
                             </padding>
