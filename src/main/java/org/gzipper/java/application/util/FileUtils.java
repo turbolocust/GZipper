@@ -73,7 +73,7 @@ public final class FileUtils {
     public static boolean isValidOutputFile(String path) {
         final File file = new File(path);
         final File parentFile = file.getParentFile();
-        return parentFile.isDirectory() && !parentFile.getName().endsWith(" ");
+        return parentFile != null && parentFile.isDirectory() && !parentFile.getName().endsWith(" ");
     }
 
     /**
