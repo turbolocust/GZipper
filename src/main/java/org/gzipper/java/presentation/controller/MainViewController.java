@@ -938,6 +938,11 @@ public final class MainViewController extends BaseController {
                 if (_putIntoSeparateArchives) {
                     infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
                             _compressionLevel, _selectedFiles, outputPath);
+                } else if (_selectedFiles.size() == 1) {
+                    final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+                            _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
+                    infos = new ArrayList<>(1);
+                    infos.add(info);
                 } else {
                     infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
                             _archiveName, _compressionLevel, _selectedFiles, outputPath);
