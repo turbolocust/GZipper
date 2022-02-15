@@ -96,7 +96,7 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
 
             final int startIndex = fullname.lastIndexOf(File.separator) + 1;
             final File outputFolder = new File(location + fullname.substring(
-                    startIndex, fullname.indexOf('.', startIndex)));
+                    startIndex, fullname.lastIndexOf('.')));
 
             if (createOutputFolderIfNotExists(outputFolder)) {
                 Log.e(I18N.getString("errorCreatingDirectory.text", FileUtils.getPath(outputFolder)));
