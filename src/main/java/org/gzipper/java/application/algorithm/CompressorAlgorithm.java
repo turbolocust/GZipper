@@ -32,7 +32,6 @@ import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public abstract class CompressorAlgorithm extends AbstractAlgorithm {
@@ -55,9 +54,9 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                     file.getName(), compressionLevel);
 
             try (final FileInputStream fis = new FileInputStream(file);
-                    final BufferedInputStream bis = new BufferedInputStream(fis);
-                    final CompressorOutputStream cos = makeCompressorOutputStream(
-                            new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
+                 final BufferedInputStream bis = new BufferedInputStream(fis);
+                 final CompressorOutputStream cos = makeCompressorOutputStream(
+                         new BufferedOutputStream(new FileOutputStream(fullname)), options)) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                 int readBytes;
                 while (!interrupt && (readBytes = bis.read(buffer)) != -1) {
@@ -89,14 +88,13 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
                 new BufferedInputStream(new FileInputStream(archive)), options)) {
 
             final File outputFile;
+
             if (StringUtils.isNullOrEmpty(options._name)) {
-                // generate unique file name from display name
-                outputFile = new File(FileUtils.generateUniqueFilename(
-                        location, FileUtils.getDisplayName(fullname)));
+                outputFile = new File(FileUtils.generateUniqueFilename(location, FileUtils.getDisplayName(fullname)));
             } else { // create output file with name as defined in header
-                outputFile = new File(FileUtils.generateUniqueFilename(
-                        location, options._name));
+                outputFile = new File(FileUtils.generateUniqueFilename(location, options._name));
             }
+
             try (final BufferedOutputStream bos = new BufferedOutputStream(
                     new FileOutputStream(outputFile))) {
                 final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
@@ -113,8 +111,8 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
      * Creates a new instance of {@link CompressorInputStream}. This is used so
      * that specific algorithms can e.g. apply individual parameters.
      *
-     * @param stream the {@link InputStream} being used when creating a new
-     * {@link CompressorInputStream}.
+     * @param stream  the {@link InputStream} being used when creating a new
+     *                {@link CompressorInputStream}.
      * @param options Options that may be applied.
      * @return new instance of {@link CompressorInputStream}.
      * @throws java.io.IOException if an I/O error occurs.
@@ -126,8 +124,8 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
      * Creates a new instance of {@link CompressorOutputStream}. This is used so
      * that specific algorithms can e.g. apply individual parameters.
      *
-     * @param stream the {@link OutputStream} being used when creating a new
-     * {@link CompressorOutputStream}.
+     * @param stream  the {@link OutputStream} being used when creating a new
+     *                {@link CompressorOutputStream}.
      * @param options Options that may be applied.
      * @return new instance of {@link CompressorOutputStream}.
      * @throws IOException if an I/O error occurs.

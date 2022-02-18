@@ -421,11 +421,12 @@ public final class MainViewController extends BaseController {
             if (_decompressRadioButton.isSelected()) {
                 resetSelectedFiles();
             } else { // update file extension
-                String outputPathText = _outputPathTextField.getText();
-                String fileExtension = type.getDefaultExtensionName();
+                final String outputPathText = _outputPathTextField.getText();
+                final String fileExtension = type.getDefaultExtensionName();
                 String outputPath;
                 if (outputPathText.endsWith(_archiveFileExtension)) {
-                    outputPath = outputPathText.replace(_archiveFileExtension, fileExtension);
+                    final int lastIndexOfExtension = outputPathText.lastIndexOf(_archiveFileExtension);
+                    outputPath = outputPathText.substring(0, lastIndexOfExtension) + fileExtension;
                 } else if (!FileUtils.isValidDirectory(outputPathText)) {
                     outputPath = outputPathText + fileExtension;
                 } else {
@@ -571,7 +572,7 @@ public final class MainViewController extends BaseController {
         if (file != null) {
             if (!file.isDirectory()) {
                 final String archiveName = _archiveName = file.getName();
-                String fileExtension = FileUtils.getExtension(archiveName);
+                String fileExtension = FileUtils.getExtension(archiveName, true);
                 if (fileExtension.isEmpty()) {
                     fileExtension = _archiveTypeComboBox.getValue().getDefaultExtensionName();
                 }
@@ -907,7 +908,8 @@ public final class MainViewController extends BaseController {
             _archiveFileExtension = extName;
 
             if (FileUtils.isValidOutputFile(outputPath)) {
-                _outputPathTextField.setText(outputPath);
+                final String osStyleFilePath = outputPath.replace('/', File.separatorChar);
+                _outputPathTextField.setText(osStyleFilePath);
                 return true;
             }
 
@@ -991,7 +993,7 @@ public final class MainViewController extends BaseController {
 
             for (File file : _selectedFiles) {
                 final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                        FileUtils.getPath(file), FileUtils.getPath(_outputFile)+ File.separator);
+                        FileUtils.getPath(file), FileUtils.getPath(_outputFile) + File.separator);
                 final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());

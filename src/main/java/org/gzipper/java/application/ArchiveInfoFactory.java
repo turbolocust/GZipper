@@ -16,18 +16,13 @@
  */
 package org.gzipper.java.application;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.Deflater;
-
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.util.FileUtils;
-import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
+
+import java.io.File;
+import java.util.*;
+import java.util.zip.Deflater;
 
 /**
  * Factory class that offers static methods for creating {@link ArchiveInfo}.
@@ -60,8 +55,9 @@ public final class ArchiveInfoFactory {
         } else throwGZipperExceptionIfFaultyCompressionLevelSpecified(level);
 
         final String properName = checkAddExtension(archiveName, archiveType);
-        final String ext = FileUtils.getExtension(properName);
-        final String displayName = properName.replace(ext, StringUtils.EMPTY);
+        final String ext = FileUtils.getExtension(properName, true);
+        final int lastIndexOfExtension = properName.lastIndexOf(ext);
+        final String displayName = properName.substring(0, lastIndexOfExtension);
 
         final String fullName = FileUtils.generateUniqueFilename(outputPath, displayName, ext, 0);
         String name = FileUtils.getName(fullName);
@@ -93,8 +89,9 @@ public final class ArchiveInfoFactory {
         throwGZipperExceptionIfFaultyCompressionLevelSpecified(level);
 
         final String properName = checkAddExtension(archiveName, archiveType);
-        final String ext = FileUtils.getExtension(properName);
-        final String displayName = properName.replace(ext, StringUtils.EMPTY);
+        final String ext = FileUtils.getExtension(properName, true);
+        final int lastIndexOfExtension = properName.lastIndexOf(ext);
+        final String displayName = properName.substring(0, lastIndexOfExtension);
 
         final Set<String> names = new HashSet<>(); // to avoid name collisions
         List<ArchiveInfo> archiveInfos = new ArrayList<>(files.size());

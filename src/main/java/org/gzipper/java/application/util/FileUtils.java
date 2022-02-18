@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -36,17 +39,35 @@ public final class FileUtils {
         throw new AssertionError("Holds static members only");
     }
 
-    private static String getArchiveTypeExtensionName(String filename) {
-        for (ArchiveType type : ArchiveType.values()) {
-            String[] extensionNames = type.getExtensionNames(false);
+    private static String getArchiveTypeExtensionName(String filename, List<ArchiveType> archiveTypes) {
+        for (var archiveType : archiveTypes) {
+            String[] extensionNames = archiveType.getExtensionNames(false);
             for (String extensionName : extensionNames) {
-                if (filename.endsWith(extensionName)) {
-                    return extensionName;
-                }
+                if (filename.endsWith(extensionName)) return extensionName;
             }
         }
 
         return null;
+    }
+
+    private static String getArchiveTypeExtensionName(String filename) {
+
+        var archiveTypes = ArchiveType.values();
+        var tarArchiveTypes = new ArrayList<ArchiveType>();
+        var nonTarArchiveTypes = new ArrayList<ArchiveType>();
+
+        Arrays.stream(archiveTypes).forEach(type -> {
+            if (type.getName().toLowerCase().startsWith("tar")) {
+                tarArchiveTypes.add(type);
+            } else {
+                nonTarArchiveTypes.add(type);
+            }
+        });
+
+        String extensionName = getArchiveTypeExtensionName(filename, tarArchiveTypes);
+        if (extensionName != null) return extensionName;
+
+        return getArchiveTypeExtensionName(filename, nonTarArchiveTypes);
     }
 
     private static class SizeValueHolder {
@@ -149,6 +170,13 @@ public final class FileUtils {
         return absolutePath + append;
     }
 
+    /**
+     * Returns the file name extension(s) of a specified filename.
+     *
+     * @param filename the name of the file as string.
+     * @return file name extension(s) including period or an empty string if the
+     * specified filename has no file name extension.
+     */
     public static String getExtension(String filename) {
         return getExtension(filename, false);
     }
@@ -349,13 +377,13 @@ public final class FileUtils {
      * @return a unique filename that consists of the path, name, suffix and file name extension (if any).
      */
     public static String generateUniqueFilename(String path, String name, int beginSuffix) {
-        final String ext = name.lastIndexOf('.') != -1 ? getExtension(name) : StringUtils.EMPTY;
+        final String extension = getExtension(name, true);
 
-        if (!ext.isEmpty()) {
+        if (!extension.isEmpty()) {
             name = getDisplayName(name);
         }
 
-        return generateUniqueFilename(path, name, ext, beginSuffix);
+        return generateUniqueFilename(path, name, extension, beginSuffix);
     }
 
     /**
