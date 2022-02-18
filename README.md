@@ -55,7 +55,7 @@ For compression and decompression this application uses parts of the commons-com
 
 ## Remarks
 
-<b>This application is built for Java 11 and supports Kotlin, but is compatible with Java 8 as well. To build this application with Java 8, module-specific files have to be removed and the Maven configuration (pom.xml) needs to be updated.</b>
+<b>This application is built for Java 11 and upwards and supports Kotlin.</b>
 
 # Screenshots
 
