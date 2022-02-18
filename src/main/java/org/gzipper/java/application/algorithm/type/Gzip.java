@@ -16,17 +16,18 @@
  */
 package org.gzipper.java.application.algorithm.type;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.gzipper.java.application.algorithm.CompressorAlgorithm;
+import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.util.Settings;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Represents the GZIP archive type.
@@ -49,9 +50,11 @@ public class Gzip extends CompressorAlgorithm {
         int osValue = settings.getOs().getOsInfo().getValue();
         params.setOperatingSystem(osValue);
         params.setModificationTime(System.currentTimeMillis());
-        if (filename != null && !filename.contains(File.separator)) {
+
+        if (filename != null && !FileUtils.normalize(filename).contains("/")) {
             params.setFilename(filename);
         }
+
         return params;
     }
 

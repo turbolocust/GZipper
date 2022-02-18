@@ -990,8 +990,8 @@ public final class MainViewController extends BaseController {
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
 
             for (File file : _selectedFiles) {
-                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(
-                        archiveType, FileUtils.getPath(file), _outputFile + File.separator);
+                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+                        FileUtils.getPath(file), FileUtils.getPath(_outputFile)+ File.separator);
                 final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());

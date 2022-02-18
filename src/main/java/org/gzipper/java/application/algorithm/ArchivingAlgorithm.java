@@ -93,10 +93,11 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
                      : makeArchiveInputStream(bis)) {
 
             ArchiveEntry entry = ais.getNextEntry();
+            fullname = FileUtils.normalize(fullname);
 
-            final int startIndex = fullname.lastIndexOf(File.separator) + 1;
-            final File outputFolder = new File(location + fullname.substring(
-                    startIndex, fullname.lastIndexOf('.')));
+            final String displayName = FileUtils.getDisplayName(fullname);
+            final String outputFolderName = FileUtils.combine(location, displayName);
+            final File outputFolder = new File(outputFolderName);
 
             if (createOutputFolderIfNotExists(outputFolder)) {
                 Log.e(I18N.getString("errorCreatingDirectory.text", FileUtils.getPath(outputFolder)));

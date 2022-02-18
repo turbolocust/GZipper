@@ -16,19 +16,14 @@
  */
 package org.gzipper.java.application.util;
 
+import org.gzipper.java.application.model.ArchiveType;
+import org.gzipper.java.util.Log;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Predicate;
-
-import org.gzipper.java.util.Log;
 
 /**
  * Utility class that provides methods for different kinds of file operations.
@@ -39,6 +34,28 @@ public final class FileUtils {
 
     private FileUtils() {
         throw new AssertionError("Holds static members only");
+    }
+
+    private static String getArchiveTypeExtensionName(String filename) {
+        for (ArchiveType type : ArchiveType.values()) {
+            String[] extensionNames = type.getExtensionNames(false);
+            for (String extensionName : extensionNames) {
+                if (filename.endsWith(extensionName)) {
+                    return extensionName;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static class SizeValueHolder {
+
+        private long _size;
+
+        SizeValueHolder() {
+            _size = 0;
+        }
     }
 
     /**
@@ -120,36 +137,53 @@ public final class FileUtils {
         if (StringUtils.isNullOrEmpty(filename) || StringUtils.isNullOrEmpty(append)) {
             return StringUtils.EMPTY;
         }
-        // check if location ends with separator and add it if missing
+
+        filename = normalize(filename);
         final String absolutePath;
-        if (filename.endsWith(File.separator)) {
+
+        if (filename.endsWith("/")) {
             absolutePath = filename;
         } else {
-            absolutePath = filename + File.separator;
+            absolutePath = filename + "/";
         }
         return absolutePath + append;
     }
 
-    /**
-     * Returns the filename extension of a specified filename.
-     *
-     * @param filename the name of the file as string.
-     * @return filename extension including period or an empty string if the
-     * specified filename has no filename extension.
-     */
     public static String getExtension(String filename) {
-        int period = new File(filename).getName().indexOf('.');
-        return period > 0 ? filename.substring(period) : StringUtils.EMPTY;
+        return getExtension(filename, false);
     }
 
     /**
-     * Returns the name of the specified filename including its extension.
+     * Returns the file name extension(s) of a specified filename.
+     *
+     * @param filename                      the name of the file as string.
+     * @param considerArchiveTypeExtensions true to consider file name extensions of known archive types.
+     * @return file name extension(s) including period or an empty string if the
+     * specified filename has no file name extension.
+     */
+    public static String getExtension(String filename, boolean considerArchiveTypeExtensions) {
+        final String normalizedFilename = normalize(filename);
+
+        if (considerArchiveTypeExtensions) {
+            String extensionName = getArchiveTypeExtensionName(normalizedFilename);
+            if (extensionName != null) return extensionName;
+        }
+
+        final int lastIndexOfFileSeparator = normalizedFilename.lastIndexOf('/');
+        final int indexOfPeriod = normalizedFilename.indexOf('.', lastIndexOfFileSeparator);
+
+        return indexOfPeriod > 0 ? normalizedFilename.substring(indexOfPeriod) : StringUtils.EMPTY;
+    }
+
+    /**
+     * Returns the name of the specified filename including its file name extension.
      *
      * @param filename the name of the file as string.
      * @return the name of the file including its file name extension.
      */
     public static String getName(String filename) {
-        int lastSeparatorIndex = filename.lastIndexOf(File.separator);
+        filename = normalize(filename);
+        int lastSeparatorIndex = filename.lastIndexOf('/');
 
         if (lastSeparatorIndex == -1) {
             lastSeparatorIndex = 0; // no separator present
@@ -167,20 +201,22 @@ public final class FileUtils {
      * @return the display name of the file without its file name extension.
      */
     public static String getDisplayName(String filename) {
-        int lastSeparatorIndex = filename.lastIndexOf(File.separator);
-        int lastPeriodIndex = filename.lastIndexOf('.');
+        final String normalizedFilename = normalize(filename);
 
-        if (lastSeparatorIndex == -1) {
-            lastSeparatorIndex = 0; // no separator present
+        int lastIndexOfFileSeparator = normalizedFilename.lastIndexOf('/');
+        int lastIndexOfPeriod = filename.lastIndexOf('.');
+
+        if (lastIndexOfFileSeparator == -1) {
+            lastIndexOfFileSeparator = 0; // no separator present
         } else {
-            ++lastSeparatorIndex;
+            ++lastIndexOfFileSeparator;
         }
 
-        if (lastPeriodIndex == -1) {
-            lastPeriodIndex = filename.length();
+        if (lastIndexOfPeriod == -1) {
+            lastIndexOfPeriod = normalizedFilename.length();
         }
 
-        return filename.substring(lastSeparatorIndex, lastPeriodIndex);
+        return normalizedFilename.substring(lastIndexOfFileSeparator, lastIndexOfPeriod);
     }
 
     /**
@@ -226,6 +262,16 @@ public final class FileUtils {
             options = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
         }
         Files.copy(Paths.get(src), Paths.get(dst), options);
+    }
+
+    /**
+     * Normalizes the specified path. After the normalization, all file separators are equal to {@code /}.
+     *
+     * @param path the path to be normalized.
+     * @return a normalized version of the specified path.
+     */
+    public static String normalize(String path) {
+        return path.replace('\\', '/');
     }
 
     /**
@@ -288,8 +334,7 @@ public final class FileUtils {
      *
      * @param path the file path including only the directory.
      * @param name the name of the file of which to generate a unique version.
-     * @return a unique filename that consists of the path, name, suffix and
-     * filename extension (if any).
+     * @return a unique filename that consists of the path, name, suffix and file name extension (if any).
      */
     public static String generateUniqueFilename(String path, String name) {
         return generateUniqueFilename(path, name, 1);
@@ -301,15 +346,15 @@ public final class FileUtils {
      * @param path        the file path including only the directory.
      * @param name        the name of the file of which to generate a unique version.
      * @param beginSuffix the suffix to begin with (will be incremented).
-     * @return a unique filename that consists of the path, name, suffix and
-     * filename extension (if any).
+     * @return a unique filename that consists of the path, name, suffix and file name extension (if any).
      */
     public static String generateUniqueFilename(String path, String name, int beginSuffix) {
-        final String ext = name.contains(".")
-                ? getExtension(name) : StringUtils.EMPTY;
+        final String ext = name.lastIndexOf('.') != -1 ? getExtension(name) : StringUtils.EMPTY;
+
         if (!ext.isEmpty()) {
             name = getDisplayName(name);
         }
+
         return generateUniqueFilename(path, name, ext, beginSuffix);
     }
 
@@ -319,8 +364,7 @@ public final class FileUtils {
      * @param path the file path including only the directory.
      * @param name the name of the file of which to generate a unique version.
      * @param ext  the name of the file extension.
-     * @return a unique filename that consists of the path, name, suffix and
-     * filename extension.
+     * @return a unique filename that consists of the path, name, suffix and file name extension.
      */
     public static String generateUniqueFilename(String path, String name, String ext) {
         return generateUniqueFilename(path, name, ext, 1);
@@ -334,11 +378,13 @@ public final class FileUtils {
      * @param ext         the name of the file extension.
      * @param beginSuffix the suffix to begin with (will be incremented). This
      *                    parameter will be ignored if its value is less or equal zero.
-     * @return a unique filename that consists of the path, name, suffix and
-     * filename extension.
+     * @return a unique filename that consists of the path, name, suffix and file name extension.
      */
     public static String generateUniqueFilename(String path, String name, String ext, int beginSuffix) {
-        int suffix = beginSuffix > 0 ? beginSuffix : 1; // will be appended
+        path = normalize(path);
+        name = normalize(name);
+
+        int suffix = beginSuffix > 0 ? beginSuffix : 1; // to be appended
         boolean isFirst = true; // to ignore suffix on first check
         final StringBuilder filename = new StringBuilder();
 
@@ -347,11 +393,9 @@ public final class FileUtils {
         }
 
         final String trimmedPath = path.trim();
-
         String uniqueFilename = FileUtils.combine(trimmedPath, name + ext);
-        if (!FileUtils.isValid(uniqueFilename)) {
-            return uniqueFilename; // return as it is if not exists
-        }
+
+        if (!FileUtils.isValid(uniqueFilename)) return uniqueFilename; // return as it is if not exists
 
         do { // as long as file exists
             if (isFirst && beginSuffix <= 0) {
@@ -366,14 +410,5 @@ public final class FileUtils {
         } while (FileUtils.isValidFile(uniqueFilename));
 
         return uniqueFilename;
-    }
-
-    private static class SizeValueHolder {
-
-        private long _size;
-
-        SizeValueHolder() {
-            _size = 0;
-        }
     }
 }
