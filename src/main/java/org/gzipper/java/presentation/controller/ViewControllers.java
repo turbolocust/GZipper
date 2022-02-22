@@ -17,6 +17,7 @@
 package org.gzipper.java.presentation.controller;
 
 import java.io.IOException;
+
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,7 +31,6 @@ import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.util.Log;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public final class ViewControllers {
@@ -55,9 +55,9 @@ public final class ViewControllers {
     }
 
     /**
-     * Shows the about view in a separate window.
+     * Shows the about-view in a separate window.
      *
-     * @param theme the theme to be applied.
+     * @param theme        the theme to be applied.
      * @param hostServices the host services to be aggregated.
      * @return the controller for the view.
      */
@@ -81,8 +81,7 @@ public final class ViewControllers {
             aboutView.setTitle(I18N.getString("aboutViewTitle.text"));
             aboutView.setScene(loadScene(fxmlLoader, theme));
             aboutView.showAndWait();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
 
@@ -111,8 +110,7 @@ public final class ViewControllers {
             dropView.setTitle(I18N.getString("addMany.text"));
             dropView.setScene(loadScene(fxmlLoader, theme));
             dropView.showAndWait();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
 
@@ -154,8 +152,7 @@ public final class ViewControllers {
             hashView.setTitle(I18N.getString("hashViewTitle.text"));
             hashView.setScene(loadScene(fxmlLoader, theme));
             hashView.show();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
 
@@ -181,7 +178,7 @@ public final class ViewControllers {
      * the correct theme.
      *
      * @param loader the {@link FXMLLoader} to be used.
-     * @param theme the CSS theme to be applied.
+     * @param theme  the CSS theme to be applied.
      * @return the loaded {@link Scene}.
      * @throws IOException if an I/O error occurs.
      */
@@ -196,9 +193,9 @@ public final class ViewControllers {
      * will log the localized exception message and bring up an error dialog
      * using the specified theme.
      *
-     * @param ex the {@link Exception} to be logged.
+     * @param ex    the {@link Exception} to be logged.
      * @param theme the theme to be applied to the error dialog.
-     * @param icon the icon to be shown in the title.
+     * @param icon  the icon to be shown in the title.
      */
     private static void handleErrorLoadingView(Exception ex, CSS.Theme theme, Image icon) {
         Log.e(ex.getLocalizedMessage(), ex);

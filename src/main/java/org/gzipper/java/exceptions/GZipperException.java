@@ -56,7 +56,7 @@ public class GZipperException extends Exception {
      * Delegates error message and cause to its super class {@link Exception}.
      *
      * @param errorMessage the specified error message.
-     * @param cause the cause of this exception.
+     * @param cause        the cause of this exception.
      */
     public GZipperException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);
@@ -78,7 +78,7 @@ public class GZipperException extends Exception {
      * Creates a new {@link GZipperException} including a reason.
      *
      * @param reason the reason of this exception.
-     * @param msg the specified error message.
+     * @param msg    the specified error message.
      * @return a new instance of {@link GZipperException}.
      */
     public static GZipperException createWithReason(Reason reason, String msg) {
@@ -91,7 +91,7 @@ public class GZipperException extends Exception {
      * Creates a new {@link GZipperException} including a reason.
      *
      * @param reason the reason of this exception.
-     * @param cause the cause of this exception.
+     * @param cause  the cause of this exception.
      * @return a new instance of {@link GZipperException}.
      */
     public static GZipperException createWithReason(Reason reason, Throwable cause) {
@@ -104,8 +104,8 @@ public class GZipperException extends Exception {
      * Creates a new {@link GZipperException} including a reason.
      *
      * @param reason the reason of this exception.
-     * @param msg the specified error message.
-     * @param cause the cause of this exception.
+     * @param msg    the specified error message.
+     * @param cause  the cause of this exception.
      * @return a new instance of {@link GZipperException}.
      */
     public static GZipperException createWithReason(Reason reason, String msg, Throwable cause) {

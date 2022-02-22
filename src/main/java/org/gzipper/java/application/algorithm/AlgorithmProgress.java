@@ -19,11 +19,11 @@ package org.gzipper.java.application.algorithm;
 import java.io.File;
 import java.util.Objects;
 import java.util.function.Predicate;
+
 import org.gzipper.java.application.predicates.Predicates;
 import org.gzipper.java.application.util.FileUtils;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public final class AlgorithmProgress {
@@ -37,11 +37,6 @@ public final class AlgorithmProgress {
      * Total amount of bytes already read.
      */
     private long _totalBytesRead;
-
-    AlgorithmProgress(File... files) {
-        Objects.requireNonNull(files);
-        setTotalSize(Predicates.createAlwaysTrue(), files);
-    }
 
     AlgorithmProgress(Predicate<String> filter, File... files) {
         Objects.requireNonNull(filter);

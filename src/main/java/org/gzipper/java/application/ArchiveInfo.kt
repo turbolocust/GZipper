@@ -25,26 +25,27 @@ import java.io.File
  * @author Matthias Fussenegger
  */
 class ArchiveInfo internal constructor(
-        /**
-         * The type of the archive.
-         */
-        val archiveType: ArchiveType,
-        /**
-         * The full name of the archive.
-         */
-        var archiveName: String,
-        /**
-         * The compression level of the archive.
-         */
-        var level: Int,
-        /**
-         * The files to be compressed. May be <code>null</code> if decompression.
-         */
-        var files: List<File>?,
-        /**
-         * The output path either of the archive or the decompressed file(s).
-         */
-        var outputPath: String) {
+    /**
+     * The type of the archive.
+     */
+    val archiveType: ArchiveType,
+    /**
+     * The full name of the archive.
+     */
+    var archiveName: String,
+    /**
+     * The compression level of the archive.
+     */
+    var level: Int,
+    /**
+     * The files to be compressed. May be <code>null</code> if decompression.
+     */
+    var files: List<File>?,
+    /**
+     * The output path either of the archive or the decompressed file(s).
+     */
+    var outputPath: String
+) {
 
     override fun toString(): String {
         return """

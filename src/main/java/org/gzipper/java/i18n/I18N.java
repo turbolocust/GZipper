@@ -45,7 +45,7 @@ public final class I18N {
     /**
      * Returns the value that belongs to the specified key.
      *
-     * @param key the key as string.
+     * @param key  the key as string.
      * @param args optional format arguments.
      * @return the value that belongs to the key.
      */

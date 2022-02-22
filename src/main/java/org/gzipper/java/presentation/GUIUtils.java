@@ -19,6 +19,7 @@ package org.gzipper.java.presentation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
+
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -49,12 +50,11 @@ public final class GUIUtils {
                 clazz = Class.forName("com.sun.javafx.scene.control.skin.TableViewSkin");
                 method = clazz.getDeclaredMethod(methodName, TableColumn.class, int.class);
                 method.setAccessible(true);
-            } else {
-                /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
-                // does not work with Java 9 and above since module is not part of public API
             }
-        }
-        catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+
+            /* clazz = Class.forName("javafx.scene.control.skin.TableSkinUtils"); */
+            // does not work with Java 9 and above since module is not part of public API
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
             Log.e("Method lookup via reflection failed", ex);
         }
 
@@ -83,8 +83,7 @@ public final class GUIUtils {
                         if (column.isVisible()) {
                             COLUMN_AUTOFIT_METHOD.invoke(table.getSkin(), column, -1);
                         }
-                    }
-                    catch (IllegalAccessException | InvocationTargetException ex) {
+                    } catch (IllegalAccessException | InvocationTargetException ex) {
                         Log.e("Error invoking " + COLUMN_AUTOFIT_METHOD.getName(), ex);
                     }
                 });

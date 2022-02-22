@@ -18,11 +18,11 @@ package org.gzipper.java.application.hashing;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.util.Log;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public class MessageDigestProvider {
@@ -39,7 +39,7 @@ public class MessageDigestProvider {
      * @param algorithm the algorithm for the {@link MessageDigest}.
      * @return a new instance of {@link MessageDigestProvider}.
      * @throws NoSuchAlgorithmException if the specified algorithm (its name)
-     * does not exist.
+     *                                  does not exist.
      */
     public static MessageDigestProvider createProvider(
             MessageDigestAlgorithm algorithm) throws NoSuchAlgorithmException {
@@ -75,7 +75,7 @@ public class MessageDigestProvider {
      * whatever reason, does not exist, an empty result is returned.
      *
      * @param bytes the bytes to be processed.
-     * @param algo the algorithm to be used.
+     * @param algo  the algorithm to be used.
      * @return result object which holds the computed values.
      */
     public static MessageDigestResult computeHash(byte[] bytes, MessageDigestAlgorithm algo) {
@@ -84,8 +84,7 @@ public class MessageDigestProvider {
             final MessageDigest msgDigest = MessageDigest.getInstance(name);
             byte[] result = msgDigest.digest(bytes);
             return new MessageDigestResult(result, convertToHex(result));
-        }
-        catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             Log.e("Specified message digest algorithm does not exist", ex);
         }
         // return an empty result if something went wrong
@@ -95,7 +94,7 @@ public class MessageDigestProvider {
     /**
      * Updates the digest of the aggregated {@link MessageDigest}.
      *
-     * @param bytes the bytes to be processed.
+     * @param bytes  the bytes to be processed.
      * @param offset starting index in array.
      * @param length the length to be processed, starting at {@code offset}.
      */

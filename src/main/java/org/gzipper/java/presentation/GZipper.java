@@ -164,7 +164,7 @@ public final class GZipper extends Application {
     }
 
     @Override
-    public final void start(Stage stage) throws Exception {
+    public void start(Stage stage) throws Exception {
 
         initApplication(); // has to be the first call
 

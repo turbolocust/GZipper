@@ -72,7 +72,7 @@ public final class Log {
     /**
      * Logs a new error message including an exception.
      *
-     * @param msg the message to log.
+     * @param msg    the message to log.
      * @param thrown the exception to include.
      */
     public static void e(String msg, Throwable thrown) {
@@ -85,7 +85,7 @@ public final class Log {
     /**
      * Logs a new error message with an optional parameter.
      *
-     * @param msg the message to log.
+     * @param msg   the message to log.
      * @param param the optional parameter.
      */
     public static void e(String msg, Object param) {
@@ -97,7 +97,7 @@ public final class Log {
     /**
      * Logs a new error message with optional parameters.
      *
-     * @param msg the message to log.
+     * @param msg    the message to log.
      * @param params the optional parameters.
      */
     public static void e(String msg, Object... params) {
@@ -109,8 +109,8 @@ public final class Log {
     /**
      * Logs a new info message including an exception.
      *
-     * @param msg the message to log.
-     * @param thrown the exception to include.
+     * @param msg       the message to log.
+     * @param thrown    the exception to include.
      * @param uiLogging true to log to the UI as well.
      */
     public static void i(String msg, Throwable thrown, boolean uiLogging) {
@@ -123,8 +123,8 @@ public final class Log {
     /**
      * Logs a new info message with an optional parameter.
      *
-     * @param msg the message to log.
-     * @param param the optional parameter.
+     * @param msg       the message to log.
+     * @param param     the optional parameter.
      * @param uiLogging true to log to the UI as well.
      */
     public static void i(String msg, Object param, boolean uiLogging) {
@@ -136,9 +136,9 @@ public final class Log {
     /**
      * Logs a new info message with optional parameters.
      *
-     * @param msg the message to log.
+     * @param msg       the message to log.
      * @param uiLogging true to log to the UI as well.
-     * @param params the optional parameters.
+     * @param params    the optional parameters.
      */
     public static void i(String msg, boolean uiLogging, Object... params) {
         LogRecord record = new LogRecord(Level.INFO, msg);
@@ -149,8 +149,8 @@ public final class Log {
     /**
      * Logs a new warning message including an exception.
      *
-     * @param msg the message to log.
-     * @param thrown the exception to include.
+     * @param msg       the message to log.
+     * @param thrown    the exception to include.
      * @param uiLogging true to log to the UI as well.
      */
     public static void w(String msg, Throwable thrown, boolean uiLogging) {
@@ -163,8 +163,8 @@ public final class Log {
     /**
      * Logs a new warning message with an optional parameter.
      *
-     * @param msg the message to log.
-     * @param param the optional parameter.
+     * @param msg       the message to log.
+     * @param param     the optional parameter.
      * @param uiLogging true to log to the UI as well.
      */
     public static void w(String msg, Object param, boolean uiLogging) {
@@ -176,9 +176,9 @@ public final class Log {
     /**
      * Logs a new warning message with optional parameters.
      *
-     * @param msg the message to log.
+     * @param msg       the message to log.
      * @param uiLogging true to log to the UI as well.
-     * @param params the optional parameters.
+     * @param params    the optional parameters.
      */
     public static void w(String msg, boolean uiLogging, Object... params) {
         LogRecord record = new LogRecord(Level.WARNING, msg);
@@ -202,7 +202,7 @@ public final class Log {
      * Logs the specified {@link LogRecord} using both, the default logger and
      * the logger for UI output if {@code uiLogging} equals true.
      *
-     * @param record the {@link LogRecord} to be logged.
+     * @param record    the {@link LogRecord} to be logged.
      * @param uiLogging true to also log using the logger for UI.
      */
     private static void log(LogRecord record, boolean uiLogging) {

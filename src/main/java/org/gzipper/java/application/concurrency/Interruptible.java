@@ -17,7 +17,6 @@
 package org.gzipper.java.application.concurrency;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 @FunctionalInterface

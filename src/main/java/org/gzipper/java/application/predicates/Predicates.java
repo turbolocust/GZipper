@@ -19,7 +19,6 @@ package org.gzipper.java.application.predicates;
 import java.util.function.Predicate;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public final class Predicates {
@@ -32,7 +31,7 @@ public final class Predicates {
      * Creates a new {@link Predicate} which always evaluates to <b>true</b>.
      *
      * @param <T> the type of the object that is to be consumed by the predicate
-     * and thus the type of the input to the predicate.
+     *            and thus the type of the input to the predicate.
      * @return a new instance of {@link Predicate} with the specified type.
      */
     public static <T> Predicate<T> createAlwaysTrue() {
@@ -43,7 +42,7 @@ public final class Predicates {
      * Creates a new {@link Predicate} which always evaluates to <b>false</b>.
      *
      * @param <T> the type of the object that is to be consumed by the predicate
-     * and thus the type of the input to the predicate.
+     *            and thus the type of the input to the predicate.
      * @return a new instance of {@link Predicate} with the specified type.
      */
     public static <T> Predicate<T> createAlwaysFalse() {

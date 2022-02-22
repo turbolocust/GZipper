@@ -17,6 +17,7 @@
 package org.gzipper.java.presentation;
 
 import java.util.List;
+
 import javafx.scene.Scene;
 
 /**
@@ -32,7 +33,7 @@ public final class CSS {
 
     /**
      * Applies the specified {@link Theme} to the specified {@link Scene}.
-     *
+     * <p>
      * To be more precise, this method clears the list of style sheets of the
      * specified scene and adds the resource location of the respective CSS file
      * in external form to the list. This way the alternative theme will be

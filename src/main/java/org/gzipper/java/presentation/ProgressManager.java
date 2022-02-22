@@ -74,16 +74,6 @@ public class ProgressManager {
     }
 
     /**
-     * Constructs a new instance of this class and initializes the progress with
-     * the specified value.
-     *
-     * @param value the value to initialize the progress with.
-     */
-    public ProgressManager(double value) {
-        _progress = new AtomicLong(Double.doubleToLongBits(value));
-    }
-
-    /**
      * Gets the current value of the progress and sets a new value.
      *
      * @param value the value to be set.
@@ -101,7 +91,7 @@ public class ProgressManager {
      * considering all previously added identifiers. If an identifier does not
      * yet exist it will be created and mapped to the specified id.
      *
-     * @param id the identifier to be mapped to the progress value.
+     * @param id    the identifier to be mapped to the progress value.
      * @param value the updated progress value.
      * @return the total progress of all stored progress values.
      */

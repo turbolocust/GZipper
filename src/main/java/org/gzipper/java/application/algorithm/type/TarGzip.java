@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- *
  * Represents the TAR+GZ archive type.
  *
  * @author Matthias Fussenegger

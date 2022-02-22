@@ -60,7 +60,7 @@ public class Gzip extends CompressorAlgorithm {
 
     @Override
     protected CompressorInputStream makeCompressorInputStream(InputStream stream,
-            CompressorOptions options) throws IOException {
+                                                              CompressorOptions options) throws IOException {
         GzipCompressorInputStream gcis = new GzipCompressorInputStream(stream);
         options.setName(gcis.getMetaData().getFilename());
         return gcis;
@@ -68,7 +68,7 @@ public class Gzip extends CompressorAlgorithm {
 
     @Override
     protected CompressorOutputStream makeCompressorOutputStream(OutputStream stream,
-            CompressorOptions options) throws IOException {
+                                                                CompressorOptions options) throws IOException {
         // set additional parameters for compressor stream
         GzipParameters params = getDefaultGzipParams(options.getName());
         params.setCompressionLevel(compressionLevel);

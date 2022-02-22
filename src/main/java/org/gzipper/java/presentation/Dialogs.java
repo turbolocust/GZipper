@@ -19,6 +19,7 @@ package org.gzipper.java.presentation;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -32,7 +33,6 @@ import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public final class Dialogs {
@@ -44,17 +44,17 @@ public final class Dialogs {
     /**
      * Brings up a dialog using the specified parameters.
      *
-     * @param type the type of the alert.
-     * @param title the title of the dialog.
-     * @param header the header text of the dialog.
-     * @param content the content text of the dialog.
-     * @param theme the CSS theme to be applied.
-     * @param icon the icon to be shown in the title.
+     * @param type        the type of the alert.
+     * @param title       the title of the dialog.
+     * @param header      the header text of the dialog.
+     * @param content     the content text of the dialog.
+     * @param theme       the CSS theme to be applied.
+     * @param icon        the icon to be shown in the title.
      * @param buttonTypes the buttons to be added.
      * @return an {@link Optional} to indicate which button has been pressed.
      */
     public static Optional<ButtonType> showDialog(Alert.AlertType type, String title,
-            String header, String content, CSS.Theme theme, Image icon, ButtonType... buttonTypes) {
+                                                  String header, String content, CSS.Theme theme, Image icon, ButtonType... buttonTypes) {
 
         final Alert alert = new Alert(type, content, buttonTypes);
         final Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -70,15 +70,15 @@ public final class Dialogs {
     /**
      * Brings up a confirmation dialog using the specified parameters.
      *
-     * @param title the title of the dialog.
-     * @param header the header text of the dialog.
+     * @param title   the title of the dialog.
+     * @param header  the header text of the dialog.
      * @param content the content text of the dialog.
-     * @param theme the CSS theme to be applied.
-     * @param icon the icon to be shown in the title.
+     * @param theme   the CSS theme to be applied.
+     * @param icon    the icon to be shown in the title.
      * @return an {@link Optional} to indicate which button has been pressed.
      */
     public static Optional<ButtonType> showConfirmationDialog(String title,
-            String header, String content, CSS.Theme theme, Image icon) {
+                                                              String header, String content, CSS.Theme theme, Image icon) {
 
         final Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content,
                 ButtonType.YES, ButtonType.NO);
@@ -102,15 +102,15 @@ public final class Dialogs {
     /**
      * Brings up a {@link TextInputDialog} using the specified parameters.
      *
-     * @param title the title of the dialog.
-     * @param header the header text of the dialog.
+     * @param title   the title of the dialog.
+     * @param header  the header text of the dialog.
      * @param content the content text of the dialog.
-     * @param theme the CSS theme to be applied.
-     * @param icon the icon to be shown in the title.
+     * @param theme   the CSS theme to be applied.
+     * @param icon    the icon to be shown in the title.
      * @return an {@link Optional} which holds the input text as string.
      */
     public static Optional<String> showTextInputDialog(String title,
-            String header, String content, CSS.Theme theme, Image icon) {
+                                                       String header, String content, CSS.Theme theme, Image icon) {
 
         final TextInputDialog dialog = new TextInputDialog();
         final Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
@@ -133,7 +133,7 @@ public final class Dialogs {
      * result is a valid regular expression.
      *
      * @param theme the CSS theme to be applied.
-     * @param icon the icon to be shown in the title.
+     * @param icon  the icon to be shown in the title.
      * @return an {@link Optional} which holds the pattern as string.
      */
     public static Optional<String> showPatternInputDialog(CSS.Theme theme, Image icon) {
@@ -155,8 +155,7 @@ public final class Dialogs {
             try { // validate regex
                 Pattern.compile(text);
                 confirmButton.setDisable(false);
-            }
-            catch (PatternSyntaxException ex) {
+            } catch (PatternSyntaxException ex) {
                 Log.w(ex.getMessage(), false);
                 confirmButton.setDisable(true);
             }

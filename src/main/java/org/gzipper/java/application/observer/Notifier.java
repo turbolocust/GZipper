@@ -19,15 +19,15 @@ package org.gzipper.java.application.observer;
 /**
  * Simple observable which supports generic types.
  *
- * @author Matthias Fussenegger
  * @param <T> type of the value.
+ * @author Matthias Fussenegger
  */
 public interface Notifier<T> {
 
     /**
      * Each notifier should provide a unique identifier so it can be easier
      * recognized by any listener.
-     *
+     * <p>
      * This is mainly used to avoid recalculations using the {@code hashCode()}
      * method, which provides a hash code for this object.
      *
@@ -52,7 +52,7 @@ public interface Notifier<T> {
     /**
      * Replaces the currently associated value with the specified one, sets the
      * current status to changed and then notifies all attached listeners.
-     *
+     * <p>
      * To be more detailed, this default implementation first calls
      * {@link #setValue(java.lang.Object)}, then {@link #setChanged()} and last
      * but not least {@link #notifyListeners()}.

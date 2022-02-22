@@ -19,8 +19,8 @@ package org.gzipper.java.application.observer;
 /**
  * Simple observer which supports generic types.
  *
- * @author Matthias Fussenegger
  * @param <T> type of the value.
+ * @author Matthias Fussenegger
  */
 public interface Listener<T> {
 
@@ -28,7 +28,7 @@ public interface Listener<T> {
      * Called by a {@link Notifier} if its associated value has been updated.
      *
      * @param notifier the source of this call.
-     * @param value the updated value.
+     * @param value    the updated value.
      */
     void update(Notifier<T> notifier, T value);
 }

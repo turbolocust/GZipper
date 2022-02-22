@@ -18,6 +18,7 @@ package org.gzipper.java.application.hashing;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.gzipper.java.application.util.StringUtils;
 
 /**
@@ -46,7 +47,7 @@ public final class MessageDigestResult {
      *
      * @return the computed hash as an array of bytes.
      */
-    public final byte[] getHashedBytes() {
+    public byte[] getHashedBytes() {
         return _hashedBytes;
     }
 
@@ -55,7 +56,7 @@ public final class MessageDigestResult {
      *
      * @return the hexadecimal representation of the hash value.
      */
-    public final String getHashedValue() {
+    public String getHashedValue() {
         return _hashedValue;
     }
 

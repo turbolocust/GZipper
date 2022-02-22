@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- *
  * Represents the TAR archive type.
  *
  * @author Matthias Fussenegger
@@ -47,10 +46,10 @@ public class Tar extends ArchivingAlgorithm {
     /**
      * Constructs a new instance of this class using the specified values.
      *
-     * @param archiveType the archive type, which has to be a constant of
-     * {@link ArchiveStreamFactory}.
+     * @param archiveType     the archive type, which has to be a constant of
+     *                        {@link ArchiveStreamFactory}.
      * @param compressionType the compression type, which has to be a constant
-     * of {@link CompressorStreamFactory}.
+     *                        of {@link CompressorStreamFactory}.
      */
     public Tar(String archiveType, String compressionType) {
         super(archiveType, compressionType);

@@ -44,18 +44,18 @@ public final class TaskHandler implements AutoCloseable {
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public final synchronized Future<?> submit(Runnable task) {
+    public synchronized Future<?> submit(Runnable task) {
         return _executorService.submit(task);
     }
 
     /**
      * Executes the specified task.
      *
-     * @param <T> the type of the task's result.
+     * @param <T>  the type of the task's result.
      * @param task the task to be executed.
      * @return a {@link Future} which can be used to manipulate the task.
      */
-    public final synchronized <T> Future<T> submit(Callable<T> task) {
+    public synchronized <T> Future<T> submit(Callable<T> task) {
         return _executorService.submit(task);
     }
 

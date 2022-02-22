@@ -42,11 +42,11 @@ public interface CompressionAlgorithm extends Interruptible, Notifier<Integer> {
      * Compresses files using the algorithm of the concrete class with default
      * settings and stores an archive to the specified path.
      *
-     * @param files the files selected from the file chooser.
+     * @param files    the files selected from the file chooser.
      * @param location defines where to store the archive.
-     * @param name the name of the archive without the directory path.
-     * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException if an error related to the archiver occurs.
+     * @param name     the name of the archive without the directory path.
+     * @throws IOException         if an I/O error occurs.
+     * @throws ArchiveException    if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     void compress(File[] files, String location, String name)
@@ -58,8 +58,8 @@ public interface CompressionAlgorithm extends Interruptible, Notifier<Integer> {
      * {@link ArchiveInfo}.
      *
      * @param info POJO that holds information required for compression.
-     * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws IOException         if an I/O error occurs.
+     * @throws ArchiveException    if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     void compress(ArchiveInfo info)
@@ -71,8 +71,8 @@ public interface CompressionAlgorithm extends Interruptible, Notifier<Integer> {
      *
      * @param location the location where to extract the archive.
      * @param fullname the filename of the archive to extract.
-     * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws IOException         if an I/O error occurs.
+     * @throws ArchiveException    if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     void extract(String location, String fullname)
@@ -83,8 +83,8 @@ public interface CompressionAlgorithm extends Interruptible, Notifier<Integer> {
      * the files of the archive to the path specified in {@link ArchiveInfo}.
      *
      * @param info POJO that holds information required for extraction.
-     * @throws IOException if an I/O error occurs.
-     * @throws ArchiveException if an error related to the archiver occurs.
+     * @throws IOException         if an I/O error occurs.
+     * @throws ArchiveException    if an error related to the archiver occurs.
      * @throws CompressorException if an error related to the compressor occurs.
      */
     void extract(ArchiveInfo info)

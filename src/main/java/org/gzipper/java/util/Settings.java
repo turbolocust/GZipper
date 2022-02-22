@@ -37,7 +37,7 @@ public final class Settings {
 
     public static final String FALSE_STRING = "false";
     public static final String TRUE_STRING = "true";
-	
+
     /**
      * The actual properties file. Required to store away changed properties.
      */
@@ -66,7 +66,7 @@ public final class Settings {
      * Initializes this singleton class. This may only be called once.
      *
      * @param props the properties file to initialize this class with.
-     * @param os the current operating system.
+     * @param os    the current operating system.
      */
     public void init(File props, OperatingSystem os) {
         if (_props == null) {
@@ -76,7 +76,7 @@ public final class Settings {
                 _props = new Properties(_defaults);
 
                 try (final FileInputStream fis = new FileInputStream(props);
-                        final BufferedInputStream bis = new BufferedInputStream(fis)) {
+                     final BufferedInputStream bis = new BufferedInputStream(fis)) {
                     _props.load(bis);
                 } catch (IOException ex) {
                     Log.e(ex.getLocalizedMessage(), ex);
@@ -105,7 +105,7 @@ public final class Settings {
     /**
      * Sets a new property to {@link #_props}.
      *
-     * @param key the key of the property.
+     * @param key   the key of the property.
      * @param value the value of the property as string.
      * @return the previous value of the specified key.
      */
@@ -116,7 +116,7 @@ public final class Settings {
     /**
      * Sets a new property to {@link #_props}.
      *
-     * @param key the key of the property.
+     * @param key   the key of the property.
      * @param value the value of the property as boolean.
      * @return the previous value of the specified key.
      */

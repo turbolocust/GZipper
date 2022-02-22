@@ -70,7 +70,7 @@ public final class AppUtils {
      * <b>.tmp</b>. The file will be deleted on JVM termination.
      *
      * @param clazz the class of which to receive the resource path.
-     * @param name the name of the resource to receive.
+     * @param name  the name of the resource to receive.
      * @return the resource path of the specified class.
      * @throws URISyntaxException if URL conversion failed.
      */
@@ -99,8 +99,7 @@ public final class AppUtils {
                 resource = file.getPath();
                 file.deleteOnExit();
 
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }
         } else {

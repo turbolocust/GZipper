@@ -20,7 +20,6 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- *
  * @author Matthias Fussenegger
  */
 public final class HashViewTableModel {
@@ -41,31 +40,31 @@ public final class HashViewTableModel {
         _hashValue.bind(_hashValueProperty);
     }
 
-    public final String getFileName() {
+    public String getFileName() {
         return _fileName.get();
     }
 
-    public final String getFilePath() {
+    public String getFilePath() {
         return _filePath.get();
     }
 
-    public final String getHashValue() {
+    public String getHashValue() {
         return _hashValue.get();
     }
 
-    public final void setHashValue(String value) {
+    public void setHashValue(String value) {
         _hashValueProperty.setValue(value);
     }
 
-    public final ReadOnlyStringWrapper fileNameProperty() {
+    public ReadOnlyStringWrapper fileNameProperty() {
         return _fileName;
     }
 
-    public final ReadOnlyStringWrapper filePathProperty() {
+    public ReadOnlyStringWrapper filePathProperty() {
         return _filePath;
     }
 
-    public final ReadOnlyStringWrapper hashValueProperty() {
+    public ReadOnlyStringWrapper hashValueProperty() {
         return _hashValue;
     }
 
