@@ -16,8 +16,6 @@
  */
 package org.gzipper.java.presentation.controller;
 
-import java.io.IOException;
-
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,9 +24,11 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
-import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.CSS;
+import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.util.Log;
+
+import java.io.IOException;
 
 /**
  * @author Matthias Fussenegger

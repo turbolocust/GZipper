@@ -16,8 +16,6 @@
  */
 package org.gzipper.java.presentation;
 
-import org.gzipper.java.util.Log;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -29,6 +27,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.gzipper.java.util.Log;
 
 /**
  * Class for creating and displaying toast messages.

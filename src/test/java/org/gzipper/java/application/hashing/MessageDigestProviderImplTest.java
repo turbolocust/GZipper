@@ -16,9 +16,11 @@
  */
 package org.gzipper.java.application.hashing;
 
-import java.util.EnumMap;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.util.EnumMap;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *

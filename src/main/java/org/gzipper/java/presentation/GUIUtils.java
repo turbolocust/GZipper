@@ -16,15 +16,15 @@
  */
 package org.gzipper.java.presentation;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.regex.Pattern;
-
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.util.Log;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 
 /**
  * GUI utility class.

@@ -16,15 +16,15 @@
  */
 package org.gzipper.java.application.algorithm;
 
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.ArchiveInfo;
+import org.gzipper.java.application.concurrency.Interruptible;
+import org.gzipper.java.application.observer.Notifier;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Predicate;
-
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.application.observer.Notifier;
-import org.gzipper.java.application.ArchiveInfo;
-import org.gzipper.java.application.concurrency.Interruptible;
 
 /**
  * Any implementing class offers methods for compression and decompression.

@@ -16,16 +16,16 @@
  */
 package org.gzipper.java.application.algorithm;
 
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.gzipper.java.application.ArchiveInfo;
+import org.gzipper.java.application.observer.NotifierImpl;
+import org.gzipper.java.application.predicates.Predicates;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Predicate;
-
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.gzipper.java.application.observer.NotifierImpl;
-import org.gzipper.java.application.ArchiveInfo;
-import org.gzipper.java.application.predicates.Predicates;
 
 /**
  * Abstract class that offers generally used attributes and methods for

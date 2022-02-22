@@ -16,11 +16,11 @@
  */
 package org.gzipper.java.presentation.handler;
 
-import java.util.logging.LogRecord;
-import java.util.logging.StreamHandler;
-
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
+
+import java.util.logging.LogRecord;
+import java.util.logging.StreamHandler;
 
 /**
  * Handles the logging of information to text areas. An instance of this class

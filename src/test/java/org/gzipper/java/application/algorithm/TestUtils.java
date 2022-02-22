@@ -16,6 +16,10 @@
  */
 package org.gzipper.java.application.algorithm;
 
+import org.gzipper.java.application.model.OS;
+import org.gzipper.java.application.model.OperatingSystem;
+import org.gzipper.java.application.util.FileUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -25,9 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import org.gzipper.java.application.model.OS;
-import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.util.FileUtils;
 
 /**
  *

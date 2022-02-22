@@ -16,14 +16,6 @@
  */
 package org.gzipper.java.application.algorithm;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Iterator;
 import org.gzipper.java.application.algorithm.TestUtils.TestObject;
 import org.gzipper.java.application.algorithm.type.*;
 import org.gzipper.java.application.model.OperatingSystem;
@@ -34,8 +26,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import static org.junit.Assert.*;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Iterator;
+
+import static org.junit.Assert.*;
 
 /**
  * Test of {@link CompressionAlgorithm} interface and its realizations.

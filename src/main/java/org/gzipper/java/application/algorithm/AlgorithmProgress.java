@@ -16,12 +16,11 @@
  */
 package org.gzipper.java.application.algorithm;
 
+import org.gzipper.java.application.util.FileUtils;
+
 import java.io.File;
 import java.util.Objects;
 import java.util.function.Predicate;
-
-import org.gzipper.java.application.predicates.Predicates;
-import org.gzipper.java.application.util.FileUtils;
 
 /**
  * @author Matthias Fussenegger

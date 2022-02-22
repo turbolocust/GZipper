@@ -16,21 +16,7 @@
  */
 package org.gzipper.java.application.algorithm;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.*;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
@@ -39,6 +25,9 @@ import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.util.Log;
+
+import java.io.*;
+import java.util.Arrays;
 
 /**
  * @author Matthias Fussenegger

@@ -16,20 +16,13 @@
  */
 package org.gzipper.java.application.algorithm;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.exceptions.GZipperException;
+
+import java.io.*;
 
 /**
  * @author Matthias Fussenegger

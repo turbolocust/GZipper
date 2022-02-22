@@ -16,11 +16,11 @@
  */
 package org.gzipper.java.application.hashing;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import org.gzipper.java.application.util.StringUtils;
 import org.gzipper.java.util.Log;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Matthias Fussenegger

@@ -16,14 +16,6 @@
  */
 package org.gzipper.java.presentation.controller;
 
-import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,6 +31,9 @@ import javafx.scene.text.Text;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
+
+import java.net.URL;
+import java.util.*;
 
 /**
  * Controller for the FXML named "DropView.fxml".

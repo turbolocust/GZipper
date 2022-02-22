@@ -16,16 +16,11 @@
  */
 package org.gzipper.java.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.util.StringUtils;
+
+import java.io.*;
+import java.util.Properties;
 
 /**
  * Singleton that provides convenience when working with {@link Properties} and

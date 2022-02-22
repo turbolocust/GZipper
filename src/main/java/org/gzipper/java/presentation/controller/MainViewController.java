@@ -51,7 +51,6 @@ import org.gzipper.java.util.Settings;
 
 import java.io.File;
 import java.net.URL;
-
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;

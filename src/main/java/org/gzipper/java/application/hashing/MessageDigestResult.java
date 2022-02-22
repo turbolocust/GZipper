@@ -16,10 +16,10 @@
  */
 package org.gzipper.java.application.hashing;
 
+import org.gzipper.java.application.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.Objects;
-
-import org.gzipper.java.application.util.StringUtils;
 
 /**
  * Holds result values of message digest algorithms.

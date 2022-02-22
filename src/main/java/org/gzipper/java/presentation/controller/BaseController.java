@@ -16,15 +16,15 @@
  */
 package org.gzipper.java.presentation.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.gzipper.java.presentation.CSS;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The base controller each other controller should derive from.

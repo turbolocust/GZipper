@@ -16,9 +16,9 @@
  */
 package org.gzipper.java.presentation;
 
-import java.util.List;
-
 import javafx.scene.Scene;
+
+import java.util.List;
 
 /**
  * Class that allows global access to CSS related information.
@@ -46,8 +46,7 @@ public final class CSS {
         List<String> stylesheets = scene.getStylesheets();
         stylesheets.clear();
         if (theme != Theme.getDefault()) {
-            stylesheets.add(CSS.class.getResource(
-                    theme.getLocation()).toExternalForm());
+            stylesheets.add(CSS.class.getResource(theme.getLocation()).toExternalForm());
         }
     }
 
