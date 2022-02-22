@@ -394,7 +394,7 @@ public final class MainViewController extends BaseController {
                 if (!file.isDirectory() && FileUtils.getExtension(path).isEmpty()) {
                     path += _archiveFileExtension;
                 }
-                _outputPathTextField.setText(path);
+                setOutputPath(path);
                 Log.i("Output file set to: {0}", FileUtils.getPath(file), false);
             }
         }
@@ -413,26 +413,26 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleArchiveTypeComboBoxAction(ActionEvent evt) {
         if (evt.getSource().equals(_archiveTypeComboBox)) {
-            final ArchiveType type = _archiveTypeComboBox.getValue();
-            Log.i("Archive type selection change to: {0}", type, false);
-            if (type == ArchiveType.GZIP) {
+            var archiveType = _archiveTypeComboBox.getValue();
+            Log.i("Archive type selection change to: {0}", archiveType, false);
+            if (archiveType == ArchiveType.GZIP) {
                 performGzipSelectionAction();
             }
             if (_decompressRadioButton.isSelected()) {
                 resetSelectedFiles();
             } else { // update file extension
                 final String outputPathText = _outputPathTextField.getText();
-                final String fileExtension = type.getDefaultExtensionName();
+                final String fileExtension = archiveType.getDefaultExtensionName();
                 String outputPath;
                 if (outputPathText.endsWith(_archiveFileExtension)) {
-                    final int lastIndexOfExtension = outputPathText.lastIndexOf(_archiveFileExtension);
+                    int lastIndexOfExtension = outputPathText.lastIndexOf(_archiveFileExtension);
                     outputPath = outputPathText.substring(0, lastIndexOfExtension) + fileExtension;
                 } else if (!FileUtils.isValidDirectory(outputPathText)) {
                     outputPath = outputPathText + fileExtension;
                 } else {
                     outputPath = outputPathText;
                 }
-                _outputPathTextField.setText(outputPath);
+                setOutputPath(outputPath);
                 _archiveFileExtension = fileExtension;
             }
         }
@@ -441,7 +441,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
-            final String filename = _outputPathTextField.getText();
+            String filename = _outputPathTextField.getText();
             if (!FileUtils.containsIllegalChars(filename)) {
                 updateSelectedFile(new File(filename));
             }
@@ -451,7 +451,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleEnableLoggingCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableLoggingCheckMenuItem)) {
-            final boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
+            boolean enableLogging = _enableLoggingCheckMenuItem.isSelected();
             Settings.getInstance().setProperty("loggingEnabled", enableLogging);
             Log.setVerboseUiLogging(enableLogging);
         }
@@ -460,7 +460,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleEnableDarkThemeCheckMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_enableDarkThemeCheckMenuItem)) {
-            final boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
+            boolean enableTheme = _enableDarkThemeCheckMenuItem.isSelected();
             loadAlternativeTheme(enableTheme);
             Settings.getInstance().setProperty("darkThemeEnabled", enableTheme);
         }
@@ -483,18 +483,18 @@ public final class MainViewController extends BaseController {
         final File file;
 
         if (_compressRadioButton.isSelected() && _putIntoSeparateArchives) {
-            final DirectoryChooser dc = new DirectoryChooser();
-            dc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
-            file = dc.showDialog(primaryStage);
+            var directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle(I18N.getString("saveAsArchiveTitle.text"));
+            file = directoryChooser.showDialog(primaryStage);
         } else if (_compressRadioButton.isSelected()) {
-            final FileChooser fc = new FileChooser();
-            fc.setTitle(I18N.getString("saveAsArchiveTitle.text"));
-            _state.applyExtensionFilters(fc);
-            file = fc.showSaveDialog(primaryStage);
+            var fileChooser = new FileChooser();
+            fileChooser.setTitle(I18N.getString("saveAsArchiveTitle.text"));
+            _state.applyExtensionFilters(fileChooser);
+            file = fileChooser.showSaveDialog(primaryStage);
         } else {
-            final DirectoryChooser dc = new DirectoryChooser();
-            dc.setTitle(I18N.getString("saveAsPathTitle.text"));
-            file = dc.showDialog(primaryStage);
+            var directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle(I18N.getString("saveAsPathTitle.text"));
+            file = directoryChooser.showDialog(primaryStage);
         }
 
         return file;
@@ -566,6 +566,11 @@ public final class MainViewController extends BaseController {
         _putIntoSeparateArchives = false;
         _selectedFiles = Collections.emptyList();
         _startButton.setDisable(true);
+    }
+
+    private void setOutputPath(String outputPath) {
+        String osStyleFilePath = outputPath.replace('/', File.separatorChar);
+        _outputPathTextField.setText(osStyleFilePath);
     }
 
     private void updateSelectedFile(File file) {
@@ -726,9 +731,9 @@ public final class MainViewController extends BaseController {
         final String recentPath = settings.getProperty("recentPath");
 
         if (FileUtils.isValidDirectory(recentPath)) {
-            _outputPathTextField.setText(recentPath);
+            setOutputPath(recentPath);
         } else {
-            _outputPathTextField.setText(os.getDefaultUserDirectory());
+            setOutputPath(os.getDefaultUserDirectory());
         }
 
         _outputFile = new File(_outputPathTextField.getText());
@@ -908,8 +913,7 @@ public final class MainViewController extends BaseController {
             _archiveFileExtension = extName;
 
             if (FileUtils.isValidOutputFile(outputPath)) {
-                final String osStyleFilePath = outputPath.replace('/', File.separatorChar);
-                _outputPathTextField.setText(osStyleFilePath);
+                setOutputPath(outputPath);
                 return true;
             }
 
@@ -938,10 +942,10 @@ public final class MainViewController extends BaseController {
                 operations = new ArrayList<>(_selectedFiles.size());
 
                 if (_putIntoSeparateArchives) {
-                    infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
-                            _compressionLevel, _selectedFiles, outputPath);
+                    infos = ArchiveInfoFactory.createArchiveInfos(
+                            archiveType, _compressionLevel, _selectedFiles, outputPath);
                 } else if (_selectedFiles.size() == 1) {
-                    final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
+                    var info = ArchiveInfoFactory.createArchiveInfo(archiveType,
                             _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
                     infos = new ArrayList<>(1);
                     infos.add(info);
@@ -951,15 +955,17 @@ public final class MainViewController extends BaseController {
                 }
 
                 for (ArchiveInfo info : infos) {
-                    final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
+                    var builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                     builder.addListener(this).filterPredicate(_filterPredicate);
                     operations.add(builder.build());
                 }
             } else {
                 operations = new ArrayList<>(1);
-                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                        _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
-                final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
+                var info = ArchiveInfoFactory.createArchiveInfo(archiveType, _archiveName,
+                        _compressionLevel, _selectedFiles, _outputFile.getParent());
+                _archiveName = info.getArchiveName();
+                setOutputPath(FileUtils.combine(info.getOutputPath(), _archiveName));
+                var builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }
@@ -992,9 +998,9 @@ public final class MainViewController extends BaseController {
             List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
 
             for (File file : _selectedFiles) {
-                final ArchiveInfo info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                        FileUtils.getPath(file), FileUtils.getPath(_outputFile) + File.separator);
-                final ArchiveOperation.Builder builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
+                var info = ArchiveInfoFactory.createArchiveInfo(archiveType, FileUtils.getPath(file),
+                        FileUtils.getPath(_outputFile) + File.separator);
+                var builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
                 builder.addListener(this).filterPredicate(_filterPredicate);
                 operations.add(builder.build());
             }
