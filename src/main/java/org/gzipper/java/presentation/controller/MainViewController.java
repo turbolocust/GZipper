@@ -19,7 +19,6 @@ package org.gzipper.java.presentation.controller;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -45,6 +44,7 @@ import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.ProgressManager;
+import org.gzipper.java.presentation.TaskGroup;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
@@ -53,8 +53,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -87,10 +85,13 @@ public final class MainViewController extends BaseController {
     private final TaskHandler _taskHandler;
 
     /**
-     * Map consisting of {@link Future} objects representing the currently
-     * active tasks.
+     * Holds the currently active tasks (or operations).
      */
-    private final ConcurrentMap<Integer, Future<?>> _activeTasks;
+    private final TaskGroup _activeTasks;
+
+    public TaskGroup getActiveTasks() {
+        return _activeTasks;
+    }
 
     /**
      * The currently active state.
@@ -103,8 +104,8 @@ public final class MainViewController extends BaseController {
     private File _outputFile;
 
     /**
-     * A list consisting of the files that have been selected by the user. These
-     * can either be files to be packed or archives to be extracted.
+     * A list consisting of the files that have been selected by the user.
+     * These can either be files to be packed or archives to be extracted.
      */
     private List<File> _selectedFiles;
 
@@ -196,7 +197,7 @@ public final class MainViewController extends BaseController {
         super(theme, hostServices);
         _archiveName = DEFAULT_ARCHIVE_NAME;
         _compressionLevel = Deflater.DEFAULT_COMPRESSION;
-        _activeTasks = new ConcurrentHashMap<>();
+        _activeTasks = new TaskGroup();
         _taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
@@ -240,7 +241,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
-            cancelActiveTasks();
+            _activeTasks.cancelTasks();
             exit();
         }
     }
@@ -326,12 +327,15 @@ public final class MainViewController extends BaseController {
 
                     final String recentPath = FileUtils.getParent(outputPath);
                     Settings.getInstance().setProperty("recentPath", recentPath);
-                    final ArchiveType archiveType = _archiveTypeComboBox.getValue();
-                    for (ArchiveOperation operation : _state.initOperation(archiveType)) {
-                        Log.i("Operation started using the following archive info: {0}",
+                    final var archiveType = _archiveTypeComboBox.getValue();
+                    final var operations = _state.initOperation(archiveType);
+
+                    for (var operation : operations) {
+                        Log.i("Starting operation using the following archive info: {0}",
                                 operation.getArchiveInfo().toString(), false);
-                        _state.performOperation(operation);
                     }
+
+                    _state.performOperations(operations.toArray(new ArchiveOperation[0]));
                 } else {
                     Log.w(I18N.getString("invalidOutputPath.text"), true);
                 }
@@ -344,7 +348,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            cancelActiveTasks();
+            _activeTasks.cancelTasks();
         }
     }
 
@@ -517,26 +521,24 @@ public final class MainViewController extends BaseController {
         }
     }
 
-    private void bindUIControls(Task<?> task) {
+    private void bindUIControls() {
+        if (_startButton.disableProperty().isBound()) return;
 
-        final ReadOnlyBooleanProperty running = task.runningProperty();
+        final var runningProperty = _activeTasks.anyTasksPresentProperty();
 
-        // controls
-        _startButton.disableProperty().bind(running);
-        _abortButton.disableProperty().bind(Bindings.not(running));
-        _compressRadioButton.disableProperty().bind(running);
-        _decompressRadioButton.disableProperty().bind(running);
-        _archiveTypeComboBox.disableProperty().bind(running);
-        _saveAsButton.disableProperty().bind(running);
-        _selectFilesButton.disableProperty().bind(running);
-        _addManyFilesMenuItem.disableProperty().bind(running);
-        // progress bar
-        _progressBar.visibleProperty().bind(running);
-        _progressText.visibleProperty().bind(running);
+        _startButton.disableProperty().bind(runningProperty);
+        _abortButton.disableProperty().bind(Bindings.not(runningProperty));
+        _compressRadioButton.disableProperty().bind(runningProperty);
+        _decompressRadioButton.disableProperty().bind(runningProperty);
+        _archiveTypeComboBox.disableProperty().bind(runningProperty);
+        _saveAsButton.disableProperty().bind(runningProperty);
+        _selectFilesButton.disableProperty().bind(runningProperty);
+        _addManyFilesMenuItem.disableProperty().bind(runningProperty);
+        _progressBar.visibleProperty().bind(runningProperty);
+        _progressText.visibleProperty().bind(runningProperty);
     }
 
     private void unbindUIControls() {
-        // controls
         _startButton.disableProperty().unbind();
         _abortButton.disableProperty().unbind();
         _compressRadioButton.disableProperty().unbind();
@@ -545,7 +547,6 @@ public final class MainViewController extends BaseController {
         _selectFilesButton.disableProperty().unbind();
         _saveAsButton.disableProperty().unbind();
         _addManyFilesMenuItem.disableProperty().unbind();
-        // progress bar
         _progressBar.visibleProperty().unbind();
         _progressText.visibleProperty().unbind();
     }
@@ -589,19 +590,6 @@ public final class MainViewController extends BaseController {
     //</editor-fold>
 
     //<editor-fold desc="Methods related to archiving job">
-
-    /**
-     * Cancels all currently active tasks.
-     */
-    public void cancelActiveTasks() {
-        if (!MapUtils.isNullOrEmpty(_activeTasks)) {
-            _activeTasks.keySet().stream().map(_activeTasks::get)
-                    .filter((task) -> (!task.cancel(true))).forEachOrdered((task) -> {
-                        // log error message only when cancellation failed
-                        Log.e("Task cancellation failed for {0}", task.hashCode());
-                    });
-        }
-    }
 
     /**
      * Initializes the archiving job by creating the required {@link Task}. This
@@ -684,7 +672,6 @@ public final class MainViewController extends BaseController {
         _activeTasks.remove(task.hashCode());
         if (_activeTasks.isEmpty()) {
             unbindUIControls();
-            _state.refresh();
             _progressBar.setProgress(0d); // reset
             _progressText.setText(StringUtils.EMPTY);
         }
@@ -763,19 +750,17 @@ public final class MainViewController extends BaseController {
     private abstract class ArchivingState implements Listener<Integer> {
 
         /**
-         * Holds the current progress or {@code -1d}. The current progress is
-         * retrieved by the JavaFX thread to update the progress in the UI. A
-         * new task is only submitted to the JavaFX thread if the value is
-         * {@code -1d}. This avoids an unresponsive UI since the JavaFX thread
-         * will not be flooded with new tasks.
-         */
-        private final ProgressManager _progressManager = new ProgressManager();
-
-        /**
          * Converts percentage values to string objects. See method
          * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Integer)}.
          */
         private final PercentageStringConverter _converter = new PercentageStringConverter();
+
+        /**
+         * Holds the current progress or {@code -1d}. The current progress is retrieved by the UI thread to update
+         * the progress in the UI. A new task is only submitted to the UI thread if the value is {@code -1d}.
+         * This avoids an unresponsive UI since the UI thread will not be flooded with new tasks.
+         */
+        private ProgressManager _progressManager;
 
         /**
          * Used to filter files or archive entries when processing archives.
@@ -838,26 +823,29 @@ public final class MainViewController extends BaseController {
         }
 
         /**
-         * Refreshes this state, e.g. clears the state of the progress manager.
-         */
-        void refresh() {
-            _progressManager.reset();
-        }
-
-        /**
-         * Performs the specified {@link ArchiveOperation}.
+         * Performs the specified array of {@link ArchiveOperation} instances.
          *
-         * @param operation the {@link ArchiveOperation} to be performed.
+         * @param operations the {@link ArchiveOperation} instances to be performed.
          */
-        void performOperation(ArchiveOperation operation) {
-            if (operation != null) {
-                Task<Boolean> task = initArchivingJob(operation);
-                final ArchiveInfo info = operation.getArchiveInfo();
-                Log.i(I18N.getString("operationStarted.text"), true, operation,
-                        info.getArchiveType().getDisplayName());
-                Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
-                bindUIControls(task); // do this before submitting task
-                _activeTasks.put(task.hashCode(), _taskHandler.submit(task));
+        void performOperations(ArchiveOperation... operations) {
+            if (operations == null || operations.length == 0) return;
+
+            _progressManager = new ProgressManager(operations.length);
+
+            for (var operation : operations) {
+                if (operation != null) {
+                    Task<Boolean> task = initArchivingJob(operation);
+                    final ArchiveInfo info = operation.getArchiveInfo();
+
+                    Log.i(I18N.getString("operationStarted.text"), true, operation,
+                            info.getArchiveType().getDisplayName());
+                    Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
+
+                    bindUIControls();
+
+                    var future = _taskHandler.submit(task);
+                    _activeTasks.put(task.hashCode(), future);
+                }
             }
         }
 
@@ -867,11 +855,9 @@ public final class MainViewController extends BaseController {
                 notifier.detach(this);
             } else {
                 double progress = _progressManager.updateProgress(notifier.getId(), value);
-                // update progress and execute on JavaFX thread if not busy
                 if (_progressManager.getAndSetProgress(progress) == ProgressManager.SENTINEL) {
                     Platform.runLater(() -> {
-                        double totalProgress = _progressManager
-                                .getAndSetProgress(ProgressManager.SENTINEL);
+                        double totalProgress = _progressManager.getAndSetProgress(ProgressManager.SENTINEL);
                         if (totalProgress > _progressBar.getProgress()) {
                             _progressBar.setProgress(totalProgress);
                             _progressText.setText(_converter.toString(totalProgress));
@@ -920,11 +906,11 @@ public final class MainViewController extends BaseController {
         }
 
         @Override
-        public void performOperation(ArchiveOperation operation) {
+        public void performOperations(ArchiveOperation... operations) {
             if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
-                super.performOperation(operation);
+                super.performOperations(operations);
             } else {
-                Log.e("Operation cannot be started as no files have been specified");
+                Log.e("Operation(s) cannot be started, because no files have been specified");
                 Log.i(I18N.getString("noFilesSelectedWarning.text"), true);
             }
         }
@@ -981,11 +967,11 @@ public final class MainViewController extends BaseController {
         }
 
         @Override
-        public void performOperation(ArchiveOperation operation) {
+        public void performOperations(ArchiveOperation... operations) {
             if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
-                super.performOperation(operation);
+                super.performOperations(operations);
             } else {
-                Log.e("Operation cannot be started because an invalid path has been specified");
+                Log.e("Operation(s) cannot be started, because an invalid path has been specified");
                 Log.w(I18N.getString("outputPathWarning.text"), true);
                 _outputPathTextField.requestFocus();
             }

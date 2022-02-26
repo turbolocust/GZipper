@@ -21,19 +21,16 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Manages progress values and calculates the total progress on an update. Also
- * holds the current progress, which can be a sentinel value. Besides the
- * calculation of the total progress, the purpose of this class is to provide a
- * solution for the flooding of the UI thread, which can be caused by too many
- * frequent updates of the progress value itself. With this solution, the UI may
- * only be updated if the current progress is set to the sentinel value. The UI
- * thread should then update the progress visually and reset the progress value
- * to the sentinel value. Basically, this behavior is similar to a lock.
+ * Manages progress values and calculates the total progress on an update. Also holds the current progress, which can
+ * be a sentinel value. Beside calculating the total progress, the purpose of this class is to provide a solution for
+ * the flooding of the UI thread, which can be caused by too many frequent updates of the progress value itself.
+ * With this solution, the UI may only be updated if the current progress is set to the sentinel value. The UI
+ * thread should then update the progress visually and reset the progress value to the sentinel value. Basically,
+ * this behavior is similar to locking.
  *
  * <p>
- * To achieve the latter of the above explanation this class provides the
- * {@link #getAndSetProgress(double)} method to get a new value while setting
- * another one with the same call.
+ * To achieve the latter of the above explanation, this class provides the {@link #getAndSetProgress(double)} method
+ * to get a new value while setting another one with the same call.
  * </p>
  *
  * <blockquote><pre>
@@ -56,6 +53,11 @@ public class ProgressManager {
     public static final double SENTINEL = -1d;
 
     /**
+     * The total number of operations that are to be tracked.
+     */
+    private final int _totalOperations;
+
+    /**
      * Holds the current progress.
      */
     private final AtomicLong _progress;
@@ -65,11 +67,19 @@ public class ProgressManager {
      */
     private final ConcurrentMap<Integer, Double> _progressMap = new ConcurrentHashMap<>();
 
+    private double calculateProgress(Integer id, double value) {
+        _progressMap.merge(id, value, (oldValue, newValue) -> newValue);
+        double totalProgress = _progressMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        return totalProgress / _totalOperations / 100d;
+    }
+
     /**
-     * Constructs a new instance of this class and initializes the progress with
-     * {@link #SENTINEL}.
+     * Constructs a new instance of this class and initializes the progress with {@link #SENTINEL}.
      */
-    public ProgressManager() {
+    public ProgressManager(int totalOperations) {
+        if (totalOperations <= 0) throw new IllegalArgumentException("Total operations must be greater than zero.");
+
+        _totalOperations = totalOperations;
         _progress = new AtomicLong(Double.doubleToLongBits(SENTINEL));
     }
 
@@ -97,18 +107,5 @@ public class ProgressManager {
      */
     public double updateProgress(Integer id, double value) {
         return calculateProgress(id, value);
-    }
-
-    /**
-     * Removes (clears) all progress mappings.
-     */
-    public void reset() {
-        _progressMap.clear();
-    }
-
-    private double calculateProgress(Integer id, double value) {
-        _progressMap.merge(id, value, (oldValue, newValue) -> newValue);
-        double totalProgress = _progressMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        return (totalProgress /= _progressMap.size()) / 100d;
     }
 }

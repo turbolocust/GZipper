@@ -216,8 +216,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
             _archiveInfo = info;
             _compressionMode = compressionMode;
             if ((_algorithm = init(info)) == null) {
-                throw new GZipperException(new NullPointerException(
-                        "Algorithm could not be determined"));
+                throw new GZipperException(new NullPointerException("Algorithm could not be determined"));
             }
         }
 

@@ -106,13 +106,13 @@ public final class GZipper extends Application {
         // properly shut down application when closing/hiding window
         stage.setOnCloseRequest((WindowEvent evt) -> {
             evt.consume();
-            controller.cancelActiveTasks();
+            controller.getActiveTasks().cancelTasks();
             exitApplication();
         });
 
         stage.setOnHiding((WindowEvent evt) -> {
             evt.consume();
-            controller.cancelActiveTasks();
+            controller.getActiveTasks().cancelTasks();
             exitApplication();
         });
 
