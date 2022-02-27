@@ -234,7 +234,7 @@ public final class MainViewController extends BaseController {
         if (compressionStrength != null) {
             _compressionLevel = (int) compressionStrength;
             final String msg = I18N.getString("compressionLevelChange.text") + " ";
-            Log.i("{0}{1}", true, msg, selectedItem.getText());
+            Log.i("{0}{1} {2}", true, msg, selectedItem.getText(), "(Deflate)");
         }
     }
 
