@@ -34,17 +34,36 @@
 ## Compatibility
 
 <b>The application has been tested on these platforms:</b>
- * Windows
- * Unix-based systems
-   - make sure to install the JavaFX components
-   - `sudo apt-get install openjfx`
+ * Windows 10
+ * Ubuntu (20.04)
+
+## Quick Start
+
+In order to quickly launch the application, run either of the following scripts:
+* `run_gzipper.bat`
+* `run_gzipper.sh`
+
+On Linux-based systems, make sure that the script file is executable by running the following:
+
+```shell
+chmod +x run_gzipper.sh
+```
+
+You may want to alter the script to point to a different Java home directory.<br />
+The scripts assume that a compatible Java version is available in `PATH`.<br />
+
+If there is a `JAVA_HOME` environment variable set, then the script `run_gzipper.bat` may e.g. be altered to:
+
+```bash
+start /min PowerShell.exe -WindowStyle Hidden "& "$env:JAVA_HOME\bin\java" --module-path ..."
+```
 
 ## Command line arguments
 
-``--launch_mode``
-- ``application``
-  - Default. Launches full application.
-- ``hashview``
+`--launch_mode`
+- `application`
+  - Default. Launches the entire application.
+- `hashview`
   - Launches hash (message digest) view only.
 
 ## Attribution
@@ -55,7 +74,7 @@ For compression and decompression this application uses parts of the commons-com
 
 ## Remarks
 
-<b>This application is built for Java 11 and upwards and supports Kotlin.</b>
+This application is built for Java 11 and upwards and supports Kotlin.
 
 # Screenshots
 
