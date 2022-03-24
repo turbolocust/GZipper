@@ -74,7 +74,7 @@ For compression and decompression this application uses parts of the commons-com
 
 ## Remarks
 
-This application is built for Java 11 and upwards and supports Kotlin.
+This application is built for Java 11 and supports Kotlin. In theory, it should work fine with higher Java versions. To use it with a higher version, the JavaFX dependencies may have to be updated (see pom.xml).
 
 # Screenshots
 
