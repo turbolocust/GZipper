@@ -3,7 +3,6 @@
   <h1 align="center">GZipper</h1>
 </p>
 
-![Travis CI](https://travis-ci.org/turbolocust/GZipper.svg?branch=master)
 ![Java CI](https://github.com/turbolocust/GZipper/workflows/Java%20CI/badge.svg?branch=master)
 
 ## Features
