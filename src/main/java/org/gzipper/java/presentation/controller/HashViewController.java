@@ -64,12 +64,12 @@ import java.util.*;
 public final class HashViewController extends BaseController implements Interruptible {
 
     /**
-     * Default buffer size when reading large files. Currently 1 mebibyte(s).
+     * Default buffer size when reading large files. Currently, set to 1 mebibyte.
      */
     private static final int BUFFER_SIZE = 1024 * 1024;
 
     /**
-     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently set to 100 Mebibytes.
+     * Threshold at which {@link #BUFFER_SIZE} will be used. Currently, set to 100 Mebibyte.
      */
     private static final int LARGE_FILE_THRESHOLD = 1024 * 1024 * 100;
 
@@ -190,12 +190,9 @@ public final class HashViewController extends BaseController implements Interrup
     }
 
     private void initTableCells() {
-        _fileNameColumn.setCellValueFactory(data
-                -> new ReadOnlyStringWrapper(data.getValue().getFileName()));
-        _filePathColumn.setCellValueFactory(data
-                -> new ReadOnlyStringWrapper(data.getValue().getFilePath()));
-        _hashValueColumn.setCellValueFactory(data
-                -> new ReadOnlyStringWrapper(data.getValue().getHashValue()));
+        _fileNameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getFileName()));
+        _filePathColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getFilePath()));
+        _hashValueColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getHashValue()));
         setCellFactory(_fileNameColumn);
         setCellFactory(_filePathColumn);
         setCellFactory(_hashValueColumn);
@@ -306,8 +303,7 @@ public final class HashViewController extends BaseController implements Interrup
             if (file.isFile()) { // folders are not supported
                 final MessageDigestAlgorithm algorithm = _algorithm.get();
                 if (file.length() > LARGE_FILE_THRESHOLD) {
-                    final MessageDigestProvider provider
-                            = MessageDigestProvider.createProvider(algorithm);
+                    final MessageDigestProvider provider = MessageDigestProvider.createProvider(algorithm);
                     try (FileInputStream fis = new FileInputStream(file);
                          BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE)) {
                         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -443,8 +439,7 @@ public final class HashViewController extends BaseController implements Interrup
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // set up combo box
-        final MessageDigestAlgorithm selectedAlgorithm
-                = MessageDigestAlgorithm.SHA_256;
+        final MessageDigestAlgorithm selectedAlgorithm = MessageDigestAlgorithm.SHA_256;
         _algorithmComboBox.getItems().addAll(MessageDigestAlgorithm.values());
         _algorithmComboBox.valueProperty().bindBidirectional(_algorithm);
         _algorithm.setValue(selectedAlgorithm);
