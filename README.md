@@ -3,7 +3,6 @@
   <h1 align="center">GZipper</h1>
 </p>
 
-![Travis CI](https://travis-ci.org/turbolocust/GZipper.svg?branch=master)
 ![Java CI](https://github.com/turbolocust/GZipper/workflows/Java%20CI/badge.svg?branch=master)
 
 ## Features
@@ -36,6 +35,8 @@
 <b>The application has been tested on these platforms:</b>
  * Windows 10
  * Ubuntu (20.04)
+
+*Note, that it should work on newer versions of these operating systems as well if a compatible JRE is used, but it is not guaranteed. The same is true for different Linux distributions.*
 
 ## Quick Start
 
@@ -74,7 +75,8 @@ For compression and decompression this application uses parts of the commons-com
 
 ## Remarks
 
-This application is built for Java 11 and supports Kotlin. In theory, it should work fine with higher Java versions. To use it with a higher version, the JavaFX dependencies may have to be updated (see pom.xml).
+This application is built for Java 11 and higher and supports Kotlin.<br />
+Since version 2.0.0, the main (or master) branch targets Java 17.
 
 # Screenshots
 

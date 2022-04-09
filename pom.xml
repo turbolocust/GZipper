@@ -6,7 +6,7 @@
 
     <groupId>org.gzipper</groupId>
     <artifactId>GZipper</artifactId>
-    <version>1.5.2</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>GZipper</name>
@@ -134,7 +134,7 @@
                 <!-- Maven surefire plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
@@ -160,28 +160,28 @@
             <!-- JavaFX Base -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>11.0.2</version>
+            <version>17.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <!-- JavaFX Controls -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11.0.2</version>
+            <version>17.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <!-- JavaFX FXML -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11.0.2</version>
+            <version>17.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <!-- JavaFX graphics -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>11.0.2</version>
+            <version>17.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -198,7 +198,7 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
@@ -210,8 +210,8 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <kotlin.version>1.5.32</kotlin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <kotlin.version>1.6.10</kotlin.version>
     </properties>
 </project>

@@ -29,7 +29,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="8.0">
                     <children>
                         <CheckBox fx:id="_appendFilesCheckBox" mnemonicParsing="false" text="%appendFiles.text" wrapText="true" />
-                        <CheckBox fx:id="_lowerCaseCheckBox" mnemonicParsing="false" onAction="#handleLowerCaseCheckBoxAction" text="%lowerCase.text" />
+                        <CheckBox fx:id="_lowerCaseCheckBox" selected="true" mnemonicParsing="false" onAction="#handleLowerCaseCheckBoxAction" text="%lowerCase.text" />
                     </children>
                     <padding>
                         <Insets left="8.0" />
