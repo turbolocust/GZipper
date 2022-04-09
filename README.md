@@ -36,6 +36,8 @@
  * Windows 10
  * Ubuntu (20.04)
 
+*Note, that it should work on newer versions of these operating systems as well if a compatible JRE is used, but it is not guaranteed. The same is true for different Linux distributions.*
+
 ## Quick Start
 
 In order to quickly launch the application, run either of the following scripts:
@@ -73,7 +75,8 @@ For compression and decompression this application uses parts of the commons-com
 
 ## Remarks
 
-This application is built for Java 11 and upwards and supports Kotlin.
+This application is built for Java 11 and higher and supports Kotlin.<br />
+Since version 2.0.0, the main (or master) branch targets Java 17.
 
 # Screenshots
 
