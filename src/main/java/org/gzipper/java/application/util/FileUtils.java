@@ -190,6 +190,7 @@ public final class FileUtils {
      * specified filename has no file name extension.
      */
     public static String getExtension(String filename, boolean considerArchiveTypeExtensions) {
+
         final String normalizedFilename = normalize(filename);
 
         if (considerArchiveTypeExtensions) {
@@ -229,6 +230,7 @@ public final class FileUtils {
      * @return the display name of the file without its file name extension.
      */
     public static String getDisplayName(String filename) {
+
         final String normalizedFilename = normalize(filename);
 
         int lastIndexOfFileSeparator = normalizedFilename.lastIndexOf('/');
@@ -300,6 +302,22 @@ public final class FileUtils {
      */
     public static String normalize(String path) {
         return path.replace('\\', '/');
+    }
+
+    /**
+     * Removes the extension from the specified {@param filename}.
+     *
+     * @param filename the file name to remove the extension from.
+     * @return the specified file name without the extension (if any).
+     */
+    public static String removeExtension(String filename) {
+
+        final String normalizedFilename = normalize(filename);
+
+        final int lastIndexOfFileSeparator = normalizedFilename.lastIndexOf('/');
+        final int indexOfPeriod = normalizedFilename.indexOf('.', lastIndexOfFileSeparator);
+
+        return indexOfPeriod > 0 ? normalizedFilename.substring(0, indexOfPeriod) : filename;
     }
 
     /**
@@ -377,10 +395,11 @@ public final class FileUtils {
      * @return a unique filename that consists of the path, name, suffix and file name extension (if any).
      */
     public static String generateUniqueFilename(String path, String name, int beginSuffix) {
+
         final String extension = getExtension(name, true);
 
         if (!extension.isEmpty()) {
-            name = getDisplayName(name);
+            name = removeExtension(name);
         }
 
         return generateUniqueFilename(path, name, extension, beginSuffix);
