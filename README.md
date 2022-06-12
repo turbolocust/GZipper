@@ -76,7 +76,7 @@ For compression and decompression this application uses parts of the commons-com
 ## Remarks
 
 This application is built for Java 11 and higher and supports Kotlin.<br />
-Since version 2.0.0, the main (or master) branch targets Java 17.
+Since version 2.0.0, the main (or master) branch targets Java 17 (>= 17.0.2).
 
 # Screenshots
 
