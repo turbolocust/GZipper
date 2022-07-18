@@ -150,6 +150,8 @@ public final class MainViewController extends BaseController {
     @FXML
     private MenuItem _deleteMenuItem;
     @FXML
+    private MenuItem _startOperationMenuItem;
+    @FXML
     private MenuItem _addManyFilesMenuItem;
     @FXML
     private MenuItem _hashingMenuItem;
@@ -262,6 +264,15 @@ public final class MainViewController extends BaseController {
     }
 
     @FXML
+    void handleStartOperationMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_startOperationMenuItem)) {
+            if (!_startButton.isDisable()) {
+                createAndPerformOperations();
+            }
+        }
+    }
+
+    @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
             final DropViewController dropViewController = ViewControllers.showDropView(theme);
@@ -317,31 +328,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleStartButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_startButton)) {
-            try {
-                if (_state.checkUpdateOutputPath()) {
-                    final String outputPathText = _outputPathTextField.getText();
-                    final File outputFile = new File(outputPathText);
-                    final String outputPath = FileUtils.getPath(outputFile);
-
-                    checkUpdateOutputFileAndArchiveName(outputPath);
-
-                    final String recentPath = FileUtils.getParent(outputPath);
-                    Settings.getInstance().setProperty("recentPath", recentPath);
-                    final var archiveType = _archiveTypeComboBox.getValue();
-                    final var operations = _state.initOperation(archiveType);
-
-                    for (var operation : operations) {
-                        Log.i("Starting operation using the following archive info: {0}",
-                                operation.getArchiveInfo().toString(), false);
-                    }
-
-                    _state.performOperations(operations.toArray(new ArchiveOperation[0]));
-                } else {
-                    Log.w(I18N.getString("invalidOutputPath.text"), true);
-                }
-            } catch (GZipperException ex) {
-                Log.e(ex.getLocalizedMessage(), ex);
-            }
+            createAndPerformOperations();
         }
     }
 
@@ -442,7 +429,7 @@ public final class MainViewController extends BaseController {
     }
 
     @FXML
-    void onOutputPathTextFieldKeyTyped(KeyEvent evt) {
+    void handleOutputPathTextFieldKeyTyped(KeyEvent evt) {
         if (evt.getSource().equals(_outputPathTextField)) {
             String filename = _outputPathTextField.getText();
             if (!FileUtils.containsIllegalChars(filename)) {
@@ -589,95 +576,33 @@ public final class MainViewController extends BaseController {
 
     //</editor-fold>
 
-    //<editor-fold desc="Methods related to archiving job">
+    private void createAndPerformOperations() {
+        try {
+            if (_state.checkUpdateOutputPath()) {
+                final String outputPathText = _outputPathTextField.getText();
+                final File outputFile = new File(outputPathText);
+                final String outputPath = FileUtils.getPath(outputFile);
 
-    /**
-     * Initializes the archiving job by creating the required {@link Task}. This
-     * task will not perform the algorithmic operations for archiving but instead
-     * constantly checks for interruption to properly detect the abortion of an
-     * operation. For the algorithmic operations a new task will be created and
-     * submitted to the task handler. If an operation has been aborted, e.g.
-     * through user interaction, the operation will be interrupted.
-     *
-     * @param operation the {@link ArchiveOperation} that will eventually be
-     *                  performed by the task when executed.
-     * @return a {@link Task} that can be executed to perform the specified archiving operation.
-     */
-    @SuppressWarnings("SleepWhileInLoop")
-    private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
-        Task<Boolean> task = new Task<>() {
-            @SuppressWarnings("BusyWait")
-            @Override
-            protected Boolean call() throws Exception {
-                final Future<Boolean> futureTask = _taskHandler.submit(operation);
-                while (!futureTask.isDone()) {
-                    try {
-                        Thread.sleep(10); // continuous check for interruption
-                    } catch (InterruptedException ex) {
-                        // if exception is caught, task has been interrupted
-                        Log.i(I18N.getString("interrupt.text"), true);
-                        Log.w(ex.getLocalizedMessage(), false);
-                        operation.interrupt();
-                        if (futureTask.cancel(true)) {
-                            Log.i(I18N.getString("operationCancel.text"), true, operation);
-                        }
-                    }
+                checkUpdateOutputFileAndArchiveName(outputPath);
+
+                final String recentPath = FileUtils.getParent(outputPath);
+                Settings.getInstance().setProperty("recentPath", recentPath);
+                final var archiveType = _archiveTypeComboBox.getValue();
+                final var operations = _state.initOperation(archiveType);
+
+                for (var operation : operations) {
+                    Log.i("Starting operation using the following archive info: {0}",
+                            operation.getArchiveInfo().toString(), false);
                 }
 
-                try { // check for cancellation
-                    return futureTask.get();
-                } catch (CancellationException ex) {
-                    return false; // ignore exception
-                }
-            }
-        };
-
-        showSuccessMessageAndFinalizeArchivingJob(operation, task);
-        showErrorMessageAndFinalizeArchivingJob(operation, task);
-
-        return task;
-    }
-
-    private void showErrorMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
-        task.setOnFailed(e -> {
-            Log.i(I18N.getString("operationFail.text"), true, operation);
-            final Throwable thrown = e.getSource().getException();
-            if (thrown != null) Log.e(thrown.getLocalizedMessage(), thrown);
-            finishArchivingJob(operation, task);
-        });
-    }
-
-    private void showSuccessMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
-        task.setOnSucceeded(e -> {
-            final boolean success = (boolean) e.getSource().getValue();
-            if (success) {
-                Log.i(I18N.getString("operationSuccess.text"), true, operation);
+                _state.performOperations(operations.toArray(new ArchiveOperation[0]));
             } else {
-                Log.w(I18N.getString("operationNoSuccess.text"), true, operation);
+                Log.w(I18N.getString("invalidOutputPath.text"), true);
             }
-            finishArchivingJob(operation, task);
-        });
-    }
-
-    /**
-     * Calculates the total duration in seconds of the specified
-     * {@link ArchiveOperation} and logs it to {@link #_textArea}. Also toggles
-     * {@link #_startButton} and {@link #_abortButton}.
-     *
-     * @param operation {@link ArchiveOperation} that holds elapsed time.
-     * @param task      the task that will be removed from {@link #_activeTasks}.
-     */
-    private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
-        Log.i(I18N.getString("elapsedTime.text"), true, operation.calculateElapsedTime());
-        _activeTasks.remove(task.hashCode());
-        if (_activeTasks.isEmpty()) {
-            unbindUIControls();
-            _progressBar.setProgress(0d); // reset
-            _progressText.setText(StringUtils.EMPTY);
+        } catch (GZipperException ex) {
+            Log.e(ex.getLocalizedMessage(), ex);
         }
     }
-
-    //</editor-fold>
 
     //<editor-fold desc="Initialization">
 
@@ -802,6 +727,96 @@ public final class MainViewController extends BaseController {
          *                          determined.
          */
         abstract List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException;
+
+        //<editor-fold desc="Private helper methods">
+
+        /**
+         * Initializes the archiving job by creating the required {@link Task}. This
+         * task will not perform the algorithmic operations for archiving but instead
+         * constantly checks for interruption to properly detect the abortion of an
+         * operation. For the algorithmic operations a new task will be created and
+         * submitted to the task handler. If an operation has been aborted, e.g.
+         * through user interaction, the operation will be interrupted.
+         *
+         * @param operation the {@link ArchiveOperation} that will eventually be
+         *                  performed by the task when executed.
+         * @return a {@link Task} that can be executed to perform the specified archiving operation.
+         */
+        @SuppressWarnings("SleepWhileInLoop")
+        private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
+            Task<Boolean> task = new Task<>() {
+                @SuppressWarnings("BusyWait")
+                @Override
+                protected Boolean call() throws Exception {
+                    final Future<Boolean> futureTask = _taskHandler.submit(operation);
+                    while (!futureTask.isDone()) {
+                        try {
+                            Thread.sleep(10); // continuous check for interruption
+                        } catch (InterruptedException ex) {
+                            // if exception is caught, task has been interrupted
+                            Log.i(I18N.getString("interrupt.text"), true);
+                            Log.w(ex.getLocalizedMessage(), false);
+                            operation.interrupt();
+                            if (futureTask.cancel(true)) {
+                                Log.i(I18N.getString("operationCancel.text"), true, operation);
+                            }
+                        }
+                    }
+
+                    try { // check for cancellation
+                        return futureTask.get();
+                    } catch (CancellationException ex) {
+                        return false; // ignore exception
+                    }
+                }
+            };
+
+            showSuccessMessageAndFinalizeArchivingJob(operation, task);
+            showErrorMessageAndFinalizeArchivingJob(operation, task);
+
+            return task;
+        }
+
+        private void showErrorMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
+            task.setOnFailed(e -> {
+                Log.i(I18N.getString("operationFail.text"), true, operation);
+                final Throwable thrown = e.getSource().getException();
+                if (thrown != null) Log.e(thrown.getLocalizedMessage(), thrown);
+                finishArchivingJob(operation, task);
+            });
+        }
+
+        private void showSuccessMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
+            task.setOnSucceeded(e -> {
+                final boolean success = (boolean) e.getSource().getValue();
+                if (success) {
+                    Log.i(I18N.getString("operationSuccess.text"), true, operation);
+                } else {
+                    Log.w(I18N.getString("operationNoSuccess.text"), true, operation);
+                }
+                finishArchivingJob(operation, task);
+            });
+        }
+
+        /**
+         * Calculates the total duration in seconds of the specified
+         * {@link ArchiveOperation} and logs it to {@link #_textArea}. Also toggles
+         * {@link #_startButton} and {@link #_abortButton}.
+         *
+         * @param operation {@link ArchiveOperation} that holds elapsed time.
+         * @param task      the task that will be removed from {@link #_activeTasks}.
+         */
+        private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
+            Log.i(I18N.getString("elapsedTime.text"), true, operation.calculateElapsedTime());
+            _activeTasks.remove(task.hashCode());
+            if (_activeTasks.isEmpty()) {
+                unbindUIControls();
+                _progressBar.setProgress(0d); // reset
+                _progressText.setText(StringUtils.EMPTY);
+            }
+        }
+
+        //</editor-fold>
 
         /**
          * Applies the required extension filters to the specified file chooser.
