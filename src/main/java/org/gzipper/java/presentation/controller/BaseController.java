@@ -20,6 +20,7 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
 import org.gzipper.java.presentation.CSS;
 
@@ -27,18 +28,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The base controller each other controller should derive from.
+ * The base controller every other controller should derive from.
  *
  * @author Matthias Fussenegger
  */
 public abstract class BaseController implements Initializable {
 
     //<editor-fold desc="Static members">
-
-    /**
-     * The default archive name of an archive if not explicitly specified.
-     */
-    protected static final String DEFAULT_ARCHIVE_NAME = "gzipper_out";
 
     /**
      * A set with all the stages currently open.
@@ -55,18 +51,26 @@ public abstract class BaseController implements Initializable {
     }
 
     /**
-     * The icon image used for each stage.
+     * The icon image to be used by each stage.
      */
     protected static Image iconImage;
 
     /**
-     * Returns the icon image that is to be used for each stage.
+     * Returns the icon image that is to be used by each stage.
      *
-     * @return the icon image that is to be used for each stage.
+     * @return the icon image that is to be used by each stage.
      */
     public static Image getIconImage() {
+
         var resource = BaseController.class.getResource("/images/icon_32.png");
-        return iconImage = new Image(resource.toExternalForm());
+
+        if (resource != null) {
+            iconImage = new Image(resource.toExternalForm());
+        } else {
+            iconImage = new WritableImage(32, 32); // blank image
+        }
+
+        return iconImage;
     }
 
     //</editor-fold>
@@ -126,14 +130,14 @@ public abstract class BaseController implements Initializable {
     }
 
     /**
-     * Closes the primary stage of this controller.
+     * Closes the primary stage of this controller. Must be called by the UI thread.
      */
     protected void close() {
         primaryStage.close();
     }
 
     /**
-     * Exits the application.
+     * Terminates the application gracefully.
      */
     protected void exit() {
         close();

@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation.controller;
+package org.gzipper.java.presentation.controller.main;
 
 import javafx.application.HostServices;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -27,24 +25,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.converter.PercentageStringConverter;
-import org.gzipper.java.application.ArchiveInfo;
-import org.gzipper.java.application.ArchiveInfoFactory;
 import org.gzipper.java.application.ArchiveOperation;
-import org.gzipper.java.application.CompressionMode;
 import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.model.OperatingSystem;
-import org.gzipper.java.application.observer.Listener;
-import org.gzipper.java.application.observer.Notifier;
 import org.gzipper.java.application.predicates.PatternPredicate;
-import org.gzipper.java.application.util.*;
+import org.gzipper.java.application.util.FileUtils;
+import org.gzipper.java.application.util.ListUtils;
+import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.presentation.Dialogs;
-import org.gzipper.java.presentation.ProgressManager;
 import org.gzipper.java.presentation.TaskGroup;
+import org.gzipper.java.presentation.controller.BaseController;
+import org.gzipper.java.presentation.controller.DropViewController;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
@@ -52,9 +46,6 @@ import org.gzipper.java.util.Settings;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
@@ -82,15 +73,15 @@ public final class MainViewController extends BaseController {
     /**
      * Handler used to execute tasks.
      */
-    private final TaskHandler _taskHandler;
+    final TaskHandler taskHandler;
 
     /**
      * Holds the currently active tasks (or operations).
      */
-    private final TaskGroup _activeTasks;
+    final TaskGroup activeTasks;
 
     public TaskGroup getActiveTasks() {
-        return _activeTasks;
+        return activeTasks;
     }
 
     /**
@@ -104,30 +95,63 @@ public final class MainViewController extends BaseController {
     private File _outputFile;
 
     /**
+     * Returns the output file, i.e. the archive or file to be created.
+     *
+     * @return a reference to the output file.
+     */
+    File getOutputFile() {
+        return _outputFile;
+    }
+
+    /**
      * A list consisting of the files that have been selected by the user.
      * These can either be files to be packed or archives to be extracted.
      */
     private List<File> _selectedFiles;
 
+    List<File> getSelectedFiles() {
+        return List.copyOf(_selectedFiles);
+    }
+
     /**
-     * The archive name specified by user.
+     * The archive name specified by the user.
      */
     private String _archiveName;
+
+    String getArchiveName() {
+        return _archiveName;
+    }
+
+    void setArchiveName(String archiveName) {
+        _archiveName = archiveName;
+    }
 
     /**
      * The file extension of the archive type.
      */
     private String _archiveFileExtension;
 
+    void setArchiveFileExtension(String extension) {
+        _archiveFileExtension = extension;
+    }
+
     /**
      * The compression level. Initialized with default compression level.
      */
     private int _compressionLevel;
 
+    int getCompressionLevel() {
+        return _compressionLevel;
+    }
+
     /**
      * True if user wishes to put each file into a separate archive.
      */
-    private boolean _putIntoSeparateArchives;
+    private boolean _putFilesIntoSeparateArchives;
+
+    boolean isPutFilesIntoSeparateArchives() {
+        return _putFilesIntoSeparateArchives;
+    }
 
     //</editor-fold>
 
@@ -197,10 +221,10 @@ public final class MainViewController extends BaseController {
      */
     public MainViewController(CSS.Theme theme, HostServices hostServices) {
         super(theme, hostServices);
-        _archiveName = DEFAULT_ARCHIVE_NAME;
+        _archiveName = CompressState.DEFAULT_ARCHIVE_NAME;
         _compressionLevel = Deflater.DEFAULT_COMPRESSION;
-        _activeTasks = new TaskGroup();
-        _taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
+        activeTasks = new TaskGroup();
+        taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 
@@ -243,7 +267,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleCloseMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_closeMenuItem)) {
-            _activeTasks.cancelTasks();
+            activeTasks.cancelTasks();
             exit();
         }
     }
@@ -275,10 +299,10 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final DropViewController dropViewController = ViewControllers.showDropView(theme);
+            final DropViewController dropViewController = ViewControllers.showDropView(theme, iconImage);
             final List<String> filePaths = dropViewController.getAddresses();
             if (!ListUtils.isNullOrEmpty(filePaths)) {
-                _putIntoSeparateArchives = dropViewController.isPutInSeparateArchives();
+                _putFilesIntoSeparateArchives = dropViewController.isPutInSeparateArchives();
                 final int size = filePaths.size();
                 _selectedFiles = new ArrayList<>(size);
                 _startButton.setDisable(false);
@@ -301,7 +325,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleHashingMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_hashingMenuItem)) {
-            ViewControllers.showHashView(theme);
+            ViewControllers.showHashView(theme, iconImage);
         }
     }
 
@@ -321,7 +345,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAboutMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_aboutMenuItem)) {
-            ViewControllers.showAboutView(theme, hostServices);
+            ViewControllers.showAboutView(theme, iconImage, hostServices);
         }
     }
 
@@ -335,7 +359,7 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAbortButtonAction(ActionEvent evt) {
         if (evt.getSource().equals(_abortButton)) {
-            _activeTasks.cancelTasks();
+            activeTasks.cancelTasks();
         }
     }
 
@@ -354,7 +378,7 @@ public final class MainViewController extends BaseController {
 
             String message;
             if (selectedFiles != null) {
-                _putIntoSeparateArchives = false;
+                _putFilesIntoSeparateArchives = false;
                 _startButton.setDisable(false);
                 int size = selectedFiles.size();
                 message = I18N.getString("filesSelected.text", size);
@@ -472,7 +496,7 @@ public final class MainViewController extends BaseController {
     private File pickFileToBeSaved() {
         final File file;
 
-        if (_compressRadioButton.isSelected() && _putIntoSeparateArchives) {
+        if (_compressRadioButton.isSelected() && _putFilesIntoSeparateArchives) {
             var directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle(I18N.getString("saveAsArchiveTitle.text"));
             file = directoryChooser.showDialog(primaryStage);
@@ -491,7 +515,7 @@ public final class MainViewController extends BaseController {
     }
 
     private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
-        _state = compress ? new CompressState() : new DecompressState();
+        _state = compress ? new CompressState(this) : new DecompressState(this);
         _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
         _saveAsButton.setText(I18N.getString(saveAsButtonText));
     }
@@ -508,36 +532,6 @@ public final class MainViewController extends BaseController {
         }
     }
 
-    private void bindUIControls() {
-        if (_startButton.disableProperty().isBound()) return;
-
-        final var runningProperty = _activeTasks.anyTasksPresentProperty();
-
-        _startButton.disableProperty().bind(runningProperty);
-        _abortButton.disableProperty().bind(Bindings.not(runningProperty));
-        _compressRadioButton.disableProperty().bind(runningProperty);
-        _decompressRadioButton.disableProperty().bind(runningProperty);
-        _archiveTypeComboBox.disableProperty().bind(runningProperty);
-        _saveAsButton.disableProperty().bind(runningProperty);
-        _selectFilesButton.disableProperty().bind(runningProperty);
-        _addManyFilesMenuItem.disableProperty().bind(runningProperty);
-        _progressBar.visibleProperty().bind(runningProperty);
-        _progressText.visibleProperty().bind(runningProperty);
-    }
-
-    private void unbindUIControls() {
-        _startButton.disableProperty().unbind();
-        _abortButton.disableProperty().unbind();
-        _compressRadioButton.disableProperty().unbind();
-        _decompressRadioButton.disableProperty().unbind();
-        _archiveTypeComboBox.disableProperty().unbind();
-        _selectFilesButton.disableProperty().unbind();
-        _saveAsButton.disableProperty().unbind();
-        _addManyFilesMenuItem.disableProperty().unbind();
-        _progressBar.visibleProperty().unbind();
-        _progressText.visibleProperty().unbind();
-    }
-
     private void resetFilter() {
         final boolean wasApplied = _state.getFilterPredicate() != null;
         _state.setFilterPredicate(null);
@@ -550,7 +544,7 @@ public final class MainViewController extends BaseController {
         if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
             Log.i(I18N.getString("selectionReset.text"), true);
         }
-        _putIntoSeparateArchives = false;
+        _putFilesIntoSeparateArchives = false;
         _selectedFiles = Collections.emptyList();
         _startButton.setDisable(true);
     }
@@ -572,6 +566,111 @@ public final class MainViewController extends BaseController {
             }
             _outputFile = file;
         }
+    }
+
+    /**
+     * Disables all relevant UI controls as long as any task is active (or running).
+     * Once disabled, a UI control is unusable (or greyed-out).
+     */
+    void disableUIControlsAsLongAsAnyTaskIsActive() {
+
+        if (_startButton.disableProperty().isBound()) return;
+        final var runningProperty = activeTasks.anyTasksPresentProperty();
+
+        _startButton.disableProperty().bind(runningProperty);
+        _abortButton.disableProperty().bind(Bindings.not(runningProperty));
+        _compressRadioButton.disableProperty().bind(runningProperty);
+        _decompressRadioButton.disableProperty().bind(runningProperty);
+        _archiveTypeComboBox.disableProperty().bind(runningProperty);
+        _saveAsButton.disableProperty().bind(runningProperty);
+        _selectFilesButton.disableProperty().bind(runningProperty);
+        _addManyFilesMenuItem.disableProperty().bind(runningProperty);
+        _progressBar.visibleProperty().bind(runningProperty);
+        _progressText.visibleProperty().bind(runningProperty);
+    }
+
+    /**
+     * Enables all relevant UI controls, i.e. makes them usable again.
+     */
+    void enableUIControls() {
+        _startButton.disableProperty().unbind();
+        _abortButton.disableProperty().unbind();
+        _compressRadioButton.disableProperty().unbind();
+        _decompressRadioButton.disableProperty().unbind();
+        _archiveTypeComboBox.disableProperty().unbind();
+        _selectFilesButton.disableProperty().unbind();
+        _saveAsButton.disableProperty().unbind();
+        _addManyFilesMenuItem.disableProperty().unbind();
+        _progressBar.visibleProperty().unbind();
+        _progressText.visibleProperty().unbind();
+    }
+
+    /**
+     * Returns archive type, which is currently selected by the user.
+     *
+     * @return the currently selected archive type.
+     */
+    ArchiveType getSelectedArchiveType() {
+        return _archiveTypeComboBox.getSelectionModel().getSelectedItem();
+    }
+
+    /**
+     * Returns the text currently set in the text field which specifies the output path.
+     *
+     * @return the text currently set in the text field which specifies the output path.
+     */
+    String getTextOfOutputPathTextField() {
+        return _outputPathTextField.getText();
+    }
+
+    /**
+     * Sets the specified {@code text} in the text field which specifies the output path.
+     *
+     * @param text the text to be set in the text field which specifies the output path.
+     */
+    void setTextOfOutputPathTextField(String text) {
+        _outputPathTextField.setText(text);
+    }
+
+    /**
+     * Returns the currently set progress of the progress bar.
+     *
+     * @return the currently set progress of the progress bar.
+     */
+    double getProgressOfProgressBar() {
+        return _progressBar.getProgress();
+    }
+
+    /**
+     * Sets the current progress of the progress bar (from 0 to 1).
+     *
+     * @param value the progress of the progress bar to be set.
+     */
+    void setProgressInProgressBar(double value) {
+        _progressBar.setProgress(value);
+    }
+
+    /**
+     * Requests the focus on the text field which specifies the output path.
+     */
+    void requestFocusOnOutputPathTextField() {
+        _outputPathTextField.requestFocus();
+    }
+
+    /**
+     * Resets the progress of the progress bar.
+     */
+    void resetProgressBar() {
+        setProgressInProgressBar(0d);
+    }
+
+    /**
+     * Sets the text visible in the progress bar.
+     *
+     * @param text the text visible in the progress bar.
+     */
+    void setTextInProgressBar(String text) {
+        _progressText.setText(text);
     }
 
     //</editor-fold>
@@ -632,7 +731,7 @@ public final class MainViewController extends BaseController {
         final boolean enableLogging = settings.evaluateProperty("loggingEnabled");
         _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
-        _state = new CompressState(); // the default one
+        _state = new CompressState(this); // the default one
         final String formattedText = String.format("run:\n%s\n", I18N.getString("changeOutputPath.text"));
         _textArea.setText(formattedText);
     }
@@ -662,351 +761,6 @@ public final class MainViewController extends BaseController {
         _bestSpeedCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_SPEED);
         _defaultCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.DEFAULT_COMPRESSION);
         _bestCompressionMenuItem.getProperties().put(COMPRESSION_LEVEL_KEY, Deflater.BEST_COMPRESSION);
-    }
-
-    //</editor-fold>
-
-    //<editor-fold desc="Controller states">
-
-    /**
-     * Inner class that represents the currently active state. This can either
-     * be the {@link CompressState} or {@link DecompressState}.
-     */
-    private abstract class ArchivingState implements Listener<Integer> {
-
-        /**
-         * Converts percentage values to string objects. See method
-         * {@link #update(org.gzipper.java.application.observer.Notifier, java.lang.Integer)}.
-         */
-        private final PercentageStringConverter _converter = new PercentageStringConverter();
-
-        /**
-         * Holds the current progress or {@code -1d}. The current progress is retrieved by the UI thread to update
-         * the progress in the UI. A new task is only submitted to the UI thread if the value is {@code -1d}.
-         * This avoids an unresponsive UI since the UI thread will not be flooded with new tasks.
-         */
-        private ProgressManager _progressManager;
-
-        /**
-         * Used to filter files or archive entries when processing archives.
-         */
-        protected Predicate<String> _filterPredicate = null;
-
-        /**
-         * Set the filter to be used when processing archives.
-         *
-         * @param filterPredicate the filter or {@code null} to reset it.
-         */
-        final void setFilterPredicate(Predicate<String> filterPredicate) {
-            _filterPredicate = filterPredicate;
-        }
-
-        /**
-         * Returns the filter to be used when processing archives.
-         *
-         * @return the filter to be used when processing archives. If no filter
-         * is set, this method will return {@code null}.
-         */
-        final Predicate<String> getFilterPredicate() {
-            return _filterPredicate;
-        }
-
-        /**
-         * Validates the output path specified in user control.
-         *
-         * @return true if output path is valid, false otherwise.
-         */
-        abstract boolean checkUpdateOutputPath();
-
-        /**
-         * Initializes the archiving operation.
-         *
-         * @param archiveType the type of the archive, see {@link ArchiveType}.
-         * @return list consisting of {@link ArchiveOperation}.
-         * @throws GZipperException if the archive type could not have been
-         *                          determined.
-         */
-        abstract List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException;
-
-        //<editor-fold desc="Private helper methods">
-
-        /**
-         * Initializes the archiving job by creating the required {@link Task}. This
-         * task will not perform the algorithmic operations for archiving but instead
-         * constantly checks for interruption to properly detect the abortion of an
-         * operation. For the algorithmic operations a new task will be created and
-         * submitted to the task handler. If an operation has been aborted, e.g.
-         * through user interaction, the operation will be interrupted.
-         *
-         * @param operation the {@link ArchiveOperation} that will eventually be
-         *                  performed by the task when executed.
-         * @return a {@link Task} that can be executed to perform the specified archiving operation.
-         */
-        @SuppressWarnings("SleepWhileInLoop")
-        private Task<Boolean> initArchivingJob(final ArchiveOperation operation) {
-            Task<Boolean> task = new Task<>() {
-                @SuppressWarnings("BusyWait")
-                @Override
-                protected Boolean call() throws Exception {
-                    final Future<Boolean> futureTask = _taskHandler.submit(operation);
-                    while (!futureTask.isDone()) {
-                        try {
-                            Thread.sleep(10); // continuous check for interruption
-                        } catch (InterruptedException ex) {
-                            // if exception is caught, task has been interrupted
-                            Log.i(I18N.getString("interrupt.text"), true);
-                            Log.w(ex.getLocalizedMessage(), false);
-                            operation.interrupt();
-                            if (futureTask.cancel(true)) {
-                                Log.i(I18N.getString("operationCancel.text"), true, operation);
-                            }
-                        }
-                    }
-
-                    try { // check for cancellation
-                        return futureTask.get();
-                    } catch (CancellationException ex) {
-                        return false; // ignore exception
-                    }
-                }
-            };
-
-            showSuccessMessageAndFinalizeArchivingJob(operation, task);
-            showErrorMessageAndFinalizeArchivingJob(operation, task);
-
-            return task;
-        }
-
-        private void showErrorMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
-            task.setOnFailed(e -> {
-                Log.i(I18N.getString("operationFail.text"), true, operation);
-                final Throwable thrown = e.getSource().getException();
-                if (thrown != null) Log.e(thrown.getLocalizedMessage(), thrown);
-                finishArchivingJob(operation, task);
-            });
-        }
-
-        private void showSuccessMessageAndFinalizeArchivingJob(ArchiveOperation operation, Task<Boolean> task) {
-            task.setOnSucceeded(e -> {
-                final boolean success = (boolean) e.getSource().getValue();
-                if (success) {
-                    Log.i(I18N.getString("operationSuccess.text"), true, operation);
-                } else {
-                    Log.w(I18N.getString("operationNoSuccess.text"), true, operation);
-                }
-                finishArchivingJob(operation, task);
-            });
-        }
-
-        /**
-         * Calculates the total duration in seconds of the specified
-         * {@link ArchiveOperation} and logs it to {@link #_textArea}. Also toggles
-         * {@link #_startButton} and {@link #_abortButton}.
-         *
-         * @param operation {@link ArchiveOperation} that holds elapsed time.
-         * @param task      the task that will be removed from {@link #_activeTasks}.
-         */
-        private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
-            Log.i(I18N.getString("elapsedTime.text"), true, operation.calculateElapsedTime());
-            _activeTasks.remove(task.hashCode());
-            if (_activeTasks.isEmpty()) {
-                unbindUIControls();
-                _progressBar.setProgress(0d); // reset
-                _progressText.setText(StringUtils.EMPTY);
-            }
-        }
-
-        //</editor-fold>
-
-        /**
-         * Applies the required extension filters to the specified file chooser.
-         *
-         * @param chooser the {@link FileChooser} to which the extension filters
-         *                will be applied to.
-         */
-        void applyExtensionFilters(FileChooser chooser) {
-            if (chooser != null) {
-                final ArchiveType selectedType = _archiveTypeComboBox.getSelectionModel().getSelectedItem();
-                for (ArchiveType type : ArchiveType.values()) {
-                    if (type.equals(selectedType)) {
-                        ExtensionFilter extFilter = new ExtensionFilter(
-                                type.getDisplayName(), type.getExtensionNames(true));
-                        chooser.getExtensionFilters().add(extFilter);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Performs the specified array of {@link ArchiveOperation} instances.
-         *
-         * @param operations the {@link ArchiveOperation} instances to be performed.
-         */
-        void performOperations(ArchiveOperation... operations) {
-            if (operations == null || operations.length == 0) return;
-
-            _progressManager = new ProgressManager(operations.length);
-
-            for (var operation : operations) {
-                if (operation != null) {
-                    Task<Boolean> task = initArchivingJob(operation);
-                    final ArchiveInfo info = operation.getArchiveInfo();
-
-                    Log.i(I18N.getString("operationStarted.text"), true, operation,
-                            info.getArchiveType().getDisplayName());
-                    Log.i(I18N.getString("outputPath.text", info.getOutputPath()), true);
-
-                    bindUIControls();
-
-                    var future = _taskHandler.submit(task);
-                    _activeTasks.put(task.hashCode(), future);
-                }
-            }
-        }
-
-        @Override
-        public final void update(Notifier<Integer> notifier, Integer value) {
-            if (value >= 100) {
-                notifier.detach(this);
-            } else {
-                double progress = _progressManager.updateProgress(notifier.getId(), value);
-                if (_progressManager.getAndSetProgress(progress) == ProgressManager.SENTINEL) {
-                    Platform.runLater(() -> {
-                        double totalProgress = _progressManager.getAndSetProgress(ProgressManager.SENTINEL);
-                        if (totalProgress > _progressBar.getProgress()) {
-                            _progressBar.setProgress(totalProgress);
-                            _progressText.setText(_converter.toString(totalProgress));
-                        }
-                    });
-                }
-            }
-        }
-    }
-
-    private final class CompressState extends ArchivingState {
-
-        private String determineOutputPath(File outputFile) {
-            if (!outputFile.exists() || outputFile.isFile()) {
-                return outputFile.getParent();
-            }
-
-            return FileUtils.getPath(outputFile);
-        }
-
-        @Override
-        public boolean checkUpdateOutputPath() {
-            String outputPath = _outputPathTextField.getText();
-            String extName = _archiveTypeComboBox.getValue().getDefaultExtensionName();
-
-            if (FileUtils.isValidDirectory(outputPath) && !_putIntoSeparateArchives) {
-
-                String archiveName = DEFAULT_ARCHIVE_NAME;
-
-                if (_selectedFiles.size() == 1) {
-                    File firstFile = _selectedFiles.get(0);
-                    archiveName = firstFile.getName();
-                }
-                // user has not specified output filename
-                outputPath = FileUtils.generateUniqueFilename(outputPath, archiveName, extName);
-            }
-
-            _archiveFileExtension = extName;
-
-            if (FileUtils.isValidOutputFile(outputPath)) {
-                setOutputPath(outputPath);
-                return true;
-            }
-
-            return false;
-        }
-
-        @Override
-        public void performOperations(ArchiveOperation... operations) {
-            if (!ListUtils.isNullOrEmpty(_selectedFiles)) {
-                super.performOperations(operations);
-            } else {
-                Log.e("Operation(s) cannot be started, because no files have been specified");
-                Log.i(I18N.getString("noFilesSelectedWarning.text"), true);
-            }
-        }
-
-        @Override
-        public List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException {
-
-            List<ArchiveOperation> operations;
-
-            if (_archiveTypeComboBox.getValue() == ArchiveType.GZIP || _putIntoSeparateArchives) {
-
-                final List<ArchiveInfo> infos;
-                final String outputPath = determineOutputPath(_outputFile);
-                operations = new ArrayList<>(_selectedFiles.size());
-
-                if (_putIntoSeparateArchives) {
-                    infos = ArchiveInfoFactory.createArchiveInfos(
-                            archiveType, _compressionLevel, _selectedFiles, outputPath);
-                } else if (_selectedFiles.size() == 1) {
-                    var info = ArchiveInfoFactory.createArchiveInfo(archiveType,
-                            _archiveName, _compressionLevel, _selectedFiles, _outputFile.getParent());
-                    infos = new ArrayList<>(1);
-                    infos.add(info);
-                } else {
-                    infos = ArchiveInfoFactory.createArchiveInfos(archiveType,
-                            _archiveName, _compressionLevel, _selectedFiles, outputPath);
-                }
-
-                for (ArchiveInfo info : infos) {
-                    var builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
-                    builder.addListener(this).filterPredicate(_filterPredicate);
-                    operations.add(builder.build());
-                }
-            } else {
-                operations = new ArrayList<>(1);
-                var info = ArchiveInfoFactory.createArchiveInfo(archiveType, _archiveName,
-                        _compressionLevel, _selectedFiles, _outputFile.getParent());
-                _archiveName = info.getArchiveName();
-                setOutputPath(FileUtils.combine(info.getOutputPath(), _archiveName));
-                var builder = new ArchiveOperation.Builder(info, CompressionMode.COMPRESS);
-                builder.addListener(this).filterPredicate(_filterPredicate);
-                operations.add(builder.build());
-            }
-
-            return operations;
-        }
-    }
-
-    private final class DecompressState extends ArchivingState {
-
-        @Override
-        public boolean checkUpdateOutputPath() {
-            return FileUtils.isValidDirectory(_outputPathTextField.getText());
-        }
-
-        @Override
-        public void performOperations(ArchiveOperation... operations) {
-            if (_outputFile != null && !ListUtils.isNullOrEmpty(_selectedFiles)) {
-                super.performOperations(operations);
-            } else {
-                Log.e("Operation(s) cannot be started, because an invalid path has been specified");
-                Log.w(I18N.getString("outputPathWarning.text"), true);
-                _outputPathTextField.requestFocus();
-            }
-        }
-
-        @Override
-        public List<ArchiveOperation> initOperation(ArchiveType archiveType) throws GZipperException {
-
-            List<ArchiveOperation> operations = new ArrayList<>(_selectedFiles.size());
-
-            for (File file : _selectedFiles) {
-                var info = ArchiveInfoFactory.createArchiveInfo(archiveType, FileUtils.getPath(file),
-                        FileUtils.getPath(_outputFile) + File.separator);
-                var builder = new ArchiveOperation.Builder(info, CompressionMode.DECOMPRESS);
-                builder.addListener(this).filterPredicate(_filterPredicate);
-                operations.add(builder.build());
-            }
-
-            return operations;
-        }
     }
 
     //</editor-fold>

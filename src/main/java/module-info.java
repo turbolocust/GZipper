@@ -17,6 +17,7 @@
 module org.gzipper {
     opens org.gzipper.java.presentation to javafx.graphics;
     opens org.gzipper.java.presentation.controller to javafx.fxml;
+    opens org.gzipper.java.presentation.controller.main to javafx.fxml;
     // standard-lib modules
     requires java.logging;
     // third-party modules
