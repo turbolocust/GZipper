@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gzipper.java.presentation.controller.main;
+package org.gzipper.java.presentation.controller;
 
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
@@ -26,10 +26,6 @@ import javafx.stage.Stage;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
 import org.gzipper.java.presentation.Dialogs;
-import org.gzipper.java.presentation.controller.AboutViewController;
-import org.gzipper.java.presentation.controller.BaseController;
-import org.gzipper.java.presentation.controller.DropViewController;
-import org.gzipper.java.presentation.controller.HashViewController;
 import org.gzipper.java.util.Log;
 
 import java.io.IOException;
@@ -65,7 +61,7 @@ public final class ViewControllers {
      * @param icon         the icon to be used in the view
      * @param hostServices the host services to be aggregated.
      */
-    static void showAboutView(CSS.Theme theme, Image icon, HostServices hostServices) {
+    public static void showAboutView(CSS.Theme theme, Image icon, HostServices hostServices) {
 
         if (hostServices == null) {
             throw new NullPointerException("Host services must not be null");
@@ -96,7 +92,7 @@ public final class ViewControllers {
      * @param icon  the icon to be used in the view
      * @return the controller for the view.
      */
-    static DropViewController showDropView(CSS.Theme theme, Image icon) {
+    public static DropViewController showDropView(CSS.Theme theme, Image icon) {
         final FXMLLoader fxmlLoader = initFXMLLoader(DROP_VIEW_RES);
         DropViewController controller = new DropViewController(theme);
         fxmlLoader.setController(controller);
@@ -124,7 +120,7 @@ public final class ViewControllers {
      * @param theme the theme to be applied.
      * @param icon  the icon to be used in the view
      */
-    static void showHashView(CSS.Theme theme, Image icon) {
+    public static void showHashView(CSS.Theme theme, Image icon) {
         final FXMLLoader fxmlLoader = initFXMLLoader(HASH_VIEW_RES);
         HashViewController controller = new HashViewController(theme);
         fxmlLoader.setController(controller);

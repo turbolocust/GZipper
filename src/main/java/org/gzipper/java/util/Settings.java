@@ -98,26 +98,24 @@ public final class Settings {
     }
 
     /**
-     * Sets a new property to {@link #_props}.
+     * Sets (or overrides) the value of the property with the specified {@code key}.
      *
      * @param key   the key of the property.
-     * @param value the value of the property as string.
-     * @return the previous value of the specified key.
+     * @param value the value of the property as {@code String}.
      */
-    public synchronized Object setProperty(String key, String value) {
-        return _props.setProperty(key, value);
+    public synchronized void setProperty(String key, String value) {
+        _props.setProperty(key, value);
     }
 
     /**
-     * Sets a new property to {@link #_props}.
+     * Sets (or overrides) the value of the property with the specified {@code key}.
      *
      * @param key   the key of the property.
-     * @param value the value of the property as boolean.
-     * @return the previous value of the specified key.
+     * @param value the value of the property as {@code boolean}.
      */
-    public synchronized Object setProperty(String key, boolean value) {
+    public synchronized void setProperty(String key, boolean value) {
         final String propertyValue = value ? TRUE_STRING : FALSE_STRING;
-        return _props.setProperty(key, propertyValue);
+        _props.setProperty(key, propertyValue);
     }
 
     /**
@@ -151,7 +149,7 @@ public final class Settings {
     }
 
     /**
-     * Saves all the properties to {@link #_propsFile};
+     * Saves all stored properties to the Properties file.
      *
      * @throws IOException if an I/O error occurs.
      */

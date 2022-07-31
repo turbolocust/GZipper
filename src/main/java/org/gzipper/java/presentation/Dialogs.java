@@ -47,10 +47,9 @@ public final class Dialogs {
      * @param theme       the CSS theme to be applied.
      * @param icon        the icon to be shown in the title.
      * @param buttonTypes the buttons to be added.
-     * @return an {@link Optional} to indicate which button has been pressed.
      */
-    public static Optional<ButtonType> showDialog(Alert.AlertType type, String title,
-                                                  String header, String content, CSS.Theme theme, Image icon, ButtonType... buttonTypes) {
+    public static void showDialog(Alert.AlertType type, String title, String header, String content,
+                                  CSS.Theme theme, Image icon, ButtonType... buttonTypes) {
 
         final Alert alert = new Alert(type, content, buttonTypes);
         final Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -60,7 +59,7 @@ public final class Dialogs {
         alert.setHeaderText(header);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         CSS.load(theme, alert.getDialogPane().getScene());
-        return alert.showAndWait();
+        alert.showAndWait();
     }
 
     /**
@@ -73,8 +72,8 @@ public final class Dialogs {
      * @param icon    the icon to be shown in the title.
      * @return an {@link Optional} to indicate which button has been pressed.
      */
-    public static Optional<ButtonType> showConfirmationDialog(String title,
-                                                              String header, String content, CSS.Theme theme, Image icon) {
+    public static Optional<ButtonType> showConfirmationDialog(
+            String title, String header, String content, CSS.Theme theme, Image icon) {
 
         final Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content,
                 ButtonType.YES, ButtonType.NO);
@@ -84,7 +83,7 @@ public final class Dialogs {
         alert.setTitle(title);
         alert.setHeaderText(header);
 
-        // changing default button to {@code ButtonType.NO} to avoid accidential press of return key
+        // changing default button to {@code ButtonType.NO} to avoid accidental press of return key
         Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.YES);
         Button noButton = (Button) alert.getDialogPane().lookupButton(ButtonType.NO);
         yesButton.setDefaultButton(false);
@@ -105,8 +104,8 @@ public final class Dialogs {
      * @param icon    the icon to be shown in the title.
      * @return an {@link Optional} which holds the input text as string.
      */
-    public static Optional<String> showTextInputDialog(String title,
-                                                       String header, String content, CSS.Theme theme, Image icon) {
+    public static Optional<String> showTextInputDialog(
+            String title, String header, String content, CSS.Theme theme, Image icon) {
 
         final TextInputDialog dialog = new TextInputDialog();
         final Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();

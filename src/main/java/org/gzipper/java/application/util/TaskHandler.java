@@ -30,10 +30,6 @@ public final class TaskHandler implements AutoCloseable {
 
     private final ExecutorService _executorService;
 
-    public TaskHandler() {
-        _executorService = Executors.newCachedThreadPool();
-    }
-
     public TaskHandler(ExecutorType type) {
         _executorService = type.getExecutorService();
     }
@@ -53,7 +49,7 @@ public final class TaskHandler implements AutoCloseable {
      *
      * @param <T>  the type of the task's result.
      * @param task the task to be executed.
-     * @return a {@link Future} which can be used to manipulate the task.
+     * @return a {@link Future} representing the pending completion of the task.
      */
     public synchronized <T> Future<T> submit(Callable<T> task) {
         return _executorService.submit(task);

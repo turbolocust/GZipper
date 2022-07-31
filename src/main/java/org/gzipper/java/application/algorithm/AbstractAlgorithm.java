@@ -90,7 +90,7 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
      * than the previous one. This behavior may be changed by overriding this
      * method.
      *
-     * @param readBytes the amount of bytes read so far.
+     * @param readBytes the amount of bytes that have been read so far.
      */
     protected final void updateProgress(long readBytes) {
         algorithmProgress.updateProgress(readBytes);

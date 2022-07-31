@@ -31,7 +31,6 @@ import org.gzipper.java.application.model.OperatingSystem;
 import org.gzipper.java.application.predicates.PatternPredicate;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.application.util.ListUtils;
-import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.CSS;
@@ -39,6 +38,7 @@ import org.gzipper.java.presentation.Dialogs;
 import org.gzipper.java.presentation.TaskGroup;
 import org.gzipper.java.presentation.controller.BaseController;
 import org.gzipper.java.presentation.controller.DropViewController;
+import org.gzipper.java.presentation.controller.ViewControllers;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
@@ -71,18 +71,14 @@ public final class MainViewController extends BaseController {
     public static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
 
     /**
-     * Handler used to execute tasks.
-     */
-    final TaskHandler taskHandler;
-
-    /**
      * Holds the currently active tasks (or operations).
      */
-    final TaskGroup activeTasks;
+    private final TaskGroup activeTasks;
 
     public TaskGroup getActiveTasks() {
         return activeTasks;
     }
+
 
     /**
      * The currently active state.
@@ -224,7 +220,6 @@ public final class MainViewController extends BaseController {
         _archiveName = CompressState.DEFAULT_ARCHIVE_NAME;
         _compressionLevel = Deflater.DEFAULT_COMPRESSION;
         activeTasks = new TaskGroup();
-        taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
         Log.i("Default archive name set to: {0}", _archiveName, false);
     }
 

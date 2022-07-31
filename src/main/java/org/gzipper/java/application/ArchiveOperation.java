@@ -93,16 +93,11 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         Log.i(I18N.getString("processingArchiveFile.text"), _archiveInfo.getArchiveName(), true);
 
         switch (_compressionMode) {
-            case COMPRESS:
-                _algorithm.compress(_archiveInfo);
-                break;
-            case DECOMPRESS:
-                _algorithm.extract(_archiveInfo);
-                break;
-            default:
-                throw GZipperException.createWithReason(
-                        GZipperException.Reason.ILLEGAL_MODE,
-                        "Mode could not be determined");
+            case COMPRESS -> _algorithm.compress(_archiveInfo);
+            case DECOMPRESS -> _algorithm.extract(_archiveInfo);
+            default -> throw GZipperException.createWithReason(
+                    GZipperException.Reason.ILLEGAL_MODE,
+                    "Mode could not be determined");
         }
     }
 
@@ -147,8 +142,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         } catch (IOException ex) {
             if (!_interrupt) {
                 final Throwable cause = ex.getCause();
-                if (cause instanceof GZipperException) {
-                    GZipperException inner = (GZipperException) cause;
+                if (cause instanceof GZipperException inner) {
                     if (inner.getReason() == GZipperException.Reason.NO_DIR_SUPPORTED) {
                         Log.w(I18N.getString("noDirSupported.text"), true);
                     }

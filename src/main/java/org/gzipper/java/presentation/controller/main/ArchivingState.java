@@ -10,6 +10,7 @@ import org.gzipper.java.application.model.ArchiveType;
 import org.gzipper.java.application.observer.Listener;
 import org.gzipper.java.application.observer.Notifier;
 import org.gzipper.java.application.util.StringUtils;
+import org.gzipper.java.application.util.TaskHandler;
 import org.gzipper.java.exceptions.GZipperException;
 import org.gzipper.java.i18n.I18N;
 import org.gzipper.java.presentation.ProgressManager;
@@ -17,7 +18,6 @@ import org.gzipper.java.util.Log;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
 /**
@@ -29,6 +29,11 @@ abstract class ArchivingState implements Listener<Integer> {
      * The aggregated controller of type {@link MainViewController}.
      */
     protected final MainViewController controller;
+
+    /**
+     * Handler used to execute tasks.
+     */
+    private final TaskHandler taskHandler;
 
     /**
      * Converts percentage values to string objects. See method
@@ -55,6 +60,7 @@ abstract class ArchivingState implements Listener<Integer> {
      */
     protected ArchivingState(MainViewController controller) {
         this.controller = controller;
+        taskHandler = new TaskHandler(TaskHandler.ExecutorType.CACHED);
     }
 
     /**
@@ -113,8 +119,8 @@ abstract class ArchivingState implements Listener<Integer> {
             @SuppressWarnings("BusyWait")
             @Override
             protected Boolean call() throws Exception {
-                final Future<Boolean> futureTask = controller.taskHandler.submit(operation);
-                while (!futureTask.isDone()) {
+                final var future = taskHandler.submit(operation);
+                while (!future.isDone()) {
                     try {
                         Thread.sleep(10); // continuous check for interruption
                     } catch (InterruptedException ex) {
@@ -122,14 +128,14 @@ abstract class ArchivingState implements Listener<Integer> {
                         Log.i(I18N.getString("interrupt.text"), true);
                         Log.w(ex.getLocalizedMessage(), false);
                         operation.interrupt();
-                        if (futureTask.cancel(true)) {
+                        if (future.cancel(true)) {
                             Log.i(I18N.getString("operationCancel.text"), true, operation);
                         }
                     }
                 }
 
                 try { // check for cancellation
-                    return futureTask.get();
+                    return future.get();
                 } catch (CancellationException ex) {
                     return false; // ignore exception
                 }
@@ -172,8 +178,8 @@ abstract class ArchivingState implements Listener<Integer> {
      */
     private void finishArchivingJob(ArchiveOperation operation, Task<?> task) {
         Log.i(I18N.getString("elapsedTime.text"), true, operation.calculateElapsedTime());
-        controller.activeTasks.remove(task.hashCode());
-        if (controller.activeTasks.isEmpty()) {
+        controller.getActiveTasks().remove(task.hashCode());
+        if (controller.getActiveTasks().isEmpty()) {
             controller.enableUIControls();
             controller.resetProgressBar();
             controller.setTextInProgressBar(StringUtils.EMPTY);
@@ -213,7 +219,7 @@ abstract class ArchivingState implements Listener<Integer> {
 
         for (var operation : operations) {
             if (operation != null) {
-                Task<Boolean> task = initArchivingJob(operation);
+                final Task<Boolean> task = initArchivingJob(operation);
                 final ArchiveInfo info = operation.getArchiveInfo();
 
                 Log.i(I18N.getString("operationStarted.text"), true, operation,
@@ -222,8 +228,8 @@ abstract class ArchivingState implements Listener<Integer> {
 
                 controller.disableUIControlsAsLongAsAnyTaskIsActive();
 
-                var future = controller.taskHandler.submit(task);
-                controller.activeTasks.put(task.hashCode(), future);
+                final var future = taskHandler.submit(task);
+                controller.getActiveTasks().put(task.hashCode(), future);
             }
         }
     }

@@ -43,8 +43,8 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
             if (!filterPredicate.test(file.getName())) {
                 return; // ignore file
             }
-            final CompressorOptions options = new CompressorOptions(
-                    file.getName(), compressionLevel);
+
+            final var options = new CompressorOptions(file.getName(), compressionLevel);
 
             try (final FileInputStream fis = new FileInputStream(file);
                  final BufferedInputStream bis = new BufferedInputStream(fis);
@@ -175,15 +175,6 @@ public abstract class CompressorAlgorithm extends AbstractAlgorithm {
          */
         public final int getLevel() {
             return _level;
-        }
-
-        /**
-         * Sets the compression level.
-         *
-         * @param level the compression level.
-         */
-        public final void setLevel(int level) {
-            _level = level;
         }
     }
 }
