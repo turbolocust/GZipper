@@ -29,7 +29,7 @@ import org.gzipper.java.application.util.AppUtils;
 import org.gzipper.java.application.util.FileUtils;
 import org.gzipper.java.presentation.controller.BaseController;
 import org.gzipper.java.presentation.controller.HashViewController;
-import org.gzipper.java.presentation.controller.MainViewController;
+import org.gzipper.java.presentation.controller.main.MainViewController;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
 
@@ -184,18 +184,12 @@ public final class GZipper extends Application {
         String launchMode = params.get(LAUNCH_MODE_PARAM_NAME);
         if (launchMode == null) launchMode = LAUNCH_MODE_APPLICATION;
 
-        Parent parent;
-        switch (launchMode) {
-            case LAUNCH_MODE_APPLICATION:
-                parent = loadMainView(stage, theme);
-                break;
-            case LAUNCH_MODE_HASH_VIEW:
-                parent = loadHashView(stage, theme);
-                break;
-            default:
-                throw new IllegalArgumentException(String.format(
-                        "Value of parameter '%s' is unknown", LAUNCH_MODE_PARAM_NAME));
-        }
+        Parent parent = switch (launchMode) {
+            case LAUNCH_MODE_APPLICATION -> loadMainView(stage, theme);
+            case LAUNCH_MODE_HASH_VIEW -> loadHashView(stage, theme);
+            default -> throw new IllegalArgumentException(String.format(
+                    "Value of parameter '%s' is unknown", LAUNCH_MODE_PARAM_NAME));
+        };
 
         // load parent to initialize scene
         Scene scene = new Scene(parent);

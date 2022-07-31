@@ -82,10 +82,9 @@ public final class MessageDigestResult {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof MessageDigestResult)) {
+        if (!(obj instanceof final MessageDigestResult other)) {
             return false;
         }
-        final MessageDigestResult other = (MessageDigestResult) obj;
         if (!Objects.equals(_hashedValue, other._hashedValue)) {
             return false;
         }

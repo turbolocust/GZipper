@@ -36,7 +36,7 @@ import java.io.IOException;
 public final class ViewControllers {
 
     /**
-     * Defines the resource for the about view.
+     * Defines the resource for this view.
      */
     private static final String ABOUT_VIEW_RES = "/fxml/AboutView.fxml";
 
@@ -58,10 +58,10 @@ public final class ViewControllers {
      * Shows the about-view in a separate window.
      *
      * @param theme        the theme to be applied.
+     * @param icon         the icon to be used in the view
      * @param hostServices the host services to be aggregated.
-     * @return the controller for the view.
      */
-    static AboutViewController showAboutView(CSS.Theme theme, HostServices hostServices) {
+    public static void showAboutView(CSS.Theme theme, Image icon, HostServices hostServices) {
 
         if (hostServices == null) {
             throw new NullPointerException("Host services must not be null");
@@ -71,7 +71,6 @@ public final class ViewControllers {
         AboutViewController controller = new AboutViewController(theme, hostServices);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController.iconImage;
         final Stage aboutView = new Stage();
         aboutView.initModality(Modality.APPLICATION_MODAL);
         controller.setPrimaryStage(aboutView);
@@ -84,22 +83,20 @@ public final class ViewControllers {
         } catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
-
-        return controller;
     }
 
     /**
      * Shows the drop view in a separate window.
      *
      * @param theme the theme to be applied.
+     * @param icon  the icon to be used in the view
      * @return the controller for the view.
      */
-    static DropViewController showDropView(CSS.Theme theme) {
+    public static DropViewController showDropView(CSS.Theme theme, Image icon) {
         final FXMLLoader fxmlLoader = initFXMLLoader(DROP_VIEW_RES);
         DropViewController controller = new DropViewController(theme);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController.iconImage;
         final Stage dropView = new Stage();
         dropView.setAlwaysOnTop(true);
         dropView.initModality(Modality.APPLICATION_MODAL);
@@ -121,14 +118,13 @@ public final class ViewControllers {
      * Shows the hash view in a separate window.
      *
      * @param theme the theme to be applied.
-     * @return the controller for the view.
+     * @param icon  the icon to be used in the view
      */
-    static HashViewController showHashView(CSS.Theme theme) {
+    public static void showHashView(CSS.Theme theme, Image icon) {
         final FXMLLoader fxmlLoader = initFXMLLoader(HASH_VIEW_RES);
         HashViewController controller = new HashViewController(theme);
         fxmlLoader.setController(controller);
 
-        final Image icon = BaseController.iconImage;
         final Stage hashView = new Stage();
         hashView.setAlwaysOnTop(false);
         hashView.initModality(Modality.NONE);
@@ -155,8 +151,6 @@ public final class ViewControllers {
         } catch (IOException ex) {
             handleErrorLoadingView(ex, theme, icon);
         }
-
-        return controller;
     }
 
     /**
