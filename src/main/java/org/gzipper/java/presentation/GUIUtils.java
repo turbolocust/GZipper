@@ -66,9 +66,9 @@ public final class GUIUtils {
     }
 
     /**
-     * Auto fits the columns of the specified table to their content.
+     * Auto-fits the columns of the specified table to their content.
      *
-     * @param table the table of which the columns are to be auto fitted.
+     * @param table the table of which the columns are to be auto-fitted.
      */
     @SuppressWarnings("Convert2Lambda")
     public static void autoFitTable(TableView<?> table) {

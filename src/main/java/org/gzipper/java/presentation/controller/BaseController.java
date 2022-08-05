@@ -125,7 +125,7 @@ public abstract class BaseController implements Initializable {
      * @param enableTheme true to enable, false to disable the alternative theme.
      */
     protected void loadAlternativeTheme(boolean enableTheme) {
-        this.theme = enableTheme ? CSS.Theme.DARK_THEME : CSS.Theme.getDefault();
+        this.theme = enableTheme ? CSS.Theme.DARK_THEME : CSS.Theme.DEFAULT_THEME;
         _stages.forEach((stage) -> CSS.load(this.theme, stage.getScene()));
     }
 

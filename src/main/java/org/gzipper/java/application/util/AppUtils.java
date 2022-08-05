@@ -26,8 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 /**
- * Utility class that provides application-specific methods for e.g. receiving
- * resources from the resource path of a class.
+ * Utility class that provides application-specific methods for e.g. receiving resources from the class resource path.
  *
  * @author Matthias Fussenegger
  */
@@ -79,11 +78,15 @@ public final class AppUtils {
         String resource = null;
 
         final URL url = clazz.getResource(name);
+        if (url == null) return null;
+
         if (url.toString().startsWith("jar:")) {
 
             String tempName = name.substring(name.lastIndexOf('/') + 1);
+            var inputStream = clazz.getResourceAsStream(name);
+            if (inputStream == null) return null;
 
-            try (BufferedInputStream bis = new BufferedInputStream(clazz.getResourceAsStream(name))) {
+            try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
 
                 File file = File.createTempFile(tempName, ".tmp");
                 try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {

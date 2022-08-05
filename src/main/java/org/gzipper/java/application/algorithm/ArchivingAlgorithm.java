@@ -96,22 +96,20 @@ public abstract class ArchivingAlgorithm extends AbstractAlgorithm {
             while (!interrupt && entry != null) {
                 final String entryName = entry.getName();
                 if (filterPredicate.test(entryName)) { // check predicate first
-                    final String uniqueName = FileUtils.generateUniqueFilename(
-                            FileUtils.getPath(outputFolder), entryName);
+                    final String uniqueName = FileUtils
+                            .generateUniqueFilename(FileUtils.getPath(outputFolder), entryName);
                     final File newFile = new File(uniqueName);
                     // check if entry contains a directory
                     if (entryName.indexOf('/') > -1) {
                         if (!newFile.getParentFile().exists()) {
-                            // also create parent directories by calling "mkdirs"
-                            if (!newFile.getParentFile().mkdirs()) {
+                            if (!newFile.getParentFile().mkdirs()) { // "mkdirs" creates parent directories as well
                                 final String parentFilePath = FileUtils.getPath(newFile.getParentFile());
                                 Log.e(I18N.getString("errorCreatingDirectory.text", parentFilePath));
                                 throw new IOException(String.format("%s could not be created", parentFilePath));
                             }
                         }
                     }
-                    if (!entry.isDirectory()) {
-                        // create new output stream and write bytes to file
+                    if (!entry.isDirectory()) { // create new output stream and write bytes to file
                         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile))) {
                             final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
                             int readBytes;

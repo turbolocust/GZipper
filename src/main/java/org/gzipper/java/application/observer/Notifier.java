@@ -17,7 +17,7 @@
 package org.gzipper.java.application.observer;
 
 /**
- * Simple observable which supports generic types.
+ * Simple Observable which supports generic types.
  *
  * @param <T> type of the value.
  * @author Matthias Fussenegger
@@ -25,11 +25,9 @@ package org.gzipper.java.application.observer;
 public interface Notifier<T> {
 
     /**
-     * Each notifier should provide a unique identifier so it can be easier
-     * recognized by any listener.
+     * Each notifier should provide a unique identifier, so it can be easier recognized by any listener.
      * <p>
-     * This is mainly used to avoid recalculations using the {@code hashCode()}
-     * method, which provides a hash code for this object.
+     * This is mainly used to avoid recalculations using the {@link Object#hashCode()} method.
      *
      * @return the unique identifier of this instance.
      */
@@ -96,13 +94,11 @@ public interface Notifier<T> {
     void attach(Listener<T> listener);
 
     /**
-     * Detaches the specified listener.
+     * Detaches the specified listener. If the specified listener is not attached, then this is a no-op.
      *
      * @param listener the listener to be detached.
-     * @return true if listener was detached, false if listener had not been
-     * attached before.
      */
-    boolean detach(Listener<T> listener);
+    void detach(Listener<T> listener);
 
     /**
      * Removes all attached listeners.

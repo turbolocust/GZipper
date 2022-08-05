@@ -73,7 +73,7 @@ public final class AlgorithmProgress {
      * Updates the current progress and returns it. The progress is only updated
      * if it is less or equal {@code 100}.
      *
-     * @param readBytes the amount of bytes read so far.
+     * @param readBytes the amount of bytes that have been read so far.
      */
     void updateProgress(long readBytes) {
         _totalBytesRead += readBytes;

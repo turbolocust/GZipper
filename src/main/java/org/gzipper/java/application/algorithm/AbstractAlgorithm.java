@@ -28,9 +28,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Abstract class that offers generally used attributes and methods for
- * archiving algorithms. Any class that represents an archiving algorithm should
- * derive from this class.
+ * Abstract class that offers generally used attributes and methods for Archiving Algorithms.
+ * Any class that represents an archiving algorithm should derive from this class.
  *
  * @author Matthias Fussenegger
  */
@@ -85,10 +84,9 @@ public abstract class AbstractAlgorithm extends NotifierImpl<Integer> implements
     }
 
     /**
-     * Updates the progress of the current operation and notifies all attached
-     * listeners if the new progress using {@code Math.rint(double)} is greater
-     * than the previous one. This behavior may be changed by overriding this
-     * method.
+     * Updates the progress of the current operation and notifies all attached listeners if the new progress,
+     * which is determined via {@link Math#rint(double)}, is greater than the previous one. This behavior may
+     * be changed by overriding this method.
      *
      * @param readBytes the amount of bytes that have been read so far.
      */
