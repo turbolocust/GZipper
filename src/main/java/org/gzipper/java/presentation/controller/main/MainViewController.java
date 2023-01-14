@@ -727,8 +727,7 @@ public final class MainViewController extends BaseController {
         _enableLoggingCheckMenuItem.setSelected(enableLogging);
 
         _state = new CompressState(this); // the default one
-        final String formattedText = String.format("run:\n%s\n", I18N.getString("changeOutputPath.text"));
-        _textArea.setText(formattedText);
+        _textArea.setText("run:\n%s\n".formatted(I18N.getString("changeOutputPath.text")));
     }
 
     private void setRecentlyUsedPathInOutputPathTextField(Settings settings) {

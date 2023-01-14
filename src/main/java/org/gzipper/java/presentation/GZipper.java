@@ -181,21 +181,20 @@ public final class GZipper extends Application {
         final CSS.Theme theme = enableDarkTheme ? CSS.Theme.DARK_THEME : CSS.Theme.MODENA;
 
         var params = getParameters().getNamed(); // is never null
-        String launchMode = params.get(LAUNCH_MODE_PARAM_NAME);
+        var launchMode = params.get(LAUNCH_MODE_PARAM_NAME);
         if (launchMode == null) launchMode = LAUNCH_MODE_APPLICATION;
 
         Parent parent = switch (launchMode) {
             case LAUNCH_MODE_APPLICATION -> loadMainView(stage, theme);
             case LAUNCH_MODE_HASH_VIEW -> loadHashView(stage, theme);
-            default -> throw new IllegalArgumentException(String.format(
-                    "Value of parameter '%s' is unknown", LAUNCH_MODE_PARAM_NAME));
+            default -> throw new IllegalArgumentException(
+                    "Value of parameter '%s' is unknown".formatted(LAUNCH_MODE_PARAM_NAME));
         };
 
         // load parent to initialize scene
         Scene scene = new Scene(parent);
         BaseController.getStages().add(stage);
 
-        // load CSS theme
         CSS.load(theme, scene);
 
         stage.setTitle("GZipper");

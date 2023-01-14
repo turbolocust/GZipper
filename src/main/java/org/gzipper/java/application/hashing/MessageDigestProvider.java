@@ -49,15 +49,6 @@ public class MessageDigestProvider {
     }
 
     /**
-     * Returns the algorithm name of the aggregated {@link MessageDigest}.
-     *
-     * @return the algorithm name of the aggregated {@link MessageDigest}.
-     */
-    public String getAlgorithmName() {
-        return _messageDigest.getAlgorithm();
-    }
-
-    /**
      * Computes a hash from the current state of the digest of the aggregated
      * {@link MessageDigest} and returns the result wrapped in
      * {@link MessageDigestResult} together with its hexadecimal representation.
@@ -102,18 +93,10 @@ public class MessageDigestProvider {
         _messageDigest.update(bytes, offset, length);
     }
 
-    /**
-     * Resets the aggregated {@link MessageDigest} for further use.
-     */
-    public void reset() {
-        _messageDigest.reset();
-    }
-
     private static String convertToHex(byte[] bytes) {
         final StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
-            String formatted = String.format("%02X", b);
-            sb.append(formatted);
+            sb.append("%02X".formatted(b));
         }
         return sb.toString();
     }
