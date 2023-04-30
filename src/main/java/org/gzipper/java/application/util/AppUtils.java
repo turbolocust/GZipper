@@ -54,6 +54,22 @@ public final class AppUtils {
         return version;
     }
 
+    private static String createTemporaryFile(BufferedInputStream bis, String tempName) throws IOException {
+        final File file = File.createTempFile(tempName, ".tmp");
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+
+            int readBytes;
+            byte[] bytes = new byte[1024];
+
+            while ((readBytes = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, readBytes);
+            }
+        }
+
+        file.deleteOnExit();
+        return file.getPath();
+    }
+
     /**
      * Determines the current Java version and returns the major version of Java
      * as string. For e.g. Java 8, this would return {@code 1.8}.
@@ -74,31 +90,26 @@ public final class AppUtils {
      * @return the resource path of the specified class.
      * @throws URISyntaxException if URL conversion failed.
      */
-    public static String getResource(Class<?> clazz, String name) throws URISyntaxException {
+    public static String getResource(Class<?> clazz, String name) throws URISyntaxException, FileNotFoundException {
 
         String resource = null;
-
         final URL url = clazz.getResource(name);
+
+        if (url == null) {
+            throw new FileNotFoundException("Resource not found: " + name);
+        }
+
         if (url.toString().startsWith("jar:")) {
 
             String tempName = name.substring(name.lastIndexOf('/') + 1);
+            var resourceStream = clazz.getResourceAsStream(name);
 
-            try (BufferedInputStream bis = new BufferedInputStream(clazz.getResourceAsStream(name))) {
+            if (resourceStream == null) {
+                throw new FileNotFoundException("Resource not found: " + name);
+            }
 
-                File file = File.createTempFile(tempName, ".tmp");
-                try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
-
-                    int readBytes;
-                    byte[] bytes = new byte[1024];
-
-                    while ((readBytes = bis.read(bytes)) != -1) {
-                        bos.write(bytes, 0, readBytes);
-                    }
-                }
-
-                resource = file.getPath();
-                file.deleteOnExit();
-
+            try (BufferedInputStream bis = new BufferedInputStream(resourceStream)) {
+                resource = createTemporaryFile(bis, tempName);
             } catch (IOException ex) {
                 Log.e(ex.getLocalizedMessage(), ex);
             }

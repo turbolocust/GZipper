@@ -31,6 +31,7 @@ import org.gzipper.java.presentation.GZipper;
 import org.gzipper.java.util.Log;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -112,6 +113,8 @@ public final class AboutViewController extends BaseController {
             } catch (URISyntaxException ex) {
                 Log.e(I18N.getString("error.text"), ex);
                 imgRes = AppUtils.getDecodedRootPath(getClass()) + IMG_NAME;
+            } catch (FileNotFoundException ex) {
+                Log.e(I18N.getString("error.text"), ex);
             } finally {
                 if (imgRes != null) {
                     _imageFile = new File(imgRes);

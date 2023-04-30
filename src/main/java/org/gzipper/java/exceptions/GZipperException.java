@@ -16,6 +16,8 @@
  */
 package org.gzipper.java.exceptions;
 
+import java.io.Serial;
+
 /**
  * Class to handle application specific errors.
  *
@@ -23,16 +25,10 @@ package org.gzipper.java.exceptions;
  */
 public class GZipperException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 5822293002523982761L;
 
     private Reason _reason = Reason.UNKNOWN;
-
-    /**
-     * Delegates exception to its super class {@link Exception}.
-     */
-    public GZipperException() {
-        super();
-    }
 
     /**
      * Delegates error message to its super class {@link Exception}.
@@ -53,28 +49,6 @@ public class GZipperException extends Exception {
     }
 
     /**
-     * Delegates error message and cause to its super class {@link Exception}.
-     *
-     * @param errorMessage the specified error message.
-     * @param cause        the cause of this exception.
-     */
-    public GZipperException(String errorMessage, Throwable cause) {
-        super(errorMessage, cause);
-    }
-
-    /**
-     * Creates a new {@link GZipperException} including a reason.
-     *
-     * @param reason the reason of this exception.
-     * @return a new instance of {@link GZipperException}.
-     */
-    public static GZipperException createWithReason(Reason reason) {
-        GZipperException ex = new GZipperException();
-        ex.setReason(reason);
-        return ex;
-    }
-
-    /**
      * Creates a new {@link GZipperException} including a reason.
      *
      * @param reason the reason of this exception.
@@ -83,33 +57,6 @@ public class GZipperException extends Exception {
      */
     public static GZipperException createWithReason(Reason reason, String msg) {
         GZipperException ex = new GZipperException(msg);
-        ex.setReason(reason);
-        return ex;
-    }
-
-    /**
-     * Creates a new {@link GZipperException} including a reason.
-     *
-     * @param reason the reason of this exception.
-     * @param cause  the cause of this exception.
-     * @return a new instance of {@link GZipperException}.
-     */
-    public static GZipperException createWithReason(Reason reason, Throwable cause) {
-        GZipperException ex = new GZipperException(cause);
-        ex.setReason(reason);
-        return ex;
-    }
-
-    /**
-     * Creates a new {@link GZipperException} including a reason.
-     *
-     * @param reason the reason of this exception.
-     * @param msg    the specified error message.
-     * @param cause  the cause of this exception.
-     * @return a new instance of {@link GZipperException}.
-     */
-    public static GZipperException createWithReason(Reason reason, String msg, Throwable cause) {
-        GZipperException ex = new GZipperException(msg, cause);
         ex.setReason(reason);
         return ex;
     }

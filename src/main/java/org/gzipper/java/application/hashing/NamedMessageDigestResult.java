@@ -43,15 +43,6 @@ public final class NamedMessageDigestResult {
         return _messageDigestResult;
     }
 
-    /**
-     * Returns the name that was set to this instance.
-     *
-     * @return the name that was set to this instance.
-     */
-    public String getName() {
-        return _name;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;

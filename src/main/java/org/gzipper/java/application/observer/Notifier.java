@@ -99,10 +99,8 @@ public interface Notifier<T> {
      * Detaches the specified listener.
      *
      * @param listener the listener to be detached.
-     * @return true if listener was detached, false if listener had not been
-     * attached before.
      */
-    boolean detach(Listener<T> listener);
+    void detach(Listener<T> listener);
 
     /**
      * Removes all attached listeners.

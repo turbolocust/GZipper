@@ -93,8 +93,8 @@ public class NotifierImpl<T> implements Notifier<T> {
     }
 
     @Override
-    public final boolean detach(Listener<T> listener) {
-        return _listeners.remove(listener);
+    public final void detach(Listener<T> listener) {
+        _listeners.remove(listener);
     }
 
     @Override

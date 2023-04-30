@@ -17,6 +17,7 @@
 package org.gzipper.java.presentation;
 
 import javafx.scene.Scene;
+import org.gzipper.java.util.Log;
 
 import java.util.List;
 
@@ -45,8 +46,15 @@ public final class CSS {
     public static void load(Theme theme, Scene scene) {
         List<String> stylesheets = scene.getStylesheets();
         stylesheets.clear();
+
         if (theme != Theme.getDefault()) {
-            stylesheets.add(CSS.class.getResource(theme.getLocation()).toExternalForm());
+            var resource = CSS.class.getResource(theme.getLocation());
+
+            if (resource != null) {
+                stylesheets.add(resource.toExternalForm());
+            } else {
+                Log.w("Could not load theme: " + theme.getLocation(), true);
+            }
         }
     }
 
