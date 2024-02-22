@@ -52,7 +52,7 @@ public class Gzip extends CompressorAlgorithm {
         params.setModificationTime(System.currentTimeMillis());
 
         if (filename != null && !FileUtils.normalize(filename).contains("/")) {
-            params.setFilename(filename);
+            params.setFileName(filename);
         }
 
         return params;
@@ -62,7 +62,7 @@ public class Gzip extends CompressorAlgorithm {
     protected CompressorInputStream makeCompressorInputStream(
             InputStream stream, CompressorOptions options) throws IOException {
         GzipCompressorInputStream gcis = new GzipCompressorInputStream(stream);
-        options.setName(gcis.getMetaData().getFilename());
+        options.setName(gcis.getMetaData().getFileName());
         return gcis;
     }
 
