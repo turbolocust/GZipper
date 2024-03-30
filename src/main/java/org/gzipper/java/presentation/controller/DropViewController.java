@@ -47,6 +47,11 @@ public final class DropViewController extends BaseController {
      */
     private final Set<String> _addresses;
 
+    /**
+     * If true, then {@link #_putIntoSeparateArchivesCheckBox} is enabled initially.
+     */
+    private final boolean _enablePutIntoSeparateArchivesCheckBox;
+
     @FXML
     private TextArea _textArea;
     @FXML
@@ -63,11 +68,14 @@ public final class DropViewController extends BaseController {
     /**
      * Constructs a controller for Drop View with the specified CSS theme.
      *
-     * @param theme the {@link CSS} theme to be applied.
+     * @param theme                                 the {@link CSS} theme to be applied.
+     * @param enablePutIntoSeparateArchivesCheckBox true to enable the checkbox which tells
+     *                                              to put selected files into separate archives.
      */
-    public DropViewController(CSS.Theme theme) {
+    public DropViewController(CSS.Theme theme, boolean enablePutIntoSeparateArchivesCheckBox) {
         super(theme);
         _addresses = new LinkedHashSet<>();
+        _enablePutIntoSeparateArchivesCheckBox = enablePutIntoSeparateArchivesCheckBox;
     }
 
     @FXML
@@ -82,12 +90,9 @@ public final class DropViewController extends BaseController {
         if (evt.getSource().equals(_submitButton)) {
             final String text = _textArea.getText();
             if (!text.isEmpty()) {
-                // tokenize file paths
-                final StringTokenizer tokenizer
-                        = new StringTokenizer(text, "\"\n");
-                while (tokenizer.hasMoreTokens()) {
-                    String token = tokenizer.nextToken();
-                    // only add token if it's a valid file or directory
+                final var filePathsTokenizer = new StringTokenizer(text, "\"\n");
+                while (filePathsTokenizer.hasMoreTokens()) {
+                    String token = filePathsTokenizer.nextToken();
                     if (FileUtils.isValid(token)) {
                         _addresses.add(token);
                     }
@@ -145,5 +150,6 @@ public final class DropViewController extends BaseController {
     public void initialize(URL location, ResourceBundle resources) {
         _titleText.setFont(Font.font("System", FontWeight.BOLD, -1));
         _appendAddressesCheckBox.setTooltip(new Tooltip(I18N.getString("appendAddressesTooltip.text")));
+        _putIntoSeparateArchivesCheckBox.setSelected(_enablePutIntoSeparateArchivesCheckBox);
     }
 }
