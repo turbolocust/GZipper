@@ -174,6 +174,8 @@ public final class MainViewController extends BaseController {
     @FXML
     private MenuItem _addManyFilesMenuItem;
     @FXML
+    private MenuItem _addManyFilesSeparateArchiveMenuItem;
+    @FXML
     private MenuItem _hashingMenuItem;
     @FXML
     private MenuItem _resetAppMenuItem;
@@ -294,26 +296,18 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final DropViewController dropViewController = ViewControllers.showDropView(theme, iconImage);
-            final List<String> filePaths = dropViewController.getAddresses();
-            if (!ListUtils.isNullOrEmpty(filePaths)) {
-                _putFilesIntoSeparateArchives = dropViewController.isPutInSeparateArchives();
-                final int size = filePaths.size();
-                _selectedFiles = new ArrayList<>(size);
-                _startButton.setDisable(false);
-                if (size > 10) { // threshold, to avoid flooding text area
-                    filePaths.forEach((filePath) -> _selectedFiles.add(new File(filePath)));
-                    Log.i(I18N.getString("manyFilesSelected.text"), true, size);
-                } else { // log files in detail
-                    filePaths.stream()
-                            .peek((filePath) -> _selectedFiles.add(new File(filePath)))
-                            .forEachOrdered((filePath) -> Log.i("{0}: {1}",
-                                    true, I18N.getString("fileSelected.text"), filePath));
-                }
-            } else {
-                Log.i(I18N.getString("noFilesSelected.text"), true);
-                _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
-            }
+            final var dropViewController = ViewControllers.showDropView(theme, iconImage);
+            performShowDropViewPostAction(dropViewController);
+        }
+    }
+
+    @FXML
+    void handleAddManyFilesSeparateArchiveMenuItemAction(ActionEvent evt) {
+        if (evt.getSource().equals(_addManyFilesSeparateArchiveMenuItem)) {
+            final boolean preSelectUiElementsForPuttingFilesIntoSeparateArchives = true;
+            final var dropViewController = ViewControllers.showDropView(
+                    theme, iconImage, preSelectUiElementsForPuttingFilesIntoSeparateArchives);
+            performShowDropViewPostAction(dropViewController);
         }
     }
 
@@ -527,6 +521,28 @@ public final class MainViewController extends BaseController {
         }
     }
 
+    private void performShowDropViewPostAction(DropViewController dropViewController) {
+        final var filePaths = dropViewController.getAddresses();
+        if (!ListUtils.isNullOrEmpty(filePaths)) {
+            _putFilesIntoSeparateArchives = dropViewController.isPutInSeparateArchives();
+            final int size = filePaths.size();
+            _selectedFiles = new ArrayList<>(size);
+            _startButton.setDisable(false);
+            if (size > 10) { // threshold, to avoid flooding text area
+                filePaths.forEach((filePath) -> _selectedFiles.add(new File(filePath)));
+                Log.i(I18N.getString("manyFilesSelected.text"), true, size);
+            } else { // log files in detail
+                filePaths.stream()
+                        .peek((filePath) -> _selectedFiles.add(new File(filePath)))
+                        .forEachOrdered((filePath) -> Log.i("{0}: {1}",
+                                true, I18N.getString("fileSelected.text"), filePath));
+            }
+        } else {
+            Log.i(I18N.getString("noFilesSelected.text"), true);
+            _startButton.setDisable(ListUtils.isNullOrEmpty(_selectedFiles));
+        }
+    }
+
     private void resetFilter() {
         final boolean wasApplied = _state.getFilterPredicate() != null;
         _state.setFilterPredicate(null);
@@ -580,6 +596,7 @@ public final class MainViewController extends BaseController {
         _saveAsButton.disableProperty().bind(runningProperty);
         _selectFilesButton.disableProperty().bind(runningProperty);
         _addManyFilesMenuItem.disableProperty().bind(runningProperty);
+        _addManyFilesSeparateArchiveMenuItem.disableProperty().bind(runningProperty);
         _progressBar.visibleProperty().bind(runningProperty);
         _progressText.visibleProperty().bind(runningProperty);
     }
@@ -596,6 +613,7 @@ public final class MainViewController extends BaseController {
         _selectFilesButton.disableProperty().unbind();
         _saveAsButton.disableProperty().unbind();
         _addManyFilesMenuItem.disableProperty().unbind();
+        _addManyFilesSeparateArchiveMenuItem.disableProperty().unbind();
         _progressBar.visibleProperty().unbind();
         _progressText.visibleProperty().unbind();
     }
