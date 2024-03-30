@@ -145,7 +145,14 @@
             <!-- commons-compress -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.24.0</version>
+            <version>1.26.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <!-- commons-codec -->
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.16.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
