@@ -39,6 +39,7 @@ import org.gzipper.java.presentation.TaskGroup;
 import org.gzipper.java.presentation.controller.BaseController;
 import org.gzipper.java.presentation.controller.DropViewController;
 import org.gzipper.java.presentation.controller.ViewControllers;
+import org.gzipper.java.presentation.controller.ViewControllersOptions;
 import org.gzipper.java.presentation.handler.TextAreaHandler;
 import org.gzipper.java.util.Log;
 import org.gzipper.java.util.Settings;
@@ -296,7 +297,14 @@ public final class MainViewController extends BaseController {
     @FXML
     void handleAddManyFilesMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesMenuItem)) {
-            final var dropViewController = ViewControllers.showDropView(theme, iconImage);
+            final boolean preSelectUiElementsForPuttingFilesIntoSeparateArchives = false;
+            final boolean disableUiElementsForPuttingFilesIntoSeparateArchives = _decompressRadioButton.isSelected();
+
+            final var options = new ViewControllersOptions.DropViewOptions(
+                    preSelectUiElementsForPuttingFilesIntoSeparateArchives,
+                    disableUiElementsForPuttingFilesIntoSeparateArchives);
+
+            final var dropViewController = ViewControllers.showDropView(theme, iconImage, options);
             performShowDropViewPostAction(dropViewController);
         }
     }
@@ -305,8 +313,13 @@ public final class MainViewController extends BaseController {
     void handleAddManyFilesSeparateArchiveMenuItemAction(ActionEvent evt) {
         if (evt.getSource().equals(_addManyFilesSeparateArchiveMenuItem)) {
             final boolean preSelectUiElementsForPuttingFilesIntoSeparateArchives = true;
-            final var dropViewController = ViewControllers.showDropView(
-                    theme, iconImage, preSelectUiElementsForPuttingFilesIntoSeparateArchives);
+            final boolean disableUiElementsForPuttingFilesIntoSeparateArchives = false;
+
+            final var options = new ViewControllersOptions.DropViewOptions(
+                    preSelectUiElementsForPuttingFilesIntoSeparateArchives,
+                    disableUiElementsForPuttingFilesIntoSeparateArchives);
+
+            final var dropViewController = ViewControllers.showDropView(theme, iconImage, options);
             performShowDropViewPostAction(dropViewController);
         }
     }
@@ -505,6 +518,7 @@ public final class MainViewController extends BaseController {
 
     private void performModeRadioButtonAction(boolean compress, String selectFilesButtonText, String saveAsButtonText) {
         _state = compress ? new CompressState(this) : new DecompressState(this);
+        _addManyFilesSeparateArchiveMenuItem.setDisable(!compress);
         _selectFilesButton.setText(I18N.getString(selectFilesButtonText));
         _saveAsButton.setText(I18N.getString(saveAsButtonText));
     }
@@ -596,9 +610,9 @@ public final class MainViewController extends BaseController {
         _saveAsButton.disableProperty().bind(runningProperty);
         _selectFilesButton.disableProperty().bind(runningProperty);
         _addManyFilesMenuItem.disableProperty().bind(runningProperty);
-        _addManyFilesSeparateArchiveMenuItem.disableProperty().bind(runningProperty);
         _progressBar.visibleProperty().bind(runningProperty);
         _progressText.visibleProperty().bind(runningProperty);
+        _addManyFilesSeparateArchiveMenuItem.setDisable(true);
     }
 
     /**
@@ -614,6 +628,7 @@ public final class MainViewController extends BaseController {
         _saveAsButton.disableProperty().unbind();
         _addManyFilesMenuItem.disableProperty().unbind();
         _addManyFilesSeparateArchiveMenuItem.disableProperty().unbind();
+        _addManyFilesSeparateArchiveMenuItem.setDisable(_decompressRadioButton.isSelected());
         _progressBar.visibleProperty().unbind();
         _progressText.visibleProperty().unbind();
     }
