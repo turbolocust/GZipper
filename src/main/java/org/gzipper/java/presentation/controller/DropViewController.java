@@ -48,9 +48,9 @@ public final class DropViewController extends BaseController {
     private final Set<String> _addresses;
 
     /**
-     * If true, then {@link #_putIntoSeparateArchivesCheckBox} is enabled initially.
+     * Options to customize the set-up of this DropView.
      */
-    private final boolean _enablePutIntoSeparateArchivesCheckBox;
+    private final ViewControllersOptions.DropViewOptions _options;
 
     @FXML
     private TextArea _textArea;
@@ -68,14 +68,13 @@ public final class DropViewController extends BaseController {
     /**
      * Constructs a controller for Drop View with the specified CSS theme.
      *
-     * @param theme                                 the {@link CSS} theme to be applied.
-     * @param enablePutIntoSeparateArchivesCheckBox true to enable the checkbox which tells
-     *                                              to put selected files into separate archives.
+     * @param theme   the {@link CSS} theme to be applied.
+     * @param options used to customize the set-up of the DropView.
      */
-    public DropViewController(CSS.Theme theme, boolean enablePutIntoSeparateArchivesCheckBox) {
+    public DropViewController(CSS.Theme theme, ViewControllersOptions.DropViewOptions options) {
         super(theme);
         _addresses = new LinkedHashSet<>();
-        _enablePutIntoSeparateArchivesCheckBox = enablePutIntoSeparateArchivesCheckBox;
+        _options = options;
     }
 
     @FXML
@@ -150,6 +149,7 @@ public final class DropViewController extends BaseController {
     public void initialize(URL location, ResourceBundle resources) {
         _titleText.setFont(Font.font("System", FontWeight.BOLD, -1));
         _appendAddressesCheckBox.setTooltip(new Tooltip(I18N.getString("appendAddressesTooltip.text")));
-        _putIntoSeparateArchivesCheckBox.setSelected(_enablePutIntoSeparateArchivesCheckBox);
+        _putIntoSeparateArchivesCheckBox.setSelected(_options.getPreSelectUiElementsForPuttingFilesIntoSeparateArchives());
+        _putIntoSeparateArchivesCheckBox.setVisible(!_options.getDisableUiElementsForPuttingFilesIntoSeparateArchives());
     }
 }

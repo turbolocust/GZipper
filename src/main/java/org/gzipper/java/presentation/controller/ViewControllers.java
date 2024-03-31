@@ -88,29 +88,16 @@ public final class ViewControllers {
     /**
      * Shows the drop view in a separate window.
      *
-     * @param theme the theme to be applied.
-     * @param icon  the icon to be used in the view
-     * @return the controller for the view.
-     */
-    public static DropViewController showDropView(CSS.Theme theme, Image icon) {
-        final boolean preSelectPutIntoSeparateArchivesElements = false;
-        return showDropView(theme, icon, preSelectPutIntoSeparateArchivesElements);
-    }
-
-    /**
-     * Shows the drop view in a separate window.
-     *
-     * @param theme                                                  the theme to be applied.
-     * @param icon                                                   the icon to be used in the view
-     * @param preSelectUiElementsForPuttingFilesIntoSeparateArchives true to pre-select UI elements, which allow to
-     *                                                               put selected files into separate archives.
+     * @param theme   the theme to be applied.
+     * @param icon    the icon to be used in the view
+     * @param options used to customize the set-up of the DropView.
      * @return the controller for the view.
      */
     public static DropViewController showDropView(CSS.Theme theme, Image icon,
-                                                  boolean preSelectUiElementsForPuttingFilesIntoSeparateArchives) {
+                                                  ViewControllersOptions.DropViewOptions options) {
 
         final FXMLLoader fxmlLoader = initFXMLLoader(DROP_VIEW_RES);
-        var controller = new DropViewController(theme, preSelectUiElementsForPuttingFilesIntoSeparateArchives);
+        var controller = new DropViewController(theme, options);
         fxmlLoader.setController(controller);
 
         final Stage dropView = new Stage();
