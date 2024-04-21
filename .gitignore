@@ -4,6 +4,7 @@ nbproject/
 nbactions.xml
 nb-configuration.xml
 GZipper.iml
+.DS_Store
 
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,netbeans,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,netbeans,eclipse
