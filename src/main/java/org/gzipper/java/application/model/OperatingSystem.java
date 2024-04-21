@@ -40,6 +40,23 @@ public class OperatingSystem {
     }
 
     /**
+     * Creates a new instance of {@link OperatingSystem} by parsing the specified name of an operating system.
+     *
+     * @param osName the name of the operating system.
+     * @return a new instance of {@link OperatingSystem}.
+     */
+    public static OperatingSystem create(String osName) {
+        osName = osName.toLowerCase();
+        if (osName.contains("windows")) {
+            return new OperatingSystem(OS.WINDOWS);
+        } else if (osName.contains("mac")) {
+            return new OperatingSystem(OS.MAC);
+        } else {
+            return new OperatingSystem(OS.UNIX);
+        }
+    }
+
+    /**
      * Returns the default user directory of the system.
      *
      * @return the default user directory as string.
@@ -55,5 +72,10 @@ public class OperatingSystem {
      */
     public OS getOsInfo() {
         return _operatingSystem;
+    }
+
+    @Override
+    public String toString() {
+        return _operatingSystem.toString();
     }
 }

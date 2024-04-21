@@ -67,12 +67,8 @@ public final class GZipper extends Application {
             }
         }
 
-        // determine operating system and initialize settings class
-        OperatingSystem os = System.getProperty("os.name")
-                .toLowerCase().startsWith("windows")
-                ? new OperatingSystem(OS.WINDOWS)
-                : new OperatingSystem(OS.UNIX);
-
+        var os = OperatingSystem.create(System.getProperty("os.name"));
+        Log.i("Determined operating system: " + os, false);
         Settings.getInstance().init(settings, os);
     }
 

@@ -25,7 +25,7 @@ import org.apache.commons.compress.compressors.gzip.GzipParameters;
  */
 public enum OS {
 
-    UNIX("Unix", 3), WINDOWS("Windows", 11);
+    UNIX("Unix", 3), WINDOWS("Windows", 11), MAC("MacOS", 7);
 
     /**
      * The name of the operating system.
