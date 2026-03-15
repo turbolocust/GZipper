@@ -16,8 +16,7 @@
  */
 package org.gzipper.java.application;
 
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.CompressException;
 import org.gzipper.java.application.algorithm.CompressionAlgorithm;
 import org.gzipper.java.application.concurrency.Interruptible;
 import org.gzipper.java.application.observer.Listener;
@@ -87,8 +86,7 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         }
     }
 
-    private void performOperation() throws IOException,
-            ArchiveException, CompressorException, GZipperException {
+    private void performOperation() throws IOException, GZipperException {
 
         Log.i(I18N.getString("processingArchiveFile.text"), _archiveInfo.getArchiveName(), true);
 
@@ -139,6 +137,9 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
         try {
             performOperation();
             success = true;
+        } catch (CompressException ex) {
+            Log.e(ex.getLocalizedMessage(), ex);
+            Log.w(I18N.getString("wrongFormat.text"), true);
         } catch (IOException ex) {
             if (!_interrupt) {
                 final Throwable cause = ex.getCause();
@@ -150,9 +151,6 @@ public final class ArchiveOperation implements Callable<Boolean>, Interruptible 
                 Log.e(ex.getLocalizedMessage(), ex);
                 Log.w(I18N.getString("corruptArchive.text"), true);
             }
-        } catch (CompressorException | ArchiveException ex) {
-            Log.e(ex.getLocalizedMessage(), ex);
-            Log.w(I18N.getString("wrongFormat.text"), true);
         } finally {
             setElapsedTime();
             _completed = true;
